@@ -1,0 +1,39 @@
+@import url("assets/css/style.css");
+@import url("assets/css/bootstrap.min.css");
+/* Add this CSS to your stylesheet */
+.Category figure {
+  position: relative;
+  cursor: pointer;
+  display: inline-block;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+}
+
+/* .Category img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  transition: opacity 0.3s ease;
+} */
+
+.Category figure:hover img {
+  opacity: 0.7; /* Dim the image when hovering to indicate it's clickable */
+}
+
+.file-list {
+  border: 2px dashed #ccc;
+  padding: 10px;
+  min-height: 100px;
+  list-style: none;
+  margin: 0;
+}
+
+.file-item {
+  padding: 8px;
+  border: 1px solid #ddd;
+  margin-bottom: 4px;
+  background-color: #f9f9f9;
+  cursor: move;
+}
