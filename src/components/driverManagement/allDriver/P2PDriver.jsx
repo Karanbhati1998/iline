@@ -194,16 +194,16 @@ const P2PDriver = () => {
                     <td>{res?.phoneNumber}</td>
                     <td>V-123</td>
                     <td>{res?.vehicleNumber}</td>
-                    <td>200</td>
+                    <td>0</td>
                     <td>
                       <span className={res?.is_online ? "Green" : "Red"}>
                         {res?.is_online ? "Online" : "Offline"}
                       </span>{" "}
                     </td>
                     <td>{moment(res?.createdAt).format("DD-MM-YYYY")}</td>
-                    <td>12</td>
-                    <td>34</td>
-                    <td>100</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
                     <td>
                       <span
                         className={

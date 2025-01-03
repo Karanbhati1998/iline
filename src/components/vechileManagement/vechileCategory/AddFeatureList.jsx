@@ -1,21 +1,29 @@
 import React, { useEffect, useRef, useState } from 'react'
 import BackButton from '../../BackButton';
 import { toastService } from '../../../utils/toastify';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { imageUpload } from '../../../features/slices/imageUpload';
 import LoaderForImage from '../../LoaderForImage';
-import { addFeature } from '../../../features/slices/vechileManagement/vechileCategory';
+import { addFeature, getFeaturesList } from '../../../features/slices/vechileManagement/vechileCategory';
 import { useLocation } from 'react-router-dom';
+import CommonPagination from '../../CommonPagination';
 const initialState = {
   name: "",
   icon: "",
   categoryId:"",
   errors: {},
   imageLoader: false,
+  page:1
 };
 const AddFeatureList = () => {
   const [iState, setUpdateState] = useState(initialState);
   const dispatch = useDispatch();
+  const { name, icon, categoryId, errors, imageLoader,page } = iState;
+  const { VechileFeatures } = useSelector((state) => {
+    return state?.vechileCategory;
+  });
+  console.log({ VechileFeatures });
+  
   const {state}=useLocation()
   const fileInputRef = useRef(null);
   useEffect(()=>{
@@ -24,7 +32,9 @@ const AddFeatureList = () => {
       categoryId:state,
     }))
   },[])
-  const { name, icon, categoryId, errors, imageLoader } = iState;
+      useEffect(() => {
+        dispatch(getFeaturesList({ categoryId: state, page }));
+      }, [page, state]);
   const handleEditClick = () => {
     if (fileInputRef.current) {
       fileInputRef.current.click();
@@ -112,6 +122,13 @@ const AddFeatureList = () => {
         })
       }
     }
+    useEffect(()=>{
+      dispatch(getFeaturesList({ categoryId: state,page }));
+
+    },[page])
+     const handlePageChange = (page) => {
+       setUpdateState({ ...iState, page });
+     };
   return (
     <div className="WrapperArea">
       <div className="WrapperBox">
@@ -216,7 +233,7 @@ const AddFeatureList = () => {
                 </div>
               </div>
             </div>
-            <div className="row">
+            {/* <div className="row">
               <div className="col-sm-4">
                 <h4>Features </h4>
               </div>
@@ -226,9 +243,9 @@ const AddFeatureList = () => {
               <div className="col-sm-4">
                 <h4>Action</h4>
               </div>
-            </div>
+            </div> */}
           </div>
-          <div className="row">
+          {/* <div className="row">
             <div className="col-sm-4">
               <div className="form-group">
                 <label>Feature </label>
@@ -290,6 +307,71 @@ const AddFeatureList = () => {
                   </a>
                 </div>
               </div>
+            </div>
+          </div> */}
+          <div className="TableList">
+            <table>
+              <thead>
+                <tr>
+                  <th>S.No.</th>
+                  <th>Features</th>
+                  <th>Features icon</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {VechileFeatures?.result?.[0]?.paginationData?.map((res, i) => {
+                  return (
+                    <tr>
+                      <td>{i + 1 + (page - 1) * 10}</td>
+                      <td> {res?.name}</td>
+
+                      <td>
+                        <figure>
+                          <img src={res?.icon} />
+                        </figure>
+                      </td>
+
+                      <td>
+                        <div className="Actions">
+                          <a className="Blue" href="">
+                            <i className="fa fa-pencil" aria-hidden="true" />
+                          </a>
+                          <a className="Red" href="">
+                            <i className="fa fa-trash" aria-hidden="true" />
+                          </a>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+          <div className="PaginationBox">
+            <div className="PaginationLeft">
+              <p>
+                Total Records :{" "}
+                <span>
+                  {VechileFeatures?.result?.[0]?.totalCount?.[0]?.count || 0}
+                </span>
+              </p>
+            </div>
+
+            <div className="PaginationRight">
+              {VechileFeatures?.result?.[0]?.totalCount?.[0]?.count > 0 && (
+                <CommonPagination
+                  activePage={page}
+                  itemsCountPerPage={10}
+                  totalItemsCount={
+                    VechileFeatures?.result?.[0]?.totalCount?.[0]?.count || 0
+                  }
+                  pageRangeDisplayed={4}
+                  onChange={handlePageChange}
+                  itemClass="page-item"
+                  linkClass="page-link"
+                />
+              )}
             </div>
           </div>
         </div>

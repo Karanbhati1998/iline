@@ -39,7 +39,7 @@ const VechileStatus = () => {
           <div className="commenone">
             <div className="CommonTabs">
               <div className="TitleBox">
-                <h4 className="Title">Pending For Approvalsss </h4>
+                <h4 className="Title">Pending For Approval </h4>
               </div>
             </div>
             <BackButton />
@@ -51,13 +51,24 @@ const VechileStatus = () => {
                   <div className="RiderHead">
                     <figure>
                       <img
-                        src={require("../../../assets/images/Avatar-1.png")}
+                        src={state?.profilePic || require(
+                          "../../../assets/images/Avatar-1.png"
+                        )}
+                        style={{
+                          borderRadius: "50%",
+                          width: "50px",
+                          height: "50px",
+                          objectFit: "cover",
+                          marginLeft: "auto",
+                          marginRight: "auto",
+                          marginBottom: "10px"
+                        }}
                       />
                     </figure>
                     <figcaption>
                       <div>
                         <h3>
-                          John Smith{" "}
+                          {state?.fullName}{" "}
                           <span>
                             <i className="fa fa-star" aria-hidden="true" /> 4.5{" "}
                           </span>
@@ -89,15 +100,15 @@ const VechileStatus = () => {
                         </p>
                         <p>
                           <label>Driver Email ID </label>{" "}
-                          <span> john@gmail.com</span>
+                          <span> {state?.email}</span>
                         </p>
                       </aside>
                       <aside>
                         <p>
-                          <label>Location</label> <span>Agra,UP</span>
+                          <label>Location</label> <span>-</span>
                         </p>
                         <p>
-                          <label>Gender</label> <span>Male</span>
+                          <label>Gender</label> <span>{state?.gender}</span>
                         </p>
                         <p>
                           <label>Registered On</label>{" "}
@@ -106,7 +117,8 @@ const VechileStatus = () => {
                           </span>
                         </p>
                         <p>
-                          <label>DOB</label> <span>12-03-2023</span>
+                          <label>DOB</label>{" "}
+                          <span>{moment(state?.dob).format("DD-MM-YYYY")}</span>
                         </p>
                       </aside>
                     </div>

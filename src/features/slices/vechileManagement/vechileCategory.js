@@ -3,6 +3,7 @@ import axiosInstance from "../../axiosInstance";
 const initialState = {
   VechileCategories: [],
   VechileFeatures: [],
+  VechileOffers: [],
   loading: false,
   error: null,
 };
@@ -118,7 +119,7 @@ export const getOffersList = createAsyncThunk(
   "get/offersList",
   async (payload, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.get("/offersList", {
+      const response = await axiosInstance.get("/offerList", {
         params: payload,
       });
       return response.data;
@@ -132,7 +133,7 @@ export const addOffer = createAsyncThunk(
   "add/offer",
   async (payload, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.post("/addOffers", payload);
+      const response = await axiosInstance.post("/addOffer", payload);
       return response.data;
     } catch (error) {
       console.log({ error });
@@ -188,6 +189,16 @@ const vechileCategorySlice = createSlice({
       state.VechileFeatures = action.payload;
     });
     builder.addCase(getFeaturesList.rejected, (state, action) => {
+      state.loading = false;
+    });
+    builder.addCase(getOffersList.pending, (state, action) => {
+      state.loading = true;
+    });
+    builder.addCase(getOffersList.fulfilled, (state, action) => {
+      state.loading = false;
+      state.VechileOffers = action.payload;
+    });
+    builder.addCase(getOffersList.rejected, (state, action) => {
       state.loading = false;
     });
   },

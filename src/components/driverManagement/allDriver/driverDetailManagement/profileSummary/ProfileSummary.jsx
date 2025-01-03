@@ -74,7 +74,7 @@ const ProfileSummary = ({state}) => {
                       </p>
                       <p>
                         <strong>Driver Email ID</strong>
-                        <span>john@gmail.com</span>
+                        <span>{state?.email}</span>
                       </p>
                       <p>
                         <strong>Location</strong>
@@ -106,23 +106,23 @@ const ProfileSummary = ({state}) => {
                     <aside>
                       <p>
                         <strong>Total No. of Booking</strong>
-                        <span>245</span>
+                        <span>0</span>
                       </p>
                       <p>
                         <strong>Total No. of Local Delivery</strong>
-                        <span>23</span>
+                        <span>0</span>
                       </p>
                       <p>
                         <strong>Total No. of Out Station Delivery</strong>
-                        <span>245</span>
+                        <span>0</span>
                       </p>
                       <p>
                         <strong>Total No. of Express Delivery</strong>
-                        <span>23</span>
+                        <span>0</span>
                       </p>
                       <p>
                         <strong>Total Cancelled Delivery</strong>
-                        <span>50</span>
+                        <span>0</span>
                       </p>
                       <p>
                         <strong>Last Location</strong>
@@ -130,19 +130,19 @@ const ProfileSummary = ({state}) => {
                       </p>
                       <p>
                         <strong>Current Location</strong>
-                        <span>Noida,UP</span>
+                        <span>-</span>
                       </p>
                       <p>
                         <strong>Earnings</strong>
-                        <span>500 Dinar</span>
+                        <span>-</span>
                       </p>
                       <p>
                         <strong>Last Time Online</strong>
-                        <span>dd-mm-yy,hh:mm</span>
+                        <span>-</span>
                       </p>
                       <p>
                         <strong>Average Waiting Time for pickup</strong>
-                        <span>2 mins</span>
+                        <span>-</span>
                       </p>
                     </aside>
                   </article>
@@ -160,7 +160,7 @@ const ProfileSummary = ({state}) => {
                     <aside>
                       <p>
                         <strong>Registration Certificate Number</strong>
-                        <span>65465165165FSA54</span>
+                        <span>{state?.dlNumber}</span>
                       </p>
                       <p>
                         <strong className="Green">
@@ -192,7 +192,7 @@ const ProfileSummary = ({state}) => {
                     <aside>
                       <p>
                         <strong>Registration Certificate Number</strong>
-                        <span>65465165165FSA54</span>
+                        <span>{state?.aadharNumber}</span>
                       </p>
                       <p>
                         <strong className="Green">
@@ -219,26 +219,26 @@ const ProfileSummary = ({state}) => {
               </div>
             </div>
             <div className="InformationBox mt-4">
-              {state?.driverType=="ILINE" &&
-              <div className="TitleBox">
-                <h4 className="Title">3.Drivers License</h4>
-                <div className="TitleLink">
-                  <a
-                    className="TitleLink"
-                    href="driver-management-assign-vehicle.html"
-                  >
-                    Assign
-                  </a>
-                  &nbsp;
-                  <a
-                    className="TitleLink"
-                    href="driver-management-vehicle-history.html"
-                  >
-                    History
-                  </a>
+              {state?.driverType == "ILINE" && (
+                <div className="TitleBox">
+                  <h4 className="Title">3.Drivers License</h4>
+                  <div className="TitleLink">
+                    <a
+                      className="TitleLink"
+                      href="driver-management-assign-vehicle.html"
+                    >
+                      Assign
+                    </a>
+                    &nbsp;
+                    <a
+                      className="TitleLink"
+                      href="driver-management-vehicle-history.html"
+                    >
+                      History
+                    </a>
+                  </div>
                 </div>
-              </div>
-              }
+              )}
               <div className="Informations">
                 <div className="ProfileInfo">
                   <h3 className="mb-4">Current Assigned Vehicle Details</h3>
@@ -246,7 +246,7 @@ const ProfileSummary = ({state}) => {
                     <aside>
                       <p>
                         <strong>Vehicle Number </strong>
-                        <span>UP 15 FX 2321</span>
+                        <span>{state?.vehicleNumber}</span>
                       </p>
                       <p>
                         <strong>Vehicle Type </strong>

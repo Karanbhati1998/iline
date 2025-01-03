@@ -1,15 +1,11 @@
-import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  callRequestCount,
-  getSupportTicketList,
-  ticketReply,
-} from "../../features/slices/supportTicketManagement";
-import CloseChat from "./CloseChat";
-import { Link } from "react-router-dom";
-import { toastService } from "../../utils/toastify";
-import CommonPagination from "../../components/CommonPagination";
-import moment from "moment";
+import React, { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux';
+import { callRequestList, statusChangedCallRequest, ticketReply } from '../../features/slices/supportTicketManagement';
+import { toastService } from '../../utils/toastify';
+import moment from 'moment';
+import CloseChat from '../../pages/supportTicketManagement/CloseChat';
+import CommonPagination from '../CommonPagination';
+import BackButton from '../BackButton';
 const initialState = {
   page: 1,
   search: "",
@@ -17,84 +13,85 @@ const initialState = {
   toDate: "",
   timeframe: "",
   closeChat: false,
-  id: "",
 };
-const SupportTicketManagement = () => {
-  const [iState, setUpdateState] = useState(initialState);
-  const { page, search, fromDate, toDate, timeframe, closeChat, id } = iState;
-  const dispatch = useDispatch();
-  const { supportTickets,count } = useSelector((state) => {
-    return state?.supportTicket;
-  });
-  console.log({ supportTickets, count });
-
-  useEffect(() => {
-    dispatch(getSupportTicketList({ page, timeframe }));
-    dispatch(callRequestCount());
-  }, [page, timeframe]);
-
-  useEffect(() => {
-    const delayDebounceFunc = setTimeout(() => {
-      dispatch(
-        getSupportTicketList({
-          search: search.trim(),
-          timeframe,
-        })
-      );
-    }, 1000);
-
-    return () => clearTimeout(delayDebounceFunc);
-  }, [search, timeframe, dispatch]);
-  const handleChange = (e) => {
-    setUpdateState({ ...iState, [e.target.name]: e.target.value });
-  };
-  const handleApply = () => {
-    const data = {
-      search,
-      fromDate,
-      toDate,
-      page,
-    };
-    dispatch(getSupportTicketList(data));
-  };
-  const handleReset = () => {
-    setUpdateState(initialState);
-    dispatch(getSupportTicketList({ page: 1 }));
-  };
-  const handleOpenChatClose = (id, type) => {
-    if (type == "PENDING") setUpdateState({ ...iState, closeChat: true, id });
-  };
-  const handlecloseChatClose = (id) => {
-    setUpdateState({ ...iState, closeChat: false });
-  };
-  const handlecloseChat = () => {
-    const data = {
-      id,
-      status: "Solved",
-    };
-    dispatch(ticketReply(data)).then((res) => {
-      if (res?.payload?.code === 200) {
-        toastService.success("Ticket closed successfully");
-        dispatch(getSupportTicketList());
-        handlecloseChatClose();
-      } else {
-        toastService.error("Failed to close ticket");
-      }
-    });
-  };
-  const handlePageChange = (page) => {
-    setUpdateState({ ...iState, page });
-    dispatch(getSupportTicketList({ page }));
-  };
+const CallRequest = () => {
+    const [iState, setUpdateState] = useState(initialState);
+     const { page, search, fromDate, toDate, timeframe, closeChat, id } =
+       iState;
+     const dispatch = useDispatch();
+     const { callRequestData } = useSelector((state) => {
+       return state?.supportTicket;
+     });
+     console.log({ callRequestData });
+     
+       useEffect(() => {
+         dispatch(callRequestList({ page, timeframe }));
+       }, [page, timeframe]);
+        useEffect(() => {
+           const delayDebounceFunc = setTimeout(() => {
+             dispatch(
+               callRequestList({
+                 search: search.trim(),
+                 timeframe,
+               })
+             );
+           }, 1000);
+       
+           return () => clearTimeout(delayDebounceFunc);
+         }, [search, timeframe, dispatch]);
+         
+         const handleChange = (e) => {
+           setUpdateState({ ...iState, [e.target.name]: e.target.value });
+         };
+         const handleApply = () => {
+           const data = {
+             search,
+             fromDate,
+             toDate,
+             page,
+           };
+           dispatch(callRequestList(data));
+         };
+         const handleReset = () => {
+           setUpdateState(initialState);
+           dispatch(callRequestList({ page: 1 }));
+         };
+         const handleOpenChatClose = (id, type) => {
+           if (type == "PENDING") setUpdateState({ ...iState, closeChat: true, id });
+         };
+         const handlecloseChatClose = (id) => {
+           setUpdateState({ ...iState, closeChat: false });
+         };
+         const handlecloseChat = () => {
+           const data = {
+             id,
+             status: "Solved",
+           };
+           dispatch(statusChangedCallRequest(data)).then((res) => {
+             if (res?.payload?.code === 200) {
+               toastService.success("Ticket closed successfully");
+               dispatch(callRequestList());
+               handlecloseChatClose();
+             } else {
+               toastService.error("Failed to close ticket");
+             }
+           });
+         };
+         const handlePageChange = (page) => {
+           setUpdateState({ ...iState, page });
+           dispatch(callRequestList({ page }));
+         };
   return (
     <>
       <div className="WrapperArea">
         <div className="WrapperBox">
           <div className="TitleBox">
-            <h4 className="Title">Support Ticket Management</h4>
-            <Link className="TitleLink" to="callRequest">
-              Call Requests <span>{count?.result}</span>
-            </Link>
+            <a className="TitleLink">
+              <BackButton />
+            </a>
+          </div>
+          <div className="TitleBox">
+            <h4 className="Title">List of Call Requests</h4>
           </div>
           <div className="Small-Wrapper">
             <div className="FilterArea">
@@ -165,30 +162,29 @@ const SupportTicketManagement = () => {
                 <thead>
                   <tr>
                     <th>S.No.</th>
-                    <th>Ticket ID</th>
-                    <th>Booking ID</th>
+                    <th>Request ID</th>
+                    <th>User ID</th>
+                    <th>User Type</th>
                     <th>User Name</th>
                     <th>Number</th>
-                    <th>User Type</th>
                     <th>Date</th>
-                    <th>Message</th>
-                    <th>Status</th>
+                    <th>Reason for request</th>
                     <th>Action</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {supportTickets?.result?.[0]?.paginationData?.map(
+                  {callRequestData?.result?.[0]?.paginationData?.map(
                     (res, i) => {
                       return (
                         <tr key={res?._id}>
                           <td>{i + 1 + (page - 1) * 10}</td>
-                          <td>{res?.ticket_number}</td>
-                          <td>-</td>
-                          <td>{res?.userData?.fullName}</td>
-                          <td>{res?.userData?.phoneNumber}</td>
+                          <td>{res?.request_number}</td>
+                          <td>{res?.userId}</td>
                           <td>Customer</td>
+                          <td>{res?.userData?.fullName}</td>
+                          <td>{res?.phoneNumber}</td>
                           <td>{moment(res?.createdAt).format("DD-MM-YYYY")}</td>
-                          <td>L{res?.description}</td>
+                          <td>App Not Working</td>
                           <td>
                             <span
                               className={
@@ -202,17 +198,6 @@ const SupportTicketManagement = () => {
                               {res?.status !== "PENDING" ? "Closed" : "Open"}
                             </span>
                           </td>
-                          <td>
-                            <div className="Actions">
-                              {res?.status !== "SOLVED" ? (
-                                <Link to="reply" className="Blue" state={res}>
-                                  Reply
-                                </Link>
-                              ) : (
-                                <span className="Disabled">Reply</span> // Add styling for "disabled" look
-                              )}
-                            </div>
-                          </td>
                         </tr>
                       );
                     }
@@ -225,18 +210,18 @@ const SupportTicketManagement = () => {
                 <p>
                   Total Records :{" "}
                   <span>
-                    {supportTickets?.result?.[0]?.totalCount?.[0]?.count || 0}
+                    {callRequestData?.result?.[0]?.totalCount?.[0]?.count || 0}
                   </span>
                 </p>
               </div>
 
               <div className="PaginationRight">
-                {supportTickets?.result?.[0]?.totalCount?.[0]?.count > 0 && (
+                {callRequestData?.result?.[0]?.totalCount?.[0]?.count > 0 && (
                   <CommonPagination
                     activePage={page}
                     itemsCountPerPage={10}
                     totalItemsCount={
-                      supportTickets?.result?.[0]?.totalCount?.[0]?.count || 0
+                      callRequestData?.result?.[0]?.totalCount?.[0]?.count || 0
                     }
                     pageRangeDisplayed={4}
                     onChange={handlePageChange}
@@ -257,6 +242,6 @@ const SupportTicketManagement = () => {
       )}
     </>
   );
-};
+}
 
-export default SupportTicketManagement;
+export default CallRequest

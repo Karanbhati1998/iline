@@ -47,11 +47,14 @@ import AddVechile from "./components/vechileManagement/AddVechile";
 import AddFeatureList from "./components/vechileManagement/vechileCategory/AddFeatureList";
 import AddOffer from "./components/vechileManagement/vechileCategory/AddOffer";
 import Reply from "./components/ticket/Reply";
+import { io } from "socket.io-client";
+import CallRequest from "./components/ticket/CallRequest";
 function App() {
-  const isAuthenticated = getToken("adminLogin", "token");
-  useEffect(() => {
-    isInternetAvailable();
-  }, []);
+  const isAuthenticated = getToken("ilineLogin", "token");
+  // const socketInstance = io("http://15.206.16.230:4100");
+  // useEffect(() => {
+  //   isInternetAvailable();
+  // }, []);
   return (
     <>
       <HashRouter>
@@ -171,6 +174,10 @@ function App() {
                 <Route
                   path="/supportTicketManagement"
                   element={<SupportTicketManagement />}
+                />
+                <Route
+                  path="/supportTicketManagement/callRequest"
+                  element={<CallRequest />}
                 />
                 <Route
                   path="/supportTicketManagement/reply"

@@ -1,21 +1,37 @@
-// src/SocketContext.js
-import React, { createContext, useContext, useEffect } from "react";
-import socketInstance from "./socket";
+import React, { createContext, useContext, useState, useEffect } from "react";
+import { io } from "socket.io-client";
 
 const SocketContext = createContext();
 
-export const useSocket = () => useContext(SocketContext);
-
 export const SocketProvider = ({ children }) => {
+  const [socket, setSocket] = useState(null);
+
   useEffect(() => {
+    const socketInstance = io("http://15.206.16.230:4100", {
+      transports: ["websocket"],
+      withCredentials: true,
+    });
+
+    setSocket(socketInstance);
+
+    socketInstance.on("connect", () => {
+      console.log("Socket connected");
+    });
+
+    socketInstance.on("connect_error", (error) => {
+      console.error("Socket connection error:", error);
+    });
+
     return () => {
-      socketInstance.disconnect(); // Clean up on unmount
+      socketInstance.disconnect();
     };
   }, []);
 
   return (
-    <SocketContext.Provider value={socketInstance}>
-      {children}
-    </SocketContext.Provider>
+    <SocketContext.Provider value={socket}>{children}</SocketContext.Provider>
   );
+};
+
+export const useSocket = () => {
+  return useContext(SocketContext);
 };

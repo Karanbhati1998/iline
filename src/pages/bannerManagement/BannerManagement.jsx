@@ -1,11 +1,105 @@
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import UploadBanner from '../../components/banner/UploadBanner';
-
+import DeleteBannerModal from '../../components/banner/DeleteBannerModal';
+import { useDispatch, useSelector } from 'react-redux';
+import { bannerStatus, getBannerList } from '../../features/slices/bannerSlice';
+import ExportToExcel from '../../components/ExportToExcel';
+import { toastService } from '../../utils/toastify';
+import moment from 'moment';
+const initialState = {
+  page: 1,
+  search: "",
+  fromDate: "",
+  toDate: "",
+  timeframe: "",
+  deleteModal: false,
+  id: "",
+  showUploadBannerModal:false,
+};
 const BannerManagement = () => {
-    const [showUploadBAnnerModal,setShowUploadBAnnerModal]=useState(false)
-    const handleClose=()=>{
-        setShowUploadBAnnerModal(false);
+    const [iState, setUpdateState] = useState(initialState);
+    const {
+      page,
+      search,
+      fromDate,
+      toDate,
+      timeframe,
+      deleteModal,
+      id,
+      showUploadBannerModal,
+    } = iState;
+     const dispatch = useDispatch();
+     const bannerRef = useRef();
+     const { bannerList } = useSelector((state) => {
+       return state?.banner;
+     });
+     console.log({ bannerList });
+
+     useEffect(() => {
+       dispatch(getBannerList({ page, timeframe }));
+     }, [page, timeframe]);
+
+     useEffect(() => {
+       const delayDebounceFunc = setTimeout(() => {
+         dispatch(
+           getBannerList({
+             search: search.trim(),
+             timeframe,
+           })
+         );
+       }, 1000);
+
+       return () => clearTimeout(delayDebounceFunc);
+     }, [search, timeframe, dispatch]);
+     const handleChange = (e) => {
+       setUpdateState({ ...iState, [e.target.name]: e.target.value });
+     };
+     const handleApply = () => {
+       const data = {
+         search,
+         fromDate,
+         toDate,
+         page,
+       };
+       dispatch(getBannerList(data));
+     };
+     const handleReset = () => {
+       setUpdateState(initialState);
+       dispatch(getBannerList({ page: 1 }));
+     };
+
+     const handleChecked = (e, id) => {
+       const { name, checked } = e?.target;
+       const status = checked ? "ACTIVE" : "INACTIVE";
+       const data = { id, status };
+       dispatch(bannerStatus(data)).then((res) => {
+         if (res?.payload?.code == 200) {
+           toastService.success("Status updated successfully");
+           dispatch(getBannerList({ page }));
+         } else {
+           toastService.error("status update failed");
+         }
+       });
+     };
+     const handleClose=()=>{
+        setUpdateState(prev=>({
+          ...prev,
+          showUploadBannerModal: false,
+        }));
     }
+     const handleCloseDeleteModal = () => {
+       setUpdateState((prev) => ({
+         ...prev,
+         deleteModal: false,
+       }));
+     };
+     const handleOpenDeleteModal = (id) => {
+       setUpdateState((prev) => ({
+         ...prev,
+         deleteModal: true,
+         id:id
+       }));
+     };
   return (
     <>
       <div className="WrapperArea">
@@ -15,7 +109,10 @@ const BannerManagement = () => {
             <a
               className="TitleLink"
               onClick={() => {
-                setShowUploadBAnnerModal(true);
+                setUpdateState((prev) => ({
+                  ...prev,
+                  showUploadBannerModal: true,
+                }));
               }}
             >
               Upload New banner
@@ -25,138 +122,142 @@ const BannerManagement = () => {
             <div className="FilterArea">
               <div className="FilterLeft">
                 <div className="form-group">
-                  <label>Search</label>
-                  <input
+                  {/* <label>Search</label> */}
+                  {/* <input
                     type="text"
                     className="form-control"
                     placeholder="Search"
+                    name="search"
+                    value={search}
+                    onChange={handleChange}
+                  /> */}
+                </div>
+                <div className="form-group">
+                  <label>Duration</label>
+                  <select
+                    className="form-control"
+                    name="timeframe"
+                    onChange={handleChange}
+                    disabled={fromDate || toDate}
+                  >
+                    <option value="select">--Select--</option>
+                    <option value="Today">Today</option>
+                    <option value="Week">This Week</option>
+                    <option value="Month">This Month</option>
+                    <option value="Year">This Year</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>From</label>
+                  <input
+                    type="date"
+                    className="form-control"
+                    name="fromDate"
+                    value={fromDate}
+                    disabled={timeframe}
+                    onChange={handleChange}
                   />
                 </div>
                 <div className="form-group">
-                  <label>From Date</label>
-                  <input type="date" className="form-control" />
-                </div>
-                <div className="form-group">
-                  <label>To Date</label>
-                  <input type="date" className="form-control" />
+                  <label>To</label>
+                  <input
+                    type="date"
+                    className="form-control"
+                    name="toDate"
+                    value={toDate}
+                    onChange={handleChange}
+                    disabled={timeframe}
+                  />
                 </div>
                 <div className="form-group">
                   <label>&nbsp;</label>
-                  <button className="Button">Apply</button>
-                  <button className="Button Cancel">
+                  <button className="Button" onClick={handleApply}>
+                    Apply
+                  </button>
+                  <button className="Button Cancel" onClick={handleReset}>
                     <i className="fa fa-refresh" />
                   </button>
                 </div>
               </div>
               <div className="FilterRight">
-                <div className="form-group">
-                  <label>Duration</label>
-                  <select className="form-control">
-                    <option>Select </option>
-                    <option value="Today">Today</option>
-                    <option value="Week">This Week</option>
-                    <option value="Month">This Month</option>
-                    <option value="Month">This Year</option>
-                  </select>
-                </div>
+                <ExportToExcel ref={bannerRef} fileName="bannerManagement" />
               </div>
             </div>
           </div>
           <div className="Small-Wrapper">
             <div className="TableList">
-              <table>
+              <table ref={bannerRef}>
                 <thead>
                   <tr>
                     <th>S.No.</th>
+                    <th>Banner Name</th>
                     <th>Banner ID</th>
                     <th>Banner Image</th>
                     <th>Uploaded On</th>
-                    <th>Removed On</th>
+                    <th>Status</th>
                     <th>Action</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <td>1</td>
-                    <td>
-                      <a
-                        className="Blue"
-                        data-toggle="modal"
-                        data-target="#ApprovalModal"
-                      >
-                        B-141
-                      </a>
-                    </td>
-                    <td>
-                      <img src="images/car.png" />
-                    </td>
-                    <td>dd/mm/yyyy</td>
-                    <td>dd/mm/yyyy</td>
-                    <td>
-                      <div className="Actions">
-                        <a className="Blue" href="">
-                          <i className="fa fa-spinner" aria-hidden="true" />
-                        </a>
-                        <a className="Red" href="">
-                          <i className="fa fa-trash" aria-hidden="true" />
-                        </a>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>2</td>
-                    <td>
-                      <a
-                        className="Blue"
-                        data-toggle="modal"
-                        data-target="#ApprovalModal"
-                      >
-                        B-141
-                      </a>
-                    </td>
-                    <td>
-                      <img src="images/car.png" />
-                    </td>
-                    <td>dd/mm/yyyy</td>
-                    <td>dd/mm/yyyy</td>
-                    <td>
-                      <div className="Actions">
-                        <a className="Blue" href="">
-                          <i className="fa fa-spinner" aria-hidden="true" />
-                        </a>
-                        <a className="Red" href="">
-                          <i className="fa fa-trash" aria-hidden="true" />
-                        </a>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>3</td>
-                    <td>
-                      <a
-                        className="Blue"
-                        data-toggle="modal"
-                        data-target="#ApprovalModal"
-                      >
-                        B-141
-                      </a>
-                    </td>
-                    <td>
-                      <img src="images/car.png" />
-                    </td>
-                    <td>dd/mm/yyyy</td>
-                    <td>dd/mm/yyyy</td>
-                    <td>
-                      <div className="Actions">
-                        <a className="Blue" href="">
-                          <i className="fa fa-spinner" aria-hidden="true" />
-                        </a>
-                        <a className="Red" href="">
-                          <i className="fa fa-trash" aria-hidden="true" />
-                        </a>
-                      </div>
-                    </td>
-                  </tr>
+                  {bannerList?.result?.[0]?.paginationData?.map((res,i)=>{
+                    return (
+                      <tr>
+                        <td>{i + 1 + (page - 1) * 10}</td>
+                        <td>{res?.name}</td>
+                        <td>
+                          <a
+                            className="Blue"
+                            data-toggle="modal"
+                            data-target="#ApprovalModal"
+                          >
+                            {res?.banner_number}
+                          </a>
+                        </td>
+                        <td>
+                          <img
+                            src={res?.imageUrl}
+                            style={{
+                              width: "50px",
+                              height: "50px",
+                              borderRadius: "50%",
+                              objectFit: "cover",
+                            }}
+                            alt="no img"
+                          />
+                        </td>
+                        <td>{moment(res?.createdAt).format("DD-MM-YYYY")}</td>
+                        <td>
+                          <span
+                            className={
+                              res?.status == "ACTIVE" ? "Green" : "Red"
+                            }
+                          >
+                            {res?.status == "ACTIVE" ? "Enabled" : "Disabled"}
+                          </span>
+                        </td>
+                        <td>
+                          <div className="Actions">
+                            <label className="Switch">
+                              <input
+                                type="checkbox"
+                                name="status"
+                                checked={res?.status == "ACTIVE"}
+                                onChange={(e) => handleChecked(e, res?._id)}
+                              />
+                              <span className="slider" />
+                            </label>
+                            <a
+                              className="Red"
+                              onClick={() => handleOpenDeleteModal(res?._id)}
+                            >
+                              <i className="fa fa-trash" aria-hidden="true" />
+                            </a>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                  
                 </tbody>
               </table>
             </div>
@@ -164,7 +265,13 @@ const BannerManagement = () => {
           {/* </div> */}
         </div>
       </div>
-      {showUploadBAnnerModal && <UploadBanner handleClose={handleClose} />}
+      {showUploadBannerModal && <UploadBanner handleClose={handleClose} />}
+      {deleteModal && (
+        <DeleteBannerModal
+          handleCloseDeleteModal={handleCloseDeleteModal}
+          id={id}
+        />
+      )}
     </>
   );
 }

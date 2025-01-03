@@ -47,7 +47,6 @@ const handlePageChange = (page) => {
   return (
     <div className="WrapperArea">
       <div className="WrapperBox">
-      
         <div className="commenone">
           <div className="CommonTabs"></div>
           <BackButton />
@@ -55,10 +54,13 @@ const handlePageChange = (page) => {
         <div className="Small-Wrapper">
           <div className="DriverDeleteBox">
             <span className="Icon">
-              <img src="images/Driver.png" />
+              <img src={require("../../assets/images/Driver.png")} />
             </span>
             <span className="Text">Pending For Approval</span>
-            <span className="Count">123</span>
+            <span className="Count">
+              {" "}
+              {pendingForApprovalList?.result?.[0]?.totalCount?.[0]?.count || 0}
+            </span>
           </div>
           <div className="TitleBox">
             <h4 className="Title">Pending For Approval</h4>
@@ -73,10 +75,6 @@ const handlePageChange = (page) => {
                   placeholder="Search"
                 />
               </div>
-              <a href="#" className="Button">
-                <span className="Badge">2</span>
-                Approval Request
-              </a>
             </div>
           </div>
           <div className="TableList mt-4">
@@ -99,29 +97,37 @@ const handlePageChange = (page) => {
                   (res, i) => {
                     return (
                       <tr>
-                        <td>{i+1 +(page-1)*10}</td>
+                        <td>{i + 1 + (page - 1) * 10}</td>
                         <td>{res?.driver_number}</td>
                         <td>{res?.fullName}</td>
                         <td>{res?.phoneNumber}</td>
-                        <td>archana@gmail.com</td>
+                        <td>{res?.email ? res?.email : "-"}</td>
                         <td>{moment(res?.createdAt).format("DD-MM-YYYY")}</td>
                         <td>{res?.userStatus}</td>
                         <td>
-                          <Link
-                            to={"/driverManagement/pendingForApprovalDetail" }
-                            state={res}
+                          <a
+                            
                           >
                             <span className="Orange">
                               {res?.approvedStatus}
                             </span>
+                          </a>
+                        </td>
+                        <td>
+                          <Link
+                            to={"/driverManagement/pendingForApprovalDetail"}
+                            state={res}
+                          >
+                            <span className="Green">
+
+                            Verify
+                            </span>
                           </Link>
                         </td>
-                        <td>Verify</td>
                       </tr>
                     );
                   }
                 )}
-              
               </tbody>
             </table>
           </div>
@@ -130,18 +136,21 @@ const handlePageChange = (page) => {
               <p>
                 Total Records :{" "}
                 <span>
-                  {pendingForApprovalList?.result?.[0]?.totalCount?.[0]?.count || 0}
+                  {pendingForApprovalList?.result?.[0]?.totalCount?.[0]
+                    ?.count || 0}
                 </span>
               </p>
             </div>
 
             <div className="PaginationRight">
-              {pendingForApprovalList?.result?.[0]?.totalCount?.[0]?.count > 0 && (
+              {pendingForApprovalList?.result?.[0]?.totalCount?.[0]?.count >
+                0 && (
                 <CommonPagination
                   activePage={page}
                   itemsCountPerPage={10}
                   totalItemsCount={
-                    pendingForApprovalList?.result?.[0]?.totalCount?.[0]?.count || 0
+                    pendingForApprovalList?.result?.[0]?.totalCount?.[0]
+                      ?.count || 0
                   }
                   pageRangeDisplayed={4}
                   onChange={handlePageChange}

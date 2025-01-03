@@ -10,6 +10,7 @@ import moment from "moment";
 import { toastService } from "../../../utils/toastify";
 import ExportToExcel from "../../ExportToExcel";
 import DeleteVechileCategory from "./DeleteVechileCategory";
+import CommonPagination from "../../CommonPagination";
 const initialState = {
   page: 1,
   search: "",
@@ -88,6 +89,10 @@ const VechileCategory = () => {
       deleteModal: false,
     }));
   };
+   const handlePageChange = (page) => {
+      setUpdateState({ ...iState, page });
+      dispatch(getVechileCategory({ page }));
+    };
   return (
     <>
       <div className="WrapperArea">
@@ -269,126 +274,33 @@ const VechileCategory = () => {
                         );
                       }
                     )}
-                    <tr>
-                      <td>1</td>
-                      <td>v-11</td>
-                      <td>Name 1</td>
-                      <td>icon</td>
-                      <td>20kg</td>
-                      <td>12-12-2024</td>
-                      <td>
-                        <span className="Green">Enabled</span>
-                      </td>
-                      <td>
-                        <div className="Actions">
-                          <label className="Switch">
-                            <input type="checkbox" />
-                            <span className="slider" />
-                          </label>
-                          <a
-                            className="Red"
-                            data-toggle="modal"
-                            data-target="#CityDeleteModal"
-                          >
-                            <i className="fa fa-trash" />
-                          </a>
-                          <a className="Blue" href="vehicle-category-fare.html">
-                            <i
-                              className="fa fa-info-circle"
-                              aria-hidden="true"
-                            />
-                          </a>
-                          <a
-                            className="Green"
-                            href="vehicle-management-p-2-p-vehicles-details.html"
-                          >
-                            <i className="fa fa-pencil" aria-hidden="true" />
-                          </a>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>2</td>
-                      <td>v-22</td>
-                      <td>Name 2</td>
-                      <td>icon</td>
-                      <td>20kg</td>
-                      <td>12-12-2024</td>
-                      <td>
-                        <span className="Red">Disabled</span>
-                      </td>{" "}
-                      <td>
-                        <div className="Actions">
-                          <label className="Switch">
-                            <input type="checkbox" />
-                            <span className="slider" />
-                          </label>
-                          <a
-                            className="Red"
-                            data-toggle="modal"
-                            data-target="#CityDeleteModal"
-                          >
-                            <i className="fa fa-trash" />
-                          </a>
-                          <a
-                            className="Blue"
-                            href="vehicle-management-p-2-p-vehicles-details.html"
-                          >
-                            <i
-                              className="fa fa-info-circle"
-                              aria-hidden="true"
-                            />
-                          </a>
-                          <a
-                            className="Green"
-                            href="vehicle-management-p-2-p-vehicles-details.html"
-                          >
-                            <i className="fa fa-pencil" aria-hidden="true" />
-                          </a>
-                        </div>
-                      </td>
-                    </tr>
                   </tbody>
                 </table>
               </div>
               <div className="PaginationBox">
                 <div className="PaginationLeft">
                   <p>
-                    Total Records : <span>200</span>
+                    Total Records :{" "}
+                    <span>
+                      {VechileCategories?.result?.[0]?.totalCount?.[0]?.count || 0}
+                    </span>
                   </p>
                 </div>
+
                 <div className="PaginationRight">
-                  <ul>
-                    <li>
-                      <a href="javascript:void(0);">
-                        <i className="fa fa-angle-double-left" />
-                      </a>
-                    </li>
-                    <li>
-                      <a href="javascript:void(0);">
-                        <i className="fa fa-angle-left" />
-                      </a>
-                    </li>
-                    <li className="active">
-                      <a href="javascript:void(0);">1</a>
-                    </li>
-                    <li>
-                      <a href="javascript:void(0);">2</a>
-                    </li>
-                    <li>
-                      <a href="javascript:void(0);">3</a>
-                    </li>
-                    <li>
-                      <a href="javascript:void(0);">
-                        <i className="fa fa-angle-right" />
-                      </a>
-                    </li>
-                    <li>
-                      <a href="javascript:void(0);">
-                        <i className="fa fa-angle-double-right" />
-                      </a>
-                    </li>
-                  </ul>
+                  {VechileCategories?.result?.[0]?.totalCount?.[0]?.count > 0 && (
+                    <CommonPagination
+                      activePage={page}
+                      itemsCountPerPage={10}
+                      totalItemsCount={
+                        VechileCategories?.result?.[0]?.totalCount?.[0]?.count || 0
+                      }
+                      pageRangeDisplayed={4}
+                      onChange={handlePageChange}
+                      itemClass="page-item"
+                      linkClass="page-link"
+                    />
+                  )}
                 </div>
               </div>
             </div>

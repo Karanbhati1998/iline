@@ -7,6 +7,7 @@ import imageUploadReducer from "./slices/imageUpload";
 import supportTicketSlice from "./slices/supportTicketManagement";
 import contentManagement from "./slices/staticContentManagement";
 import vechileCategory from "./slices/vechileManagement/vechileCategory";
+import bannerSlice from "./slices/bannerSlice";
 
 const store = configureStore({
   reducer: {
@@ -18,6 +19,7 @@ const store = configureStore({
     supportTicket: supportTicketSlice,
     contentManagement: contentManagement,
     vechileCategory: vechileCategory,
+    banner: bannerSlice,
   },
 });
 export default store;
