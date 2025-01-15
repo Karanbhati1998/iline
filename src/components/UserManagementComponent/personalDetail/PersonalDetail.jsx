@@ -1,6 +1,9 @@
+import moment from 'moment';
 import React from 'react'
 
-const PersonalDetail = () => {
+const PersonalDetail = ({ state }) => {
+  console.log({state});
+  
   return (
     <div className="Small-Wrapper">
       <div className="tab-content">
@@ -13,17 +16,22 @@ const PersonalDetail = () => {
               <div className="RiderBox">
                 <div className="RiderHead">
                   <figure>
-                    <img src={require("../../../assets/images/Avatar-1.png")} />
+                    <img
+                      src={
+                        state?.profilePic ||
+                        require("../../../assets/images/Avatar-1.png")
+                      }
+                    />
                   </figure>
                   <figcaption>
                     <div>
                       <h3>
-                        Simmi Sharma{" "}
+                        {state?.fullName}{" "}
                         <span>
-                          <i className="fa fa-star" aria-hidden="true" /> 4.5{" "}
+                          <i className="fa fa-star" aria-hidden="true" /> 0{" "}
                         </span>
                       </h3>
-                      <h4>User ID : #432394</h4>
+                      <h4>User ID : #{state?.user_number}</h4>
                     </div>
                     <div className="Actions">
                       <label className="Switch">
@@ -40,47 +48,52 @@ const PersonalDetail = () => {
                 <div className="RiderBody">
                   <aside>
                     <p>
-                      <label>User Id</label> <span> #12345</span>
+                      <label>User Id</label> <span> #{state?.user_number}</span>
                     </p>
                     <p>
-                      <label>City &amp; State</label> <span> Agra, UP</span>
+                      <label>City &amp; State</label>{" "}
+                      <span> {state?.address ? state?.address : "-"}</span>
                     </p>
                     <p>
-                      <label>Gender </label> <span> Male</span>
+                      <label>Gender </label> <span> -</span>
                     </p>
                     <p>
-                      <label>Registered on </label> <span> 20 Aug 2024</span>
+                      <label>Registered on </label>{" "}
+                      <span>
+                        {moment(state?.createdAt).format("DD-MM-YYYY")}
+                      </span>
                     </p>
                     {/* <p><label>DOB </label> <span> 25 Aug 1997</span></p> */}
                     <p>
-                      <label>Email Address </label> <span> john@gmail.com</span>
+                      <label>Email Address </label> <span> {state?.email}</span>
                     </p>
                     <p>
-                      <label>Phone Number </label> <span> +91 9876787656</span>
+                      <label>Phone Number </label>{" "}
+                      <span> {state?.phoneNumber}</span>
                     </p>
                   </aside>
                   <aside>
                     <p>
                       <label>Average Rating</label>{" "}
                       <span>
-                        4.5 <i className="fa fa-star" aria-hidden="true" />
+                        0 <i className="fa fa-star" aria-hidden="true" />
                       </span>
                     </p>
                     <p>
                       <label>Total Number of Bookings till today </label>{" "}
-                      <span> 25</span>
+                      <span> -</span>
                     </p>
                     <p>
-                      <label>Total Spent Amount </label> <span> INR 4000</span>
+                      <label>Total Spent Amount </label> <span> -</span>
                     </p>
                     <p>
-                      <label>Total Rides </label> <span>25</span>
+                      <label>Total Rides </label> <span>-</span>
                     </p>
                     <p>
-                      <label>Total Fleets Booked</label> <span>46</span>
+                      <label>Total Fleets Booked</label> <span>-</span>
                     </p>
                     <p>
-                      <label>Upcoming Booking</label> <span>67</span>
+                      <label>Upcoming Booking</label> <span>-</span>
                     </p>
                   </aside>
                 </div>
@@ -102,12 +115,12 @@ const PersonalDetail = () => {
                   <figcaption>
                     <div>
                       <h3>
-                        Simmi Sharma{" "}
+                        {state?.fullName}{" "}
                         <span>
                           <i className="fa fa-star" aria-hidden="true" /> 4.5{" "}
                         </span>
                       </h3>
-                      <h4>User ID : #432394</h4>
+                      <h4>User ID : #{state?.user_number}</h4>
                     </div>
                   </figcaption>
                 </div>
@@ -334,6 +347,6 @@ const PersonalDetail = () => {
       </div>
     </div>
   );
-}
+};
 
 export default PersonalDetail

@@ -8,6 +8,10 @@ import supportTicketSlice from "./slices/supportTicketManagement";
 import contentManagement from "./slices/staticContentManagement";
 import vechileCategory from "./slices/vechileManagement/vechileCategory";
 import bannerSlice from "./slices/bannerSlice";
+import blogSlice from "./slices/blogSlice";
+import subAdminSlice from "./slices/subAdmin";
+import  dashboardSlice from "./slices/Dashboard";
+import vechileSlice from "./slices/vechileManagement/vechileManagement";
 
 const store = configureStore({
   reducer: {
@@ -20,6 +24,10 @@ const store = configureStore({
     contentManagement: contentManagement,
     vechileCategory: vechileCategory,
     banner: bannerSlice,
+    blog: blogSlice,
+    subAdmin: subAdminSlice,
+    dashboard: dashboardSlice,
+    vechile: vechileSlice,
   },
 });
 export default store;

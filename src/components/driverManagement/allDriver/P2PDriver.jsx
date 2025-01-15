@@ -192,7 +192,7 @@ const P2PDriver = () => {
                     <td>{res?.driver_number}</td>
                     <td>{res?.fullName}</td>
                     <td>{res?.phoneNumber}</td>
-                    <td>V-123</td>
+                    <td>-</td>
                     <td>{res?.vehicleNumber}</td>
                     <td>0</td>
                     <td>

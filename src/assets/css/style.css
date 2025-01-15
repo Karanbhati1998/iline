@@ -1812,3 +1812,6 @@ input[type="date"] {
   padding-left: 0px !important;
   width: 0px !important;
 }
+.TitleLink ,.CloseModal{
+  cursor: pointer;
+}

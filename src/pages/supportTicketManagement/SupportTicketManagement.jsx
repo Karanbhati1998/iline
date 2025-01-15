@@ -186,7 +186,7 @@ const SupportTicketManagement = () => {
                           <td>-</td>
                           <td>{res?.userData?.fullName}</td>
                           <td>{res?.userData?.phoneNumber}</td>
-                          <td>Customer</td>
+                          <td>-</td>
                           <td>{moment(res?.createdAt).format("DD-MM-YYYY")}</td>
                           <td>L{res?.description}</td>
                           <td>

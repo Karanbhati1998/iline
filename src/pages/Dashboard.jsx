@@ -1,11 +1,30 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {  getEarlyAccesData } from "../features/slices/Dashboard";
+import { downloadCSV } from "../utils/downloadGetEarlyAccesData"; 
 
 const Dashboard = () => {
+  const dispatch=useDispatch()
+  useEffect(()=>{
+    dispatch(getEarlyAccesData());
+  },[])
+  const { earlyAccesData } = useSelector((state) => state.dashboard);
+  console.log({ earlyAccesData });
+  const handleDownload = () => {
+    if (earlyAccesData?.result) {
+      downloadCSV(earlyAccesData.result, "early_access_data.csv");
+    } else {
+      console.error("No data available to download.");
+    }
+  };
   return (
     <div className="WrapperArea">
       <div className="WrapperBox">
         <div className="TitleBox">
           <h4 className="Title">Dashboard</h4>
+          <button className="Button" onClick={handleDownload}>
+            Get Early Access Data
+          </button>
         </div>
         {/* <div className="CommonTabs">
           <ul className="nav nav-tabs">

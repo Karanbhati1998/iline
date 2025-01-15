@@ -29,7 +29,7 @@ const DeleteBannerModal = ({ handleCloseDeleteModal,id }) => {
             ×
           </a>
           <h3>Delete</h3>
-          <p>Are you sure you want to delete this Vechile category?</p>
+          <p>Are you sure you want to delete this Banner?</p>
           <h4>
             <a onClick={handleCloseDeleteModal}>no</a>
             <a onClick={handleDelete}>Yes</a>

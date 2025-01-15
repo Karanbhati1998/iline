@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import BackButton from "../../BackButton";
 import { useDispatch } from "react-redux";
@@ -6,11 +6,16 @@ import { imageUpload } from "../../../features/slices/imageUpload";
 import { toastService } from "../../../utils/toastify";
 import { addVechileCategory } from "../../../features/slices/vechileManagement/vechileCategory";
 import LoaderForImage from "../../LoaderForImage";
+import { getSubAdminList } from "../../../features/slices/subAdmin";
 const initialState = {
   categoryName: "",
   tagLine: "",
   uploadIcon: "",
   weightCapicity: "",
+  length: 0,
+  width: 0,
+  height: 0,
+  volume: 0,
   fareData: [
     {
       serviceType: "LOCAL",
@@ -58,7 +63,10 @@ const AddVechileCategory = () => {
   const [iState, setUpdateState] = useState(initialState);
   const [errors, setErrors] = useState({});
   const [imageLoader, setImageLoader] = useState(false);
-  const { categoryName, fareData, weightCapicity, uploadIcon, tagLine } =
+  const { categoryName, fareData, weightCapicity, uploadIcon, tagLine ,  length,
+  width,
+  height,
+  volume,} =
     iState;
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -70,6 +78,33 @@ const handleEditClick = () => {
     fileInputRef.current.click();
   }
 };
+
+useEffect(() => {
+
+  // Ensure all dimensions are valid numbers before calculating the volume
+  if (
+    width &&
+    height &&
+    length &&
+    !isNaN(width) &&
+    !isNaN(height) &&
+    !isNaN(length)
+  ) {
+    const calculatedVolume =
+      parseFloat(width) * parseFloat(height) * parseFloat(length);
+    setUpdateState((prev) => ({
+      ...prev,
+      volume: calculatedVolume,
+    }));
+  } else {
+    setUpdateState((prev) => ({
+      ...prev,
+      volume: "",
+    }));
+  }
+}, [width, height, length]);
+
+
   const uploadImage = (e) => {
     console.log({ errors });
     console.log(e.target.name);
@@ -160,6 +195,19 @@ const handleEditClick = () => {
       formErrors.weightCapicity = "Weight capicity Name is required";
       isValid = false;
     }
+    if (!length.trim()) {
+      formErrors.length = "Length is required";
+      isValid = false;
+    }
+    if (!width.trim()) {
+      formErrors.width = "Width is required";
+      isValid = false;
+    }
+    if (!height.trim()) {
+      formErrors.height = "Height is required";
+      isValid = false;
+    }
+   
     if (!uploadIcon.trim()) {
       formErrors.uploadIcon = "Upload icon Name is required";
       isValid = false;
@@ -220,6 +268,7 @@ const handleEditClick = () => {
     if (handleValidation()) {
       dispatch(addVechileCategory(iState)).then((res) => {
         if (res?.payload?.code == 200) {
+          
           toastService.success("Vehicle category added successfully");
           navigate("/vehicleManagement/vehicleCategory");
         } else {
@@ -295,6 +344,78 @@ const handleEditClick = () => {
                   {errors.weightCapicity && (
                     <p className="d-flex justify-content-start text-danger mt-2 error">
                       {errors.weightCapicity}
+                    </p>
+                  )}
+                </div>
+              </div>
+              <div className="col-sm-4">
+                <div className="form-group">
+                  <label>Length</label>
+                  <input
+                    type="number"
+                    className="form-control"
+                    placeholder={0}
+                    name="length"
+                    value={length}
+                    onChange={handleChange}
+                  />
+                  {errors.length && (
+                    <p className="d-flex justify-content-start text-danger mt-2 error">
+                      {errors.length}
+                    </p>
+                  )}
+                </div>
+              </div>
+              <div className="col-sm-4">
+                <div className="form-group">
+                  <label>Width</label>
+                  <input
+                    type="number"
+                    className="form-control"
+                    placeholder={0}
+                    name="width"
+                    value={width}
+                    onChange={handleChange}
+                  />
+                  {errors.width && (
+                    <p className="d-flex justify-content-start text-danger mt-2 error">
+                      {errors.width}
+                    </p>
+                  )}
+                </div>
+              </div>
+              <div className="col-sm-4">
+                <div className="form-group">
+                  <label>Height</label>
+                  <input
+                    type="number"
+                    className="form-control"
+                    placeholder={0}
+                    name="height"
+                    value={height}
+                    onChange={handleChange}
+                  />
+                  {errors.height && (
+                    <p className="d-flex justify-content-start text-danger mt-2 error">
+                      {errors.height}
+                    </p>
+                  )}
+                </div>
+              </div>
+              <div className="col-sm-4">
+                <div className="form-group">
+                  <label>Volume</label>
+                  <input
+                    type="number"
+                    className="form-control"
+                    placeholder={0}
+                    name="volume"
+                    value={volume}
+                    onChange={handleChange}
+                  />
+                  {errors.volume && (
+                    <p className="d-flex justify-content-start text-danger mt-2 error">
+                      {errors.volume}
                     </p>
                   )}
                 </div>

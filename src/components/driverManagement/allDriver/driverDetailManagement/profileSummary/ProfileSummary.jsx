@@ -1,5 +1,6 @@
 import moment from 'moment';
 import React from 'react'
+import { Link } from 'react-router-dom';
 
 const ProfileSummary = ({state}) => {
   console.log({state});
@@ -25,7 +26,7 @@ const ProfileSummary = ({state}) => {
                     <i className="fa fa-star" aria-hidden="true" /> 4.5
                   </span>
                 </h3>
-                <p>Driver ID: {state?.dlNumber}</p>
+                <p>Driver ID: {state?.driver_number}</p>
               </figcaption>
               <div className="Actions">
                 <a href="#">
@@ -66,7 +67,7 @@ const ProfileSummary = ({state}) => {
                       </p>
                       <p>
                         <strong>Driver ID</strong>
-                        <span>{state?.dlNumber}</span>
+                        <span>{state?.driver_number}</span>
                       </p>
                       <p>
                         <strong>Driver Phone Number</strong>
@@ -96,11 +97,11 @@ const ProfileSummary = ({state}) => {
                       </p>
                       <p>
                         <strong>Approved on</strong>
-                        <span>12-03-2023</span>
+                        <span>-</span>
                       </p>
                       <p>
                         <strong>Approved By</strong>
-                        <span>Sub-Admin Name, Sub-Admin-ID</span>
+                        <span>-</span>
                       </p>
                     </aside>
                     <aside>
@@ -126,7 +127,7 @@ const ProfileSummary = ({state}) => {
                       </p>
                       <p>
                         <strong>Last Location</strong>
-                        <span>Agra UP</span>
+                        <span>-</span>
                       </p>
                       <p>
                         <strong>Current Location</strong>
@@ -223,19 +224,19 @@ const ProfileSummary = ({state}) => {
                 <div className="TitleBox">
                   <h4 className="Title">3.Drivers License</h4>
                   <div className="TitleLink">
-                    <a
+                    <Link
+                      to="/driverManagement/assignVechile"
                       className="TitleLink"
-                      href="driver-management-assign-vehicle.html"
                     >
                       Assign
-                    </a>
+                    </Link>
                     &nbsp;
-                    <a
+                    <Link
+                      to="/driverManagement/assignVechileHistory"
                       className="TitleLink"
-                      href="driver-management-vehicle-history.html"
                     >
                       History
-                    </a>
+                    </Link>
                   </div>
                 </div>
               )}
@@ -250,15 +251,15 @@ const ProfileSummary = ({state}) => {
                       </p>
                       <p>
                         <strong>Vehicle Type </strong>
-                        <span>4 Wheeler</span>
+                        <span>-</span>
                       </p>
                       <p>
                         <strong>Assigned on </strong>
-                        <span>12/09/2024</span>
+                        <span>-</span>
                       </p>
                       <p>
                         <strong> Assigned by </strong>
-                        <span>Admin</span>
+                        <span>-</span>
                       </p>
                     </aside>
                   </article>

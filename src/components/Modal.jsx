@@ -2,10 +2,10 @@ import React from "react";
 
 const Modal = ({ children }) => {
   return (
-    <div className="ModalBox">
+    <div className="ModalBox modal-open">
       <div
         id="NotificationAddModal"
-        className="modal fade show"
+        className="  modal fade show "
         style={{ display: "block" }}
         aria-modal="true"
         role="dialog"

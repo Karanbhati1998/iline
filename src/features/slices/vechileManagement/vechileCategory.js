@@ -145,7 +145,7 @@ export const editOffer = createAsyncThunk(
   "edit/offer",
   async (payload, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.put("/editOffers", payload);
+      const response = await axiosInstance.put("/editOffer", payload);
       return response.data;
     } catch (error) {
       console.log({ error });
@@ -157,8 +157,8 @@ export const deleteOffer = createAsyncThunk(
   "delete/offer",
   async (payload, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.delete("/deleteOffers",{
-        data:payload
+      const response = await axiosInstance.delete("/deleteOffer", {
+        data: payload,
       });
       return response.data;
     } catch (error) {

@@ -40,7 +40,7 @@ const DriverManagement = () => {
                 </Link>
               </li>
               <li>
-                <a href="driver-management-insurance-management.html">
+                <a>
                   <span className="Icon">
                     <img src={require("../../assets/images/Driver.png")} />
                   </span>

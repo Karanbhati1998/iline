@@ -12,14 +12,14 @@ const initialState = {
   ticketId: "",
   profilePic: "",
   sendBy: "Admin",
-  desription:""
+  desription: "",
 };
 const Reply = () => {
   const [iState, setUpdateState] = useState(initialState);
   const { userId, roomId, ticketId, profilePic, sendBy, description } = iState;
   const { state } = useLocation();
-  console.log({state});
-  
+  console.log({ state });
+
   const dispatch = useDispatch();
   const lastMessageRef = useRef(null);
   const [messages, setMessages] = useState([]);
@@ -40,13 +40,17 @@ const Reply = () => {
   }, [state]);
 
   useEffect(() => {
-    dispatch(previousChat({ roomId })).then((res) => {
-      if (res?.payload?.code === 200) {
-        setMessages((prev) => [...prev, ...res?.payload?.askedData]);
-      }
-    });
-  }, [roomId, dispatch]);
+    if (roomId) {
+      dispatch(previousChat({ roomId })).then((res) => {
+        if (res?.payload?.code === 200) {
+          console.log({ res: res?.payload?.askedData });
 
+          setMessages((prev) => [...res?.payload?.askedData]);
+        }
+      });
+    }
+  }, [roomId]);
+  // chat code again chat code
   useEffect(() => {
     if (socket) {
       socket.emit("joinrooms", {
@@ -55,8 +59,8 @@ const Reply = () => {
       });
 
       socket.on("recieveMessage", (data) => {
-        console.log({data});
-        
+        console.log({ data });
+
         setMessages((prevMessages) => [...prevMessages, data.message]);
       });
 
@@ -87,11 +91,13 @@ const Reply = () => {
       sendMessage();
     }
   };
-useEffect(() => {
-  if (lastMessageRef.current) {
-    lastMessageRef.current.scrollIntoView({ behavior: "smooth" });
-  }
-}, [messages]);
+  useEffect(() => {
+    if (lastMessageRef.current) {
+      lastMessageRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]);
+  console.log({ messages });
+
   return (
     <div className="WrapperArea">
       <div className="WrapperBox">
@@ -134,12 +140,15 @@ useEffect(() => {
                 <div className="chat-header">
                   <div className="chat-item active">
                     <div className="avatar">
-                      <img src={state?.userData?.profilePic} style={{
-                        borderRadius: "50%",
-                        width: "50px",
-                        height: "50px",
-                        objectFit: "cover",
-                      }} />
+                      <img
+                        src={state?.userData?.profilePic}
+                        style={{
+                          borderRadius: "50%",
+                          width: "50px",
+                          height: "50px",
+                          objectFit: "cover",
+                        }}
+                      />
                     </div>
                     <div className="chat-info">
                       <p className="chat-title">{state?.userData?.fullName}</p>

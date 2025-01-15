@@ -2,9 +2,11 @@ import React, { useState } from "react";
 import BackButton from "../../components/BackButton";
 import PersonalDetail from "../../components/UserManagementComponent/personalDetail/PersonalDetail";
 import RideDetails from "../../components/UserManagementComponent/rideDetail/RideDetails";
+import { useLocation } from "react-router-dom";
 
 const UserManagementDetail = () => {
   const [showRideDetail,setShowRideDetail]=useState(false)
+  const {state}=useLocation()
   return (
     <div className="WrapperArea">
       <div className="WrapperBox">
@@ -32,7 +34,7 @@ const UserManagementDetail = () => {
           </div>
           <BackButton />
         </div>
-        {!showRideDetail ? <PersonalDetail /> : <RideDetails />}
+        {!showRideDetail ? <PersonalDetail state={state} /> : <RideDetails />}
       </div>
     </div>
   );

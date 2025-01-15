@@ -44,6 +44,7 @@ const handlePageChange = (page) => {
     setUpdateState({ ...iState, page });
     dispatch(fetchPendingForApproval({ page }));
   };
+ 
   return (
     <div className="WrapperArea">
       <div className="WrapperBox">
@@ -73,7 +74,16 @@ const handlePageChange = (page) => {
                   type="text"
                   className="form-control"
                   placeholder="Search"
+                  name="search"
+                  value={search}
+                  onChange={handleChange}
                 />
+              </div>
+              <div className="form-group">
+                
+                <button className="Button Cancel" onClick={handleReset}>
+                  <i className="fa fa-refresh" />
+                </button>
               </div>
             </div>
           </div>
@@ -105,9 +115,7 @@ const handlePageChange = (page) => {
                         <td>{moment(res?.createdAt).format("DD-MM-YYYY")}</td>
                         <td>{res?.userStatus}</td>
                         <td>
-                          <a
-                            
-                          >
+                          <a>
                             <span className="Orange">
                               {res?.approvedStatus}
                             </span>
@@ -118,10 +126,7 @@ const handlePageChange = (page) => {
                             to={"/driverManagement/pendingForApprovalDetail"}
                             state={res}
                           >
-                            <span className="Green">
-
-                            Verify
-                            </span>
+                            <span className="Green">Verify</span>
                           </Link>
                         </td>
                       </tr>

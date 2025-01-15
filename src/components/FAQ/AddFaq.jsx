@@ -3,6 +3,7 @@ import { useDispatch } from 'react-redux';
 import { addFaq, getFaq } from '../../features/slices/staticContentManagement';
 import { toastService } from '../../utils/toastify';
 import { Navigate, useNavigate } from 'react-router-dom';
+import QuillEditor from '../QuillEditor';
 const initialState={
     question:"",
     answer:"",
@@ -27,6 +28,12 @@ const AddFaq = () => {
             }
         })
     }
+     const handleQuillChange = (name, value) => {
+       setUpdateState((prev) => ({
+         ...prev,
+         [name]: value,
+       })); // Dynamically update the corresponding state field
+     };
   return (
     <div className="WrapperArea">
       <div className="WrapperBox">
@@ -58,7 +65,14 @@ const AddFaq = () => {
                   <label>Answer</label>
                 </div>
                 <div className="col-sm-10">
-                  <textarea
+                  <QuillEditor
+                    name="answer"
+                    value={answer}
+                    onChange={handleQuillChange}
+                    // error={errors.description}
+                    // Optional custom height
+                  />
+                  {/* <textarea
                     rows="10"
                     cols="100"
                     placeholder="Type your content here..."
@@ -66,10 +80,12 @@ const AddFaq = () => {
                     name="answer"
                     value={answer}
                     onChange={handleChange}
-                  ></textarea>
+                  ></textarea> */}
                   <br />
 
-                  <button className="Button" onClick={handleSubmit}>Submit</button>
+                  <button className="Button" onClick={handleSubmit}>
+                    Submit
+                  </button>
                 </div>
               </div>
             </div>

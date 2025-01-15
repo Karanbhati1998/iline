@@ -177,7 +177,7 @@ const UserManagement = () => {
                     <tr>
                       <td>{i + 1 + (page - 1) * 10}</td>
                       <td>
-                        <Link to={"userManagementDetail"}>{res?.fullName}</Link>
+                        <Link to={"userManagementDetail"} state={res}>{res?.fullName}</Link>
                       </td>
                       <td>{res?.phoneNumber} </td>
                       <td>{res?.address}</td>

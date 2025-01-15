@@ -71,9 +71,12 @@ const ContentManagement = () => {
                   className="panel-collapse collapse in"
                   data-parent="#accordion"
                 >
-                  <div className="card-body">
-                    {supportContent?.staticResult?.description}
-                  </div>
+                  <div
+                    className="card-body"
+                    dangerouslySetInnerHTML={{
+                      __html: supportContent?.staticResult?.description,
+                    }}
+                  ></div>
                 </div>
               </div>
               <div className="card">
@@ -94,9 +97,12 @@ const ContentManagement = () => {
                   className="panel-collapse collapse"
                   data-parent="#accordion"
                 >
-                  <div className="card-body">
-                    {supportContent?.staticResult?.description}
-                  </div>
+                  <div
+                    className="card-body"
+                    dangerouslySetInnerHTML={{
+                      __html: supportContent?.staticResult?.description,
+                    }}
+                  ></div>
                 </div>
               </div>
               <div className="card">
@@ -117,9 +123,12 @@ const ContentManagement = () => {
                   className="panel-collapse collapse"
                   data-parent="#accordion"
                 >
-                  <div className="card-body">
-                    {supportContent?.staticResult?.description}
-                  </div>
+                  <div
+                    className="card-body"
+                    dangerouslySetInnerHTML={{
+                      __html: supportContent?.staticResult?.description,
+                    }}
+                  ></div>
                 </div>
               </div>
               <div className="card">
@@ -140,9 +149,12 @@ const ContentManagement = () => {
                   className="panel-collapse collapse"
                   data-parent="#accordion"
                 >
-                  <div className="card-body">
-                    {supportContent?.staticResult?.description}
-                  </div>
+                  <div
+                    className="card-body"
+                    dangerouslySetInnerHTML={{
+                      __html: supportContent?.staticResult?.description,
+                    }}
+                  ></div>
                 </div>
               </div>
               <div className="card">
@@ -154,10 +166,7 @@ const ContentManagement = () => {
                   onClick={() => handleClick("REFUND")}
                 >
                   <h4>Refund Policy</h4>
-                  <Link
-                    to="/editContentManagemnt"
-                    state={supportContent?.staticResult}
-                  >
+                  <Link to="/editContentManagemnt" state="REFUND">
                     <i className="fa fa-pencil" />
                   </Link>
                 </div>
@@ -166,9 +175,12 @@ const ContentManagement = () => {
                   className="panel-collapse collapse"
                   data-parent="#accordion"
                 >
-                  <div className="card-body">
-                    {supportContent?.staticResult?.description}
-                  </div>
+                  <div
+                    className="card-body"
+                    dangerouslySetInnerHTML={{
+                      __html: supportContent?.staticResult?.description,
+                    }}
+                  ></div>
                 </div>
               </div>
               <div className="card">
@@ -214,7 +226,9 @@ const ContentManagement = () => {
                           <h5>
                             {i + 1}. {res?.question}
                           </h5>
-                          <p>{res?.answer}</p>
+                          <p
+                            dangerouslySetInnerHTML={{ __html: res?.answer }}
+                          ></p>
                         </div>
                       );
                     })}

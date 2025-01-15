@@ -51,9 +51,10 @@ const VechileStatus = () => {
                   <div className="RiderHead">
                     <figure>
                       <img
-                        src={state?.profilePic || require(
-                          "../../../assets/images/Avatar-1.png"
-                        )}
+                        src={
+                          state?.profilePic ||
+                          require("../../../assets/images/Avatar-1.png")
+                        }
                         style={{
                           borderRadius: "50%",
                           width: "50px",
@@ -61,7 +62,7 @@ const VechileStatus = () => {
                           objectFit: "cover",
                           marginLeft: "auto",
                           marginRight: "auto",
-                          marginBottom: "10px"
+                          marginBottom: "10px",
                         }}
                       />
                     </figure>
@@ -73,7 +74,7 @@ const VechileStatus = () => {
                             <i className="fa fa-star" aria-hidden="true" /> 4.5{" "}
                           </span>
                         </h3>
-                        <h4>User ID : #432394</h4>
+                        <h4>User ID : #-</h4>
                       </div>
                     </figcaption>
                   </div>
@@ -139,7 +140,7 @@ const VechileStatus = () => {
                             </p>
                             <p>
                               <strong>Expiry</strong>
-                              <span>10/09/2023</span>
+                              <span>-</span>
                             </p>
                           </aside>
                           <ul>
@@ -170,20 +171,49 @@ const VechileStatus = () => {
                             </p>
                             <p>
                               <strong>Expiry</strong>
-                              <span>10/09/2023</span>
+                              <span>
+                                {moment(
+                                  state?.driverDocumentData?.[0]?.expiryDate
+                                ).format("DD-MM-YYYY")}
+                              </span>
                             </p>
                           </aside>
                           <ul>
                             <li>
                               <span>Document</span>
                               <figure>
-                                <img src="https://mobulous.co.in/just-clubbing/assets/images/driving.png" />
+                                <img
+                                  src={
+                                    state?.driverDocumentData?.[0]?.dlFront ||
+                                    "https://mobulous.co.in/just-clubbing/assets/images/driving.png"
+                                  }
+                                />
+                              </figure>
+                              <figure
+                                style={{
+                                  marginTop: "10px",
+                                }}
+                              >
+                                <img
+                                  src={
+                                    state?.driverDocumentData?.[0]?.dlBack ||
+                                    "https://mobulous.co.in/just-clubbing/assets/images/driving.png"
+                                  }
+                                />
                               </figure>
                             </li>
                             <li>
                               <strong className="Red">
                                 <i className="fa fa-exclamation-triangle" />{" "}
-                                Expiring in 5 days
+                                {moment(
+                                  state?.driverDocumentData?.[0]?.expiryDate
+                                ).isAfter(moment())
+                                  ? `Expiring in ${moment(
+                                      state?.driverDocumentData?.[0]?.expiryDate
+                                    ).fromNow()}`
+                                  : `Expired ${moment(
+                                      state?.driverDocumentData?.[0]?.expiryDate
+                                    ).fromNow()}`}
                               </strong>
                             </li>
                           </ul>

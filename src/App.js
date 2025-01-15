@@ -49,12 +49,21 @@ import AddOffer from "./components/vechileManagement/vechileCategory/AddOffer";
 import Reply from "./components/ticket/Reply";
 import { io } from "socket.io-client";
 import CallRequest from "./components/ticket/CallRequest";
+import BlogManagement from "./pages/blogManagement/BlogManagement";
+import AddBlog from "./pages/blogManagement/AddBlog";
+import EditBlog from "./components/blog/EditBlog";
+import ViewBlog from "./components/blog/ViewBlog";
+import CreateRole from "./components/subAdmin/CreateRole";
+import EditRole from "./components/subAdmin/EditRole";
+import SubAdminDetail from "./components/subAdmin/SubAdminDetail";
+import Iline_P2pVechile from "./components/vechileManagement/vechileTable/Iline_P2pVechile";
+import DeliverTable from "./components/vechileManagement/vechileTable/DeliverTable";
+import VechileDetails from "./components/vechileManagement/vechileDetail/VechileDetails";
+import PendingVechilePage from "./components/vechileManagement/vechileTable/PendingVechilePage";
+import AssignVichel from "./components/driverManagement/allDriver/driverDetailManagement/profileSummary/AssignVichel";
+import AssignedVichelHistory from "./components/driverManagement/allDriver/driverDetailManagement/profileSummary/AssignedVichelHistory";
 function App() {
   const isAuthenticated = getToken("ilineLogin", "token");
-  // const socketInstance = io("http://15.206.16.230:4100");
-  // useEffect(() => {
-  //   isInternetAvailable();
-  // }, []);
   return (
     <>
       <HashRouter>
@@ -97,12 +106,20 @@ function App() {
                   element={<DetailDriverManagement />}
                 />
                 <Route
+                  path="driverManagement/assignVechile"
+                  element={<AssignVichel />}
+                />
+                <Route
                   path="driverManagement/addNewDriver"
                   element={<AddNewDriver />}
                 />
                 <Route
                   path="driverManagement/pendingForApproval"
                   element={<PendingForApproval />}
+                />
+                <Route
+                  path="driverManagement/assignVechileHistory"
+                  element={<AssignedVichelHistory />}
                 />
                 <Route
                   path="/driverManagement/pendingForApprovalDetail"
@@ -141,6 +158,22 @@ function App() {
                 <Route
                   path="/vehicleManagement/addVechile"
                   element={<AddVechile />}
+                />
+                <Route
+                  path="/vehicleManagement/iline_p2p"
+                  element={<Iline_P2pVechile />}
+                />
+                <Route
+                  path="/vehicleManagement/vechileService"
+                  element={<DeliverTable />}
+                />
+                <Route
+                  path="/vehicleManagement/details"
+                  element={<VechileDetails />}
+                />
+                <Route
+                  path="/vehicleManagement/pendingVechilePage"
+                  element={<PendingVechilePage />}
                 />
                 <Route
                   path="/vehicleManagement/vehicleCategory"
@@ -192,6 +225,13 @@ function App() {
                   element={<ChangeManagement />}
                 />
                 <Route path="/subAdmin" element={<SubAdmin />} />
+                <Route path="/subAdmin/detail" element={<SubAdminDetail />} />
+                <Route path="/subAdmin/createRole" element={<CreateRole />} />
+                <Route path="/subAdmin/editRole" element={<EditRole />} />
+                <Route path="/blogManagement" element={<BlogManagement />} />
+                <Route path="/blogManagement/addblog" element={<AddBlog />} />
+                <Route path="/blogManagement/editBlog" element={<EditBlog />} />
+                <Route path="/blogManagement/viewBlog" element={<ViewBlog />} />
               </Route>
             </Route>
           </Route>

@@ -203,6 +203,14 @@ const Sidebar = () => {
               Change Management
             </Link>
           </li>
+          <li className={url == "blogManagement" ? "active" : ""}>
+            <Link to="/blogManagement">
+              <span>
+                <i className="fa fa-eercast" />
+              </span>{" "}
+              Blog
+            </Link>
+          </li>
           <li>
             <a
               onClick={() => {

@@ -190,9 +190,10 @@ const I_lineDriver = () => {
                     <td>{res?.driver_number}</td>
                     <td>{res?.fullName}</td>
                     <td>{res?.phoneNumber}</td>
-                    <td>V-123</td>
-                    <td>{res?.vehicleNumber}</td>
-                    <td>200</td>
+                    <td>-</td>
+                    <td>{res?.vehicleNumber ?? "-"}</td>
+
+                    <td>-</td>
                     <td>
                       <span className={res?.is_online ? "Green" : "Red"}>
                         {res?.is_online ? "Online" : "Offline"}
