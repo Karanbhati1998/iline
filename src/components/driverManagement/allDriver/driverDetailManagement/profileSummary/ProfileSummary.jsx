@@ -173,14 +173,27 @@ const ProfileSummary = ({state}) => {
                       <ul>
                         <li>
                           <span>Document</span>
+                          <figure className="mb-2">
+                            <img
+                              src={state?.driverDocumentData?.[0]?.dlFront}
+                              alt="no dl img"
+                            />
+                          </figure>
                           <figure>
-                            <img src="https://mobulous.co.in/just-clubbing/assets/images/driving.png" />
+                            <img
+                              src={state?.driverDocumentData?.[0]?.dlBack}
+                              alt="no dl img"
+                            />
                           </figure>
                         </li>
                       </ul>
                       <p>
                         <strong>Expiry</strong>
-                        <span>10/09/2023</span>
+                        <span>
+                          {moment(
+                            state?.driverDocumentData?.[0]?.expiryDate
+                          ).format("DD-MM-YYYY")}
+                        </span>
                       </p>
                     </aside>
                   </div>
@@ -193,7 +206,9 @@ const ProfileSummary = ({state}) => {
                     <aside>
                       <p>
                         <strong>Registration Certificate Number</strong>
-                        <span>{state?.aadharNumber}</span>
+                        <span>
+                          {state?.driverDocumentData?.[0]?.aadharNumber}
+                        </span>
                       </p>
                       <p>
                         <strong className="Green">
@@ -205,15 +220,22 @@ const ProfileSummary = ({state}) => {
                       <ul>
                         <li>
                           <span>Document</span>
+                          <figure className="mb-2">
+                            <img
+                              src={state?.driverDocumentData?.[0]?.aadharFront}
+                            />
+                          </figure>
                           <figure>
-                            <img src="https://mobulous.co.in/just-clubbing/assets/images/driving.png" />
+                            <img
+                              src={state?.driverDocumentData?.[0]?.aadharBack}
+                            />
                           </figure>
                         </li>
                       </ul>
-                      <p>
+                      {/* <p>
                         <strong>Expiry</strong>
                         <span>10/09/2023</span>
-                      </p>
+                      </p> */}
                     </aside>
                   </div>
                 </div>
@@ -222,11 +244,12 @@ const ProfileSummary = ({state}) => {
             <div className="InformationBox mt-4">
               {state?.driverType == "ILINE" && (
                 <div className="TitleBox">
-                  <h4 className="Title">3.Drivers License</h4>
+                  <h4 className="Title">3.Assign Vehicle</h4>
                   <div className="TitleLink">
                     <Link
                       to="/driverManagement/assignVechile"
                       className="TitleLink"
+                      state={state}
                     >
                       Assign
                     </Link>
@@ -247,11 +270,13 @@ const ProfileSummary = ({state}) => {
                     <aside>
                       <p>
                         <strong>Vehicle Number </strong>
-                        <span>{state?.vehicleNumber}</span>
+                        <span>
+                          {state?.vehicleData?.[0]?.vehicleNumberPlate}
+                        </span>
                       </p>
                       <p>
                         <strong>Vehicle Type </strong>
-                        <span>-</span>
+                        <span>{state?.vehicleData?.[0]?.vehicleType}</span>
                       </p>
                       <p>
                         <strong>Assigned on </strong>
@@ -278,190 +303,6 @@ const ProfileSummary = ({state}) => {
                   </p>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="tab-pane" id="booking-summary">
-        <div className="banner-coupon">
-          <div className="RiderArea">
-            <div className="RiderBox">
-              <div className="RiderHead">
-                <figure>
-                  <img src="images/Avatar-1.png" />
-                </figure>
-                <figcaption>
-                  <div>
-                    <h3>
-                      Simmi Sharma
-                      <span>
-                        <i className="fa fa-star" aria-hidden="true" /> 4.5
-                      </span>
-                    </h3>
-                    <h4>User ID : #432394</h4>
-                  </div>
-                </figcaption>
-              </div>
-            </div>
-          </div>
-          <br />
-          <div className="RiderArea">
-            <div className="RiderBox">
-              <div className="FilterArea">
-                <div className="form-group">
-                  <label>Search</label>
-                  <input
-                    className="form-control"
-                    type="text"
-                    placeholder="Search"
-                  />
-                </div>
-                <div className="form-group">
-                  <label>From Date</label>
-                  <input type="date" className="form-control" />
-                </div>
-                <div className="form-group">
-                  <label>To Date</label>
-                  <input type="date" className="form-control" />
-                </div>
-                <div className="form-group">
-                  <label>Timeframe</label>
-                  <select className="form-control">
-                    <option>Select</option>
-                    <option value="Today">Today</option>
-                    <option value="Week">This Week</option>
-                    <option value="Month">This Month</option>
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label>&nbsp;</label>
-                  <button className="Button">Apply</button>
-                  <button className="Button Cancel">
-                    <i className="fa fa-refresh" />
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="rider-footer">
-            <ul>
-              <li>
-                <a className="active" href="#">
-                  Local Delivery
-                </a>
-              </li>
-              <li>
-                <a href="driver-management-outstation-delivery.html">
-                  Outstation Delivery{" "}
-                </a>
-              </li>
-              <li>
-                <a href="driver-management-express-delivery.html">
-                  Express Delivery
-                </a>
-              </li>
-            </ul>
-            <div className="TableList">
-              <table style={{ width: "120%" }}>
-                <thead>
-                  <tr>
-                    <th>S.No</th>
-                    <th>Booking ID</th>
-                    <th>Driver ID</th>
-                    <th>Driver Name</th>
-                    <th>Vehicle ID</th>
-                    <th>Assigned Vehicle</th>
-                    <th>Total Cost</th>
-                    <th>Booking Status</th>
-                    <th>Booking Date</th>
-                    <th>Pickup Location</th>
-                    <th>Drop Location</th>
-                    <th>Payment Mode</th>
-                    <th>Payment Status</th>
-                    <th>Details</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>1</td>
-                    <td>OR#11</td>
-                    <td>DR-01</td>
-                    <td>John</td>
-                    <td>V-123</td>
-                    <td>UP-12-1010</td>
-                    <td>200</td>
-                    <td>
-                      <a href="driver-management-ride-details-completed.html">
-                        <span className="Green">Completed</span>
-                      </a>
-                    </td>
-                    <td>12-12-2024</td>
-                    <td>Delhi</td>
-                    <td>Agra</td>
-                    <td>Mode 1</td>
-                    <td>Completed</td>
-                    <td>
-                      <div className="Actions">
-                        <a className="Blue" href="">
-                          <i className="fa fa-info-circle" aria-hidden="true" />
-                        </a>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>2</td>
-                    <td>OR#11</td>
-                    <td>DR-01</td>
-                    <td>John</td>
-                    <td>V-123</td>
-                    <td>UP-12-1010</td>
-                    <td>200</td>
-                    <td>
-                      <a href="driver-management-ride-details-ongoing.html">
-                        <span className="Yellow">Ongoing</span>
-                      </a>
-                    </td>
-                    <td>12-12-2024</td>
-                    <td>Delhi</td>
-                    <td>Agra</td>
-                    <td>Mode 1</td>
-                    <td>Completed</td>
-                    <td>
-                      <div className="Actions">
-                        <a className="Blue" href="">
-                          <i className="fa fa-info-circle" aria-hidden="true" />
-                        </a>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>3</td>
-                    <td>OR#11</td>
-                    <td>DR-01</td>
-                    <td>John</td>
-                    <td>V-123</td>
-                    <td>UP-12-1010</td>
-                    <td>200</td>
-                    <td>
-                      <a href="driver-management-ride-details-cancelled.html">
-                        <span className="Red">Cancelled</span>
-                      </a>
-                    </td>
-                    <td>12-12-2024</td>
-                    <td>Delhi</td>
-                    <td>Agra</td>
-                    <td>Mode 1</td>
-                    <td>Completed</td>
-                    <td>
-                      <div className="Actions">
-                        <a className="Blue" href="">
-                          <i className="fa fa-info-circle" aria-hidden="true" />
-                        </a>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
             </div>
           </div>
         </div>

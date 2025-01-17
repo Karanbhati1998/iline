@@ -191,7 +191,7 @@ const I_lineDriver = () => {
                     <td>{res?.fullName}</td>
                     <td>{res?.phoneNumber}</td>
                     <td>-</td>
-                    <td>{res?.vehicleNumber ?? "-"}</td>
+                    <td>{res?.vehicleData?.[0]?.vehicleNumberPlate ?? "-"}</td>
 
                     <td>-</td>
                     <td>
@@ -200,9 +200,9 @@ const I_lineDriver = () => {
                       </span>{" "}
                     </td>
                     <td>{moment(res?.createdAt).format("DD-MM-YYYY")}</td>
-                    <td>12</td>
-                    <td>34</td>
-                    <td>100</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
                     <td>
                       <span
                         className={

@@ -1,22 +1,83 @@
-import React, { useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import {
   getVehicleListForAssign,
   assignVehicleToDriver,
 } from "../../../../../features/slices/DriverManagement/allDriver/allDriverReducer";
-import BackButton from "../../../../BackButton"
+import BackButton from "../../../../BackButton";
+import { toastService } from "../../../../../utils/toastify";
+import CommonPagination from "../../../../CommonPagination";
+import moment from "moment/moment";
+import { useLocation } from "react-router-dom";
+const initialState = {
+  page: 1,
+  search: "",
+  fromDate: "",
+  toDate: "",
+  timeframe: "",
+  id: "",
+};
 const AssignVichel = () => {
-  const dispatch=useDispatch()
-  const {vehicleListForAssign}=useSelector(state=>{
+  const [iState, setUpdateState] = useState(initialState);
+  const { page, search, fromDate, toDate, timeframe } = iState;
+  const dispatch = useDispatch();
+  const {state}=useLocation()
+  console.log({state});
+  
+  const { vehicleListForAssign } = useSelector((state) => {
     return state?.driverManagementAllDrivers;
-  })
-  useEffect(()=>{
-    dispatch(getVehicleListForAssign());
-  },[])
-  console.log({ vehicleListForAssign });
-  const handleAssign = (id, driverId) => {
-    dispatch(assignVehicleToDriver({ id, driverId }));
+  });
+  useEffect(() => {
+    dispatch(getVehicleListForAssign({ page, timeframe }));
+  }, [page, timeframe]);
+  useEffect(() => {
+    const delayDebounceFunc = setTimeout(() => {
+      dispatch(
+        getVehicleListForAssign({
+          search: search.trim(),
+          timeframe,
+        })
+      );
+    }, 1000);
+
+    return () => clearTimeout(delayDebounceFunc);
+  }, [search, timeframe, dispatch]);
+
+  const handlePageChange = (page) => {
+    setUpdateState({ ...iState, page });
+    dispatch(getVehicleListForAssign({ page }));
   };
+
+  const handleChange = (e) => {
+    setUpdateState({ ...iState, [e.target.name]: e.target.value });
+  };
+  const handleReset = () => {
+    setUpdateState(initialState);
+    dispatch(getVehicleListForAssign({ page: 1 }));
+  };
+  const handleApply = () => {
+    const data = {
+      search,
+      fromDate,
+      toDate,
+      page,
+    };
+    dispatch(getVehicleListForAssign(data));
+  };
+  const handleAssign = (id) => {
+    console.log({ id, driverId: state?._id });
+
+    dispatch(assignVehicleToDriver({ id, driverId:state?._id })).then((res) => {
+      if (res?.payload?.code == 200) {
+        toastService.success("vechile assigned vehicle to driver");
+         dispatch(getVehicleListForAssign({ page }));
+      } else {
+        toastService.error("Failed to assign vehicle to driver");
+      }
+    });
+  };
+  console.log({ vehicleListForAssign });
+  
   return (
     <div className="WrapperArea">
       <div className="WrapperBox">
@@ -33,16 +94,16 @@ const AssignVichel = () => {
             <div className="ProfileInfo">
               <div className="ProfileDetails">
                 <figure>
-                  <img src="images/John-smith.png" />
+                  <img src={state?.profilePic} alt="no img" />
                 </figure>
                 <figcaption>
                   <h3>
-                    John Smith{" "}
+                    {state?.fullName}{" "}
                     <span className="Yellow">
-                      <i className="fa fa-star" aria-hidden="true" /> 4.5
+                      <i className="fa fa-star" aria-hidden="true" /> 0
                     </span>
                   </h3>
-                  <p>User ID : #432394</p>
+                  <p>User ID : {state?.driver_number}</p>
                 </figcaption>
                 <div className="Actions">
                   <label className="Switch">
@@ -52,9 +113,6 @@ const AssignVichel = () => {
                   <a className="Green" href="business-partner-edit.html">
                     <i className="fa fa-pencil" />
                   </a>
-                  {/* <a class="Red" data-toggle="modal" data-target="#BusinessDeleteModal">
-                              <i class="fa fa-trash"></i>
-                          </a>     */}
                 </div>
               </div>
             </div>
@@ -69,30 +127,40 @@ const AssignVichel = () => {
                   type="text"
                   className="form-control"
                   placeholder="Search"
+                  name="search"
+                  value={search}
+                  onChange={handleChange}
                 />
               </div>
-              {/* <div class="form-group">
-              <label>Duration</label>
-              <select class="form-control">
-                <option>Select</option>
-                <option>Today</option>
-                <option>This Week</option>
-                <option>This Month</option>
-                <option>This Year</option>
-              </select>
-            </div> */}
+
               <div className="form-group">
                 <label>From</label>
-                <input type="date" className="form-control" />
+                <input
+                  type="date"
+                  className="form-control"
+                  name="fromDate"
+                  value={fromDate}
+                  disabled={timeframe}
+                  onChange={handleChange}
+                />
               </div>
               <div className="form-group">
                 <label>To</label>
-                <input type="date" className="form-control" />
+                <input
+                  type="date"
+                  className="form-control"
+                  name="toDate"
+                  value={toDate}
+                  onChange={handleChange}
+                  disabled={timeframe}
+                />
               </div>
               <div className="form-group">
                 <label>&nbsp;</label>
-                <button className="Button">Apply</button>
-                <button className="Button Cancel">
+                <button className="Button" onClick={handleApply}>
+                  Apply
+                </button>
+                <button className="Button Cancel" onClick={handleReset}>
                   <i className="fa fa-refresh" />
                 </button>
               </div>
@@ -117,55 +185,83 @@ const AssignVichel = () => {
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td>1</td>
-                  <td>ABC</td>
-                  <td>Blue</td>
-                  <td>UP-16 7021</td>
-                  <td>Tata</td>
-                  <td>10-10-2024</td>
-                  <td>XYZ</td>
-                  <td>10-10-2025</td>
-                  <td>
-                    <figure>
-                      {" "}
-                      <img src="images/Avatar-1.png" />
-                    </figure>
-                  </td>
-                  <td>
-                    <span className="Green" onClick={() => handleAssign()}>
-                      <a href="">Assign</a>
-                    </span>{" "}
-                  </td>
-                </tr>
-                <tr>
-                  <td>2</td>
-                  <td>ABC</td>
-                  <td>Blue</td>
-                  <td>UP-16 7021</td>
-                  <td>Tata</td>
-                  <td>10-10-2024</td>
-                  <td>XYZ</td>
-                  <td>10-10-2025</td>
-                  <td>
-                    <figure>
-                      {" "}
-                      <img src="images/Avatar-1.png" />
-                    </figure>
-                  </td>
-                  <td>
-                    <span className="Green">
-                      <a href="">Assign</a>
-                    </span>{" "}
-                  </td>
-                </tr>
+                {vehicleListForAssign?.result?.[0]?.paginationData?.map(
+                  (res, i) => {
+                    return (
+                      <tr>
+                        <td>{i + 1 + (page - 1) * 10}</td>
+                        <td>
+                          {
+                            vehicleListForAssign?.result?.[0]
+                              ?.paginationData?.[0]?.categoryData?.categoryName
+                          }
+                        </td>
+                        <td>{res?.vehicleColour}</td>
+                        <td>{res?.rcNumber}</td>
+                        <td>{res?.vehicleModel}</td>
+                        <td>
+                          {moment(res?.rcExpiryDate).format("DD-MM-YYYY")}
+                        </td>
+                        <td>{res?.vehicleManufacturer}</td>
+                        <td>
+                          {moment(res?.insurenceExpiryDate).format(
+                            "DD-MM-YYYY"
+                          )}
+                        </td>
+                        <td>
+                          <figure>
+                            {" "}
+                            <img src={res?.vehicleFrontImage} alt="no img" />
+                          </figure>
+                        </td>
+                        <td>
+                          <span
+                            className="Green"
+                            onClick={() => handleAssign(res?._id)}
+                          >
+                            <a>Assign</a>
+                          </span>{" "}
+                        </td>
+                      </tr>
+                    );
+                  }
+                )}
               </tbody>
             </table>
+          </div>
+          <div className="PaginationBox">
+            <div className="PaginationLeft">
+              <p>
+                Total Records :{" "}
+                <span>
+                  {vehicleListForAssign?.result?.[0]?.totalCount?.[0]?.count ||
+                    0}
+                </span>
+              </p>
+            </div>
+
+            <div className="PaginationRight">
+              {vehicleListForAssign?.result?.[0]?.totalCount?.[0]?.count >
+                0 && (
+                <CommonPagination
+                  activePage={page}
+                  itemsCountPerPage={10}
+                  totalItemsCount={
+                    vehicleListForAssign?.result?.[0]?.totalCount?.[0]?.count ||
+                    0
+                  }
+                  pageRangeDisplayed={4}
+                  onChange={handlePageChange}
+                  itemClass="page-item"
+                  linkClass="page-link"
+                />
+              )}
+            </div>
           </div>
         </div>
       </div>
     </div>
   );
-}
+};
 
-export default AssignVichel
+export default AssignVichel;
