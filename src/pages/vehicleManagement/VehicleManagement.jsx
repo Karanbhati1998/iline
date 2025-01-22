@@ -1,25 +1,22 @@
-import React, { useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
-import { getCategoryWiseVehicleData } from '../../features/slices/vechileManagement/vechileManagement';
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+import { getCategoryWiseVehicleData } from "../../features/slices/vechileManagement/vechileManagement";
 
 const VehicleManagement = () => {
-  const dispatch=useDispatch()
-   const { categoryWiseVehicleData } = useSelector((state) => {
-     return state?.vechile;
-   });
-   console.log({ categoryWiseVehicleData });
-   
-  useEffect(()=>{
+  const dispatch = useDispatch();
+  const { categoryWiseVehicleData } = useSelector((state) => {
+    return state?.vechile;
+  });
+  useEffect(() => {
     dispatch(getCategoryWiseVehicleData());
-  },[])
+  }, []);
   return (
     <div className="WrapperArea">
       <div className="WrapperBox">
         <div className="TitleBox">
           <h4 className="Title">Vehicle Management</h4>
           <div className="TitleLink">
-            {" "}
             <Link to="addVechile" className="TitleLink">
               Add Vehicle
             </Link>
@@ -28,7 +25,7 @@ const VehicleManagement = () => {
             </Link>
           </div>
         </div>
-        {categoryWiseVehicleData?.result?.map((res,i)=>{
+        {categoryWiseVehicleData?.result?.map((res, i) => {
           return (
             <div className="Small-Wrapper" key={res?._id}>
               <div className="TitleBox">
@@ -111,7 +108,6 @@ const VehicleManagement = () => {
                       </span>
                       <span className="Text">Express Delivery</span>
                       <span className="Count">
-                        {" "}
                         {res?.serviceTypeCounts?.express}
                       </span>
                     </Link>
@@ -122,7 +118,7 @@ const VehicleManagement = () => {
                         <img src={require("../../assets/images/car.png")} />
                       </span>
                       <span className="Text">Offline Vehicles</span>
-                      <span className="Count">63</span>
+                      <span className="Count">-</span>
                     </a>
                   </li>
                   <li>
@@ -131,7 +127,7 @@ const VehicleManagement = () => {
                         <img src={require("../../assets/images/car.png")} />
                       </span>
                       <span className="Text">Online Vehicles</span>
-                      <span className="Count">12</span>
+                      <span className="Count">-</span>
                     </a>
                   </li>
                   <li>
@@ -421,6 +417,6 @@ const VehicleManagement = () => {
       </div>
     </div>
   );
-}
+};
 
-export default VehicleManagement
+export default VehicleManagement;

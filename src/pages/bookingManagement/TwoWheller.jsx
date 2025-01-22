@@ -3,6 +3,7 @@ import OnGoing from '../../components/bookingManagement/ongoing/OnGoing';
 import Scheduled from '../../components/bookingManagement/scheduled/Scheduled';
 import Completed from '../../components/bookingManagement/completed/Completed';
 import Canceled from '../../components/bookingManagement/canceled/Canceled';
+import { useLocation } from 'react-router-dom';
 
 const TwoWheller = () => {
   const [activeTab,setActiveTab]=useState({
@@ -12,6 +13,7 @@ const TwoWheller = () => {
     canceled:false
   })
   const {ongoing,scheduled,completed,canceled}=activeTab;
+   const { state } = useLocation();
   const activeTabFunc=(tab)=>{
     setActiveTab((prev) => ({
       ongoing: false,
@@ -63,10 +65,12 @@ const TwoWheller = () => {
             </li>
           </ul>
           <div className="tab-content">
-            {ongoing && <OnGoing />}
-            {scheduled && <Scheduled />}
-            {completed && <Completed />}
-            {canceled && <Canceled />}
+              <div className="tab-pane active" id="Ongoing">
+            {ongoing && <OnGoing categoryId={state}/>}
+            {scheduled && <Scheduled categoryId={state}/>}
+            {completed && <Completed categoryId={state}/>}
+            {canceled && <Canceled categoryId={state}/>}
+              </div>
           </div>
         </div>
       </div>

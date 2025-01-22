@@ -1,13 +1,41 @@
-import React, { useState } from "react";
-import { Link, NavLink, useLocation } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import LogoutModal from "./LogoutModal";
+import { getVechileCategory } from "../features/slices/vechileManagement/vechileCategory";
+import { useDispatch, useSelector } from "react-redux";
 
 const Sidebar = () => {
+  const [catId, setCatId] = useState("");
   const [logoutModal, setLogoutModal] = useState(false);
   const { pathname } = useLocation();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const url = pathname.split("/")[1];
   const handleClose = () => {
     setLogoutModal(false);
+  };
+  const { VechileCategories } = useSelector((state) => {
+    return state?.vechileCategory;
+  });
+  console.log({ VechileCategories });
+
+  useEffect(() => {
+    dispatch(getVechileCategory({ limit: 99999 })).then((res) => {
+      if (res?.payload?.code == 200) {
+        console.log({ res });
+        setCatId(res?.payload?.result?.[0]?.paginationData?.[0]?._id);
+      }
+    });
+  }, []);
+  useEffect(() => {
+    if (catId) {
+      // Call your API here using the updated `catId`
+      console.log("API Call with catId:", catId);
+    }
+  }, [catId]);
+  const handleNavigate = (id) => {
+    navigate("/bookingManagementTwoWheller", { state: id });
+    setCatId(id);
   };
   return (
     <>
@@ -55,27 +83,21 @@ const Sidebar = () => {
               Booking Management
             </a>
             <ol className="dropdown-menu">
-              <li>
-                <Link
-                  to="/bookingManagementTwoWheller"
-                  className={
-                    url == "bookingManagementTwoWheller"
-                      ? "textactive"
-                      : "textactive"
-                  }
-                >
-                  Two-Wheeler
-                </Link>
-              </li>
-              <li>
-                <a>Three-Wheeler</a>
-              </li>
-              <li>
-                <a>Four-Wheeler</a>
-              </li>
-              <li>
-                <a>Freight Truck</a>
-              </li>
+              {VechileCategories?.result?.[0]?.paginationData?.map((res) => {
+                return (
+                  <li key={res?._id}>
+                    <a
+                      // to="/bookingManagementTwoWheller"
+                      className={catId == res?._id ? "textactive" : ""}
+                      onClick={() => {
+                        handleNavigate(res?._id);
+                      }}
+                    >
+                      {res?.categoryName}
+                    </a>
+                  </li>
+                );
+              })}
             </ol>
           </li>
 
