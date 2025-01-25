@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import {
+  getAllUserList,
   userList,
   userStatus,
 } from "../../features/slices/userManagementReducer";
@@ -18,12 +19,28 @@ const initialState = {
 };
 const UserManagement = () => {
   const [iState, setUpdateState] = useState(initialState);
+    const [allData, setAllData] = useState([]);
   const { page, search, fromDate, toDate, timeframe } = iState;
   const dispatch = useDispatch();
   const userRef = useRef();
   const { users } = useSelector((state) => {
     return state?.userManagement;
   });
+   useEffect(() => {
+     const data = {
+       search,
+       fromDate,
+       toDate,
+       timeframe,
+       limit: 999999,
+     };
+     dispatch(getAllUserList(data)).then((res) => {
+       if (res?.payload?.code == 200) {
+         console.log({ res });
+         setAllData(res?.payload);
+       }
+     });
+   }, [timeframe, page, toDate,search, fromDate]);
   useEffect(() => {
     dispatch(userList({ page, timeframe }));
   }, [timeframe, page]);
@@ -156,8 +173,66 @@ const UserManagement = () => {
               <ExportToExcel ref={userRef} fileName="UserManagement" />
             </div>
           </div>
-          <div className="TableList mt-4">
+          <div className="TableList mt-4" style={{ display: "none" }}>
             <table style={{ width: "120%" }} ref={userRef}>
+              <thead>
+                <tr>
+                  <th>S.No</th>
+                  <th>User Name </th>
+                  <th>Mobile Number </th>
+                  <th>Frequent Address </th>
+                  <th>Created On </th>
+                  <th>Current Status </th>
+                  <th>Language Preference</th>
+                  <th>GST Number </th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {allData?.result?.[0]?.paginationData?.map((res, i) => {
+                  return (
+                    <tr>
+                      <td>{i + 1 + (page - 1) * 10}</td>
+                      <td>
+                        <Link to={"userManagementDetail"} state={res}>
+                          {res?.fullName}
+                        </Link>
+                      </td>
+                      <td>{res?.phoneNumber} </td>
+                      <td>{res?.address}</td>
+                      <td>{moment(res?.createdAt).format("DD-MM-YYYY")} </td>
+                      <td>
+                        <span
+                          className={
+                            res?.userStatus == "ACTIVE" ? "Green" : "Red"
+                          }
+                        >
+                          {res?.userStatus}
+                        </span>{" "}
+                      </td>
+                      <td>{res?.language}</td>
+                      <td>{res?.gstNumber}</td>
+                      <td>
+                        <div className="Actions">
+                          <label className="Switch">
+                            <input
+                              type="checkbox"
+                              name="status"
+                              checked={res?.userStatus == "ACTIVE"}
+                              onChange={(e) => handleChecked(e, res?._id)}
+                            />
+                            <span className="slider" />
+                          </label>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+          <div className="TableList mt-4">
+            <table style={{ width: "120%" }}>
               <thead>
                 <tr>
                   <th>S.No</th>
@@ -177,7 +252,9 @@ const UserManagement = () => {
                     <tr>
                       <td>{i + 1 + (page - 1) * 10}</td>
                       <td>
-                        <Link to={"userManagementDetail"} state={res}>{res?.fullName}</Link>
+                        <Link to={"userManagementDetail"} state={res}>
+                          {res?.fullName}
+                        </Link>
                       </td>
                       <td>{res?.phoneNumber} </td>
                       <td>{res?.address}</td>

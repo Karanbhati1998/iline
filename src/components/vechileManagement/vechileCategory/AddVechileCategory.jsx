@@ -16,6 +16,8 @@ const initialState = {
   width: 0,
   height: 0,
   volume: 0,
+  loadingTime:0,
+  unloadingTime:0,
   fareData: [
     {
       serviceType: "LOCAL",
@@ -63,11 +65,19 @@ const AddVechileCategory = () => {
   const [iState, setUpdateState] = useState(initialState);
   const [errors, setErrors] = useState({});
   const [imageLoader, setImageLoader] = useState(false);
-  const { categoryName, fareData, weightCapicity, uploadIcon, tagLine ,  length,
-  width,
-  height,
-  volume,} =
-    iState;
+  const {
+    categoryName,
+    fareData,
+    weightCapicity,
+    uploadIcon,
+    tagLine,
+    length,
+    width,
+    height,
+    volume,
+    unloadingTime,
+    loadingTime,
+  } = iState;
   const dispatch = useDispatch();
   const navigate = useNavigate();
   console.log({ fareData });
@@ -205,6 +215,14 @@ useEffect(() => {
     }
     if (!height.trim()) {
       formErrors.height = "Height is required";
+      isValid = false;
+    }
+    if (!loadingTime.trim()) {
+      formErrors.loadingTime = "Height is required";
+      isValid = false;
+    }
+    if (!unloadingTime.trim()) {
+      formErrors.unloadingTime = "unloading Time is required";
       isValid = false;
     }
    
@@ -350,7 +368,7 @@ useEffect(() => {
               </div>
               <div className="col-sm-4">
                 <div className="form-group">
-                  <label>Length</label>
+                  <label>Length (in meter)</label>
                   <input
                     type="number"
                     className="form-control"
@@ -368,7 +386,7 @@ useEffect(() => {
               </div>
               <div className="col-sm-4">
                 <div className="form-group">
-                  <label>Width</label>
+                  <label>Width (in meter)</label>
                   <input
                     type="number"
                     className="form-control"
@@ -386,7 +404,7 @@ useEffect(() => {
               </div>
               <div className="col-sm-4">
                 <div className="form-group">
-                  <label>Height</label>
+                  <label>Height (in meter)</label>
                   <input
                     type="number"
                     className="form-control"
@@ -416,6 +434,42 @@ useEffect(() => {
                   {errors.volume && (
                     <p className="d-flex justify-content-start text-danger mt-2 error">
                       {errors.volume}
+                    </p>
+                  )}
+                </div>
+              </div>
+              <div className="col-sm-4">
+                <div className="form-group">
+                  <label>Loading Time (in minus)</label>
+                  <input
+                    type="number"
+                    className="form-control"
+                    placeholder={0}
+                    name="loadingTime"
+                    value={loadingTime}
+                    onChange={handleChange}
+                  />
+                  {errors.loadingTime && (
+                    <p className="d-flex justify-content-start text-danger mt-2 error">
+                      {errors.loadingTime}
+                    </p>
+                  )}
+                </div>
+              </div>
+              <div className="col-sm-4">
+                <div className="form-group">
+                  <label>Unloading Time (in minus)</label>
+                  <input
+                    type="number"
+                    className="form-control"
+                    placeholder={0}
+                    name="unloadingTime"
+                    value={unloadingTime}
+                    onChange={handleChange}
+                  />
+                  {errors.unloadingTime && (
+                    <p className="d-flex justify-content-start text-danger mt-2 error">
+                      {errors.unloadingTime}
                     </p>
                   )}
                 </div>

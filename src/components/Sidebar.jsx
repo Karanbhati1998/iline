@@ -87,8 +87,7 @@ const Sidebar = () => {
                 return (
                   <li key={res?._id}>
                     <a
-                      // to="/bookingManagementTwoWheller"
-                      className={catId == res?._id ? "textactive" : ""}
+                    className={catId == res?._id ? "textactive" : ""}
                       onClick={() => {
                         handleNavigate(res?._id);
                       }}

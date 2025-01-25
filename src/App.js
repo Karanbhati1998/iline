@@ -62,6 +62,12 @@ import VechileDetails from "./components/vechileManagement/vechileDetail/Vechile
 import PendingVechilePage from "./components/vechileManagement/vechileTable/PendingVechilePage";
 import AssignVichel from "./components/driverManagement/allDriver/driverDetailManagement/profileSummary/AssignVichel";
 import AssignedVichelHistory from "./components/driverManagement/allDriver/driverDetailManagement/profileSummary/AssignedVichelHistory";
+import CanceledDetail from "./components/bookingManagement/canceled/CanceledDetail";
+import CompletedDetail from "./components/bookingManagement/completed/CompletedDetail";
+import ScheduledDetail from "./components/bookingManagement/scheduled/ScheduledDetail";
+import AddNotification from "./components/notification/AddNotification";
+import EditNotification from "./components/notification/EditNotification";
+import NotificationDetail from "./components/notification/NotificationDetail";
 function App() {
   const isAuthenticated = getToken("ilineLogin", "token");
   return (
@@ -148,6 +154,18 @@ function App() {
                   element={<BookingManagementDetail />}
                 />
                 <Route
+                  path="/bookingManagementTwoWheller/canceldetail"
+                  element={<CanceledDetail />}
+                />
+                <Route
+                  path="/bookingManagementTwoWheller/completedetail"
+                  element={<CompletedDetail />}
+                />
+                <Route
+                  path="/bookingManagementTwoWheller/scheduledetail"
+                  element={<ScheduledDetail />}
+                />
+                <Route
                   path="/bookingManagementTwoWheller/track"
                   element={<BookingManagementTrack />}
                 />
@@ -219,6 +237,18 @@ function App() {
                 <Route
                   path="/pushNotification"
                   element={<PushNotification />}
+                />
+                <Route
+                  path="/pushNotification/add"
+                  element={<AddNotification />}
+                />
+                <Route
+                  path="/pushNotification/edit"
+                  element={<EditNotification />}
+                />
+                <Route
+                  path="/pushNotification/detail"
+                  element={<NotificationDetail />}
                 />
                 <Route
                   path="/changeManagement"

@@ -5,6 +5,7 @@ import { getScheduledBookingList } from '../../../features/slices/bookingManagem
 import { toastService } from "../../../utils/toastify";
 import CommonPagination from "../../CommonPagination";
 import moment from "moment";
+import { Link } from 'react-router-dom';
 const initialState = {
   page: 1,
   search: "",
@@ -202,12 +203,12 @@ const Scheduled = ({ categoryId }) => {
               <td>I-Line Wallet</td>
               <td>
                 <div className="Actions">
-                  <a
+                  <Link
+                    to="scheduledetail"
                     className="Blue"
-                    href="booking-management-sheduled-booking-details.html"
-                  >
+                     >
                     <i className="fa fa-info-circle" aria-hidden="true" />
-                  </a>
+                  </Link>
                 </div>
               </td>
             </tr>

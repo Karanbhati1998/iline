@@ -1,11 +1,7 @@
-import React from "react";
-import BackButton from "../BackButton";
-import { useLocation } from "react-router-dom";
+import React from 'react'
+import BackButton from '../../BackButton';
 
-const BookingManagementDetail = () => {
-  const { state } = useLocation();
-  console.log({ state });
-
+const ScheduledDetail = () => {
   return (
     <div className="WrapperArea">
       <div className="WrapperBox">
@@ -18,66 +14,46 @@ const BookingManagementDetail = () => {
         <div className="Small-Wrapper">
           <div className="DriverCountList">
             <div className="OrderHeader">
-              <h1>Ongoing Booking Details</h1>
-              <p>
-                {state?.scheduledDate} {"  ,"}
-                {state?.scheduledTime} • ID: {state?.trip_number}
-              </p>
+              <h1>Scheduled Booking Details</h1>
+              <p>Tue, 23 Feb 2020 12:00PM • ID: 2130812309</p>
             </div>
             <ul>
               <li>
                 <h2>
-                  Driver Details{" "}
-                  <span> #{state?.driverData?.driver_number}</span>
+                  Driver Details <span> #21335</span>
                 </h2>
                 <a href="driver-management-all-driver-details.html">
                   <span className="Icon">
-                    <img
-                      src={
-                        state?.driverData?.profilePic ||
-                        require("../../assets/images/Driver.png")
-                      }
-                      alt="no img"
-                    />
+                    <img src="images/Driver.png" />
                   </span>
                   <span className="Text">
-                    {state?.driverData?.fullName}{" "}
-                    <p>{state?.driverData?.phoneNumber}</p>
+                    Akshit Kumar <p>+918382482473</p>
                   </span>
-                  <span className="Count">⭐ -</span>
+                  <span className="Count">⭐ 4.5</span>
                 </a>
               </li>
               <li>
                 <h2>
-                  Customer Details<span> #{state?.userData?.user_number}</span>
+                  Customer Details<span> #21335</span>
                 </h2>
                 <a href="driver-management-all-driver-details.html">
                   <span className="Icon">
-                    <img
-                      src={
-                        state?.userData?.profilePic ||
-                        require("../../assets/images/Driver.png")
-                      }
-                    />
+                    <img src="images/Driver.png" />
                   </span>
                   <span className="Text">
-                    {state?.userData?.fullName}{" "}
-                    <p>{state?.userData?.phoneNumber}</p>
+                    Gregory <p>+918382482473</p>
                   </span>
-                  <span className="Count">⭐ {state?.userData?.avgRating}</span>
+                  <span className="Count">⭐ 4.5</span>
                 </a>
               </li>
               <li>
                 <h2>Pick Up Location</h2>
                 <a href="driver-management-all-driver-details.html">
                   <span className="Icon">
-                    <img
-                      src={require("../../assets/images/locationIcon.png")}
-                    />
+                    <img src="images/Driver.png" />
                   </span>
                   <span className="Text">
-                    {state?.pickUpLocationName}
-                    <p>Drop off 12:28PM, 23 Feb</p>
+                    East Coast Hill<p>Drop off 12:28PM, 23 Feb</p>
                   </span>
                 </a>
               </li>
@@ -85,13 +61,10 @@ const BookingManagementDetail = () => {
                 <h2>Drop Location</h2>
                 <a href="driver-management-all-driver-details.html">
                   <span className="Icon">
-                    <img
-                      src={require("../../assets/images/locationIcon.png")}
-                    />
+                    <img src="images/Driver.png" />
                   </span>
                   <span className="Text">
-                    {state?.dropOffLocationName}
-                    <p>Drop off -, -</p>
+                    East Coast Hill<p>Drop off 12:28PM, 23 Feb</p>
                   </span>
                 </a>
               </li>
@@ -102,7 +75,7 @@ const BookingManagementDetail = () => {
                     <img src="images/Driver.png" />
                   </span>
                   <span className="Text">
-                    -<p>-</p>
+                    Poonam Vashisht<p>+918382482473</p>
                     <p>Address details</p>
                   </span>
                 </a>
@@ -114,22 +87,21 @@ const BookingManagementDetail = () => {
                     <img src="images/Driver.png" />
                   </span>
                   <span className="Text">
-                    -<p>-</p>
+                    Poonam Vashisht<p>+918382482473</p>
                     <p>Address details</p>
                   </span>
                 </a>
               </li>
               <li>
                 <h2>
-                  Vehicle Details <span> #-</span>
+                  Vehicle Details <span> #21335</span>
                 </h2>
                 <a href="driver-management-all-driver-details.html">
                   <span className="Icon">
-                    <img src={state?.vehicleData?.vehicleFrontImage} />
+                    <img src="images/car.png" />
                   </span>
                   <span className="Text">
-                    {state?.vehicleData?.vehicleNumberPlate}
-                    <p>• {state?.vehicleData?.vehicleModel}</p>
+                    UP16-BV-0000 <p>• Sedan</p>
                   </span>
                 </a>
               </li>
@@ -145,72 +117,50 @@ const BookingManagementDetail = () => {
                         </p>
                         <p>
                           <strong> Weight</strong>
-                          <span> {state?.weight} Kg</span>
+                          <span> 13.6 Kg</span>
                         </p>
                         <p>
                           <strong> Dimensions</strong>
-                          <span>
-                            {" "}
-                            {state?.length} m x {state?.width} m x{" "}
-                            {state?.height} m
-                          </span>
+                          <span> 100 m x 500 m x 25 m</span>
                         </p>
                         <p>
                           <strong> Cargo Volume</strong>
-                          <span>
-                            {" "}
-                            {(
-                              state?.length *
-                              state?.width *
-                              state?.height *
-                              35.3147
-                            ).toFixed(2)}{" "}
-                            cubic feet
-                          </span>
+                          <span> 33.2 cubic feet</span>
                         </p>
                         <p>
                           <strong>Delivery Instructions</strong>
-                          <span> {state?.deliveryInstructions}</span>
+                          <span> loremipusm</span>
                         </p>
                         <p>
                           <strong>Special Handling Instructions:</strong>
-                          <span> {state?.specialHandlingInstructions}</span>
+                          <span> loremipusm</span>
                         </p>
                       </aside>
                       <aside>
                         <p>
                           <strong>Image </strong>
                           <span>
-                            <img
-                              src={state?.parcelImages?.[0]}
-                              style={{
-                                width: "50px",
-
-                                height: "50px",
-                                objectFit: "cover",
-                                borderRadius: "50%",
-                              }}
-                            />
+                            <img src="images/akshit.png" />
                           </span>
                         </p>
                         <p>
                           <strong> No. of Parcels</strong>
-                          <span> {state?.numberOfParcel}</span>
+                          <span> 2</span>
                         </p>
                         <p>
                           <strong> Loading Time</strong>
-                          <span> -</span>
+                          <span> 1 hr 30 min</span>
                         </p>
                         <p>
                           <strong> Unloading Time</strong>
-                          <span> -</span>
+                          <span> 1 hr 30 min</span>
                         </p>
                         <p>
                           <strong>
                             {" "}
-                            -
+                            Has the purchased trip insurance for a safe journey?
                           </strong>{" "}
-                          -
+                          Yes
                         </p>
                       </aside>
                     </article>
@@ -226,36 +176,36 @@ const BookingManagementDetail = () => {
                     <aside>
                       <p>
                         <strong>Trip Charges</strong>
-                        <span> Rs {state?.tripCharge}</span>
+                        <span> Rs 210</span>
                       </p>
                       <p>
                         <strong>Loading/Unloading Charges</strong>
-                        <span> Rs -</span>
+                        <span> Rs 100</span>
                       </p>
                       <p>
                         <strong>Insurance</strong>
-                        <span> Rs -</span>
+                        <span> Rs 100</span>
                       </p>
                     </aside>
                     <aside>
                       {" "}
                       <p>
                         <strong>SGST (5%)</strong>
-                        <span> Rs -</span>
+                        <span> Rs 10.5</span>
                       </p>
                       <p>
                         <strong>CGST (5%)</strong>
-                        <span> Rs -</span>
+                        <span> Rs 10.5</span>
                       </p>
                       <p>
                         <strong>Coupon Discount</strong>
-                        <span> -Rs -</span>
+                        <span> -Rs 10.5</span>
                       </p>
                     </aside>
                   </article>
                 </div>
               </div>
-              <h3>Total Amount to Pay: Rs -</h3>
+              <h3>Total Amount to Pay: Rs 231</h3>
             </div>
             <div className="Small-Wrapper">
               <div className="TitleBox">
@@ -314,71 +264,54 @@ const BookingManagementDetail = () => {
                 </div>
               </div>
             </div>
-            <div className="row mt-4">
-              <div className="col-sm-6">
-                <div className="form-group">
-                  <label>Incorrect Load Reported</label>
-                  <div className="Avaialable">
-                    <ul>
-                      <li>
-                        <label className="CheckBox">
-                          Yes
-                          <input type="checkbox" />
-                          <span className="checkmark" />
-                        </label>
-                      </li>
-                      <li>
-                        <label className="CheckBox">
-                          No
-                          <input type="checkbox" />
-                          <span className="checkmark" />
-                        </label>
-                      </li>
-                    </ul>
+            {/* <div class="row mt-4">
+                        
+                  <div class="col-sm-6">
+                      <div class="form-group">
+                          <label>Incorrect Load Reported</label>
+                          <div class="Avaialable">
+                              <ul>
+                                  <li>
+                                      <label class="CheckBox">Yes
+                                          <input type="checkbox">
+                                          <span class="checkmark"></span>
+                                      </label>
+                                  </li>
+                                  <li>
+                                      <label class="CheckBox">No
+                                          <input type="checkbox">
+                                          <span class="checkmark"></span>
+                                      </label>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
                   </div>
-                </div>
-              </div>
-              <div className="col-sm-6">
-                <div className="form-group">
-                  <label>Revised Load Capacity</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    defaultValue="450 Kg"
-                    disabled=""
-                  />
-                </div>
-              </div>
-              <div className="col-sm-6">
-                <div className="form-group">
-                  <label>Penalty</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    defaultValue="Rs 1000"
-                    disabled=""
-                  />
-                </div>
-              </div>
-              <div className="col-sm-6">
-                <div className="form-group">
-                  <label>Revised Amount to Pay</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    defaultValue="Rs 3000"
-                    disabled=""
-                  />
-                </div>
-              </div>
-            </div>
+                  <div class="col-sm-6">
+                      <div class="form-group">
+                          <label>Revised Load Capacity</label>
+                          <input type="text" class="form-control" value="450 Kg" disabled>
+                      </div> 
+                  </div>  
+                  <div class="col-sm-6">
+                      <div class="form-group">
+                          <label>Penalty</label>
+                          <input type="text" class="form-control" value="Rs 1000" disabled>
+                      </div> 
+                  </div>  
+                  <div class="col-sm-6">
+                      <div class="form-group">
+                          <label>Revised Amount to Pay</label>
+                          <input type="text" class="form-control" value="Rs 3000" disabled>
+                      </div> 
+                  </div>  
+              </div> */}
           </div>
         </div>
-
         {/* </div> */}
       </div>
     </div>
   );
-};
+}
 
-export default BookingManagementDetail;
+export default ScheduledDetail

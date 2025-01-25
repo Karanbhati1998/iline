@@ -5,8 +5,23 @@ const initialState = {
   iLineDriverList: [],
   p2pDriverList: [],
   vehicleListForAssign:[],
+  allDriverData:[],
   loading: false,
 };
+export const fetchAllDriverList = createAsyncThunk(
+  "get/AllDriverList",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get("/driverList", {
+        params: payload,
+      });
+      return response.data;
+    } catch (error) {
+      rejectWithValue(error);
+      console.log({ error });
+    }
+  }
+);
 export const fetchILineDriverList = createAsyncThunk(
   "get/iLineDriverList",
   async (payload, { rejectWithValue }) => {
@@ -121,6 +136,16 @@ const allDriver = createSlice({
       state.vehicleListForAssign = action.payload;
     });
     builder.addCase(getVehicleListForAssign.rejected, (state, action) => {
+      state.loading = false;
+    });
+    builder.addCase(fetchAllDriverList.pending, (state, action) => {
+      state.loading = true;
+    });
+    builder.addCase(fetchAllDriverList.fulfilled, (state, action) => {
+      state.loading = false;
+      state.allDriverData = action.payload;
+    });
+    builder.addCase(fetchAllDriverList.rejected, (state, action) => {
       state.loading = false;
     });
   },

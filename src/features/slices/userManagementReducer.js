@@ -4,6 +4,18 @@ const initialState={
     users:[],
     loading: false,
 }
+export const getAllUserList=createAsyncThunk("get/alluserlist",async(payload,{rejectWithValue})=>{
+    try {
+        const response = await axiosInstance.get("/userList",{
+            params:payload
+        })
+        return response.data
+    } catch (error) {
+        rejectWithValue(error)
+        console.log({error});
+        
+    }
+})
 export const userList=createAsyncThunk("get/userlist",async(payload,{rejectWithValue})=>{
     try {
         const response = await axiosInstance.get("/userList",{

@@ -20,8 +20,6 @@ const I_lineDriver = () => {
   const {iLineDriverList} =useSelector(state=>{
     return state?.driverManagementAllDrivers;
   })
-  console.log({ iLineDriverList });
-  
   useEffect(() => {
     dispatch(fetchILineDriverList({ page, timeframe }));
   }, [page, timeframe]);

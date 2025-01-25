@@ -9,6 +9,7 @@ import { toastService } from '../../../utils/toastify';
 const initialState={}
 const VechileStatus = () => {
   const [showDisApproveModal,setShowDisApproveModal]=useState(false)
+  const [id,setId]=useState('')
   const {state}=useLocation()
   const navigate=useNavigate()
   const dispatch=useDispatch()
@@ -136,25 +137,40 @@ const VechileStatus = () => {
                           <aside>
                             <p>
                               <strong>Registration Certificate Number</strong>
-                              <span>{state?.aadharNumber}</span>
+                              <span>
+                                {state?.driverDocumentData?.[0]?.aadharNumber ||
+                                  state?.aadharNumber}
+                              </span>
                             </p>
-                            <p>
+                            {/* <p>
                               <strong>Expiry</strong>
                               <span>-</span>
-                            </p>
+                            </p> */}
                           </aside>
                           <ul>
                             <li>
                               <span>Document</span>
                               <figure>
-                                <img src="https://mobulous.co.in/just-clubbing/assets/images/driving.png" />
+                                <img
+                                  src={
+                                    state?.driverDocumentData?.[0]
+                                      ?.aadharFront 
+                                  }
+                                  alt='no img'
+                                />
                               </figure>
-                            </li>
-                            <li>
-                              <strong className="Red">
-                                <i className="fa fa-exclamation-triangle" />{" "}
-                                Expiring in 5 days
-                              </strong>
+                              <figure
+                                style={{
+                                  marginTop: "10px",
+                                }}
+                              >
+                                <img
+                                  src={
+                                    state?.driverDocumentData?.[0]
+                                      ?.aadharBack    }
+                                      alt='no img'
+                                />
+                              </figure>
                             </li>
                           </ul>
                         </div>
@@ -234,6 +250,7 @@ const VechileStatus = () => {
                   className="Reject"
                   onClick={() => {
                     setShowDisApproveModal(true);
+                    setId()
                   }}
                 >
                   Disapprove
@@ -246,7 +263,7 @@ const VechileStatus = () => {
       {showDisApproveModal && (
         <DisApproveModal
           handleCloseDisApproveModal={handleCloseDisApproveModal}
-          handleApproveOrDisApprove={handleApproveOrDisApprove}
+          id={state?._id}
         />
       )}
     </>

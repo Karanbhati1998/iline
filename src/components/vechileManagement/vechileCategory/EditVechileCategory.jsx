@@ -11,10 +11,16 @@ import {
 import LoaderForImage from "../../LoaderForImage";
 const initialState = {
   categoryName: "",
-  categoryId:"",
+  categoryId: "",
   tagLine: "",
   uploadIcon: "",
   weightCapicity: "",
+  length: 0,
+  width: 0,
+  height: 0,
+  volume: 0,
+  loadingTime: 0,
+  unloadingTime: 0,
   fareData: [
     {
       serviceType: "LOCAL",
@@ -62,8 +68,19 @@ const EditVechileCategory = () => {
   const [iState, setUpdateState] = useState(initialState);
   const [errors, setErrors] = useState({});
   const [imageLoader, setImageLoader] = useState(false);
-  const { categoryName, fareData, weightCapicity, uploadIcon, tagLine } =
-    iState;
+  const {
+    categoryName,
+    fareData,
+    weightCapicity,
+    uploadIcon,
+    tagLine,
+    length,
+    width,
+    height,
+    volume,
+    unloadingTime,
+    loadingTime,
+  } = iState;
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { state } = useLocation();
@@ -85,6 +102,31 @@ const EditVechileCategory = () => {
       fileInputRef.current.click();
     }
   };
+  useEffect(() => {
+  
+    // Ensure all dimensions are valid numbers before calculating the volume
+    if (
+      width &&
+      height &&
+      length &&
+      !isNaN(width) &&
+      !isNaN(height) &&
+      !isNaN(length)
+    ) {
+      const calculatedVolume =
+        parseFloat(width) * parseFloat(height) * parseFloat(length);
+      setUpdateState((prev) => ({
+        ...prev,
+        volume: calculatedVolume,
+      }));
+    } else {
+      setUpdateState((prev) => ({
+        ...prev,
+        volume: "",
+      }));
+    }
+  }, [width, height, length]);
+  
   const uploadImage = (e) => {
     console.log({ errors });
     console.log(e.target.name);
@@ -176,7 +218,26 @@ const EditVechileCategory = () => {
      formErrors.weightCapicity = "Weight Capacity is required";
      isValid = false;
    }
-
+  if (!length.trim()) {
+    formErrors.length = "Length is required";
+    isValid = false;
+  }
+  if (!width.trim()) {
+    formErrors.width = "Width is required";
+    isValid = false;
+  }
+  if (!height.trim()) {
+    formErrors.height = "Height is required";
+    isValid = false;
+  }
+  if (!loadingTime.trim()) {
+    formErrors.loadingTime = "Height is required";
+    isValid = false;
+  }
+  if (!unloadingTime.trim()) {
+    formErrors.unloadingTime = "unloading Time is required";
+    isValid = false;
+  }
    // Validate uploadIcon
    if (!uploadIcon?.toString().trim()) {
      formErrors.uploadIcon = "Upload Icon is required";
@@ -333,6 +394,114 @@ const EditVechileCategory = () => {
                   {errors.weightCapicity && (
                     <p className="d-flex justify-content-start text-danger mt-2 error">
                       {errors.weightCapicity}
+                    </p>
+                  )}
+                </div>
+              </div>
+              <div className="col-sm-4">
+                <div className="form-group">
+                  <label>Length (in meter)</label>
+                  <input
+                    type="number"
+                    className="form-control"
+                    placeholder={0}
+                    name="length"
+                    value={length}
+                    onChange={handleChange}
+                  />
+                  {errors.length && (
+                    <p className="d-flex justify-content-start text-danger mt-2 error">
+                      {errors.length}
+                    </p>
+                  )}
+                </div>
+              </div>
+              <div className="col-sm-4">
+                <div className="form-group">
+                  <label>Width (in meter)</label>
+                  <input
+                    type="number"
+                    className="form-control"
+                    placeholder={0}
+                    name="width"
+                    value={width}
+                    onChange={handleChange}
+                  />
+                  {errors.width && (
+                    <p className="d-flex justify-content-start text-danger mt-2 error">
+                      {errors.width}
+                    </p>
+                  )}
+                </div>
+              </div>
+              <div className="col-sm-4">
+                <div className="form-group">
+                  <label>Height (in meter)</label>
+                  <input
+                    type="number"
+                    className="form-control"
+                    placeholder={0}
+                    name="height"
+                    value={height}
+                    onChange={handleChange}
+                  />
+                  {errors.height && (
+                    <p className="d-flex justify-content-start text-danger mt-2 error">
+                      {errors.height}
+                    </p>
+                  )}
+                </div>
+              </div>
+              <div className="col-sm-4">
+                <div className="form-group">
+                  <label>Volume</label>
+                  <input
+                    type="number"
+                    className="form-control"
+                    placeholder={0}
+                    name="volume"
+                    value={volume}
+                    onChange={handleChange}
+                  />
+                  {errors.volume && (
+                    <p className="d-flex justify-content-start text-danger mt-2 error">
+                      {errors.volume}
+                    </p>
+                  )}
+                </div>
+              </div>
+              <div className="col-sm-4">
+                <div className="form-group">
+                  <label>Loading Time (in minus)</label>
+                  <input
+                    type="number"
+                    className="form-control"
+                    placeholder={0}
+                    name="loadingTime"
+                    value={loadingTime}
+                    onChange={handleChange}
+                  />
+                  {errors.loadingTime && (
+                    <p className="d-flex justify-content-start text-danger mt-2 error">
+                      {errors.loadingTime}
+                    </p>
+                  )}
+                </div>
+              </div>
+              <div className="col-sm-4">
+                <div className="form-group">
+                  <label>Unloading Time (in minus)</label>
+                  <input
+                    type="number"
+                    className="form-control"
+                    placeholder={0}
+                    name="unloadingTime"
+                    value={unloadingTime}
+                    onChange={handleChange}
+                  />
+                  {errors.unloadingTime && (
+                    <p className="d-flex justify-content-start text-danger mt-2 error">
+                      {errors.unloadingTime}
                     </p>
                   )}
                 </div>

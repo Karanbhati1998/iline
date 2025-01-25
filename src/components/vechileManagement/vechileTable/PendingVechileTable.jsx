@@ -127,6 +127,8 @@ const PendingVechileTable = () => {
        }
      });
   };
+
+
   return (
     <>
       <div className="tab-pane fade active show">
@@ -259,10 +261,10 @@ const PendingVechileTable = () => {
                                 ? "Green"
                                 : "Blue"
                             }
-                            onClick={() =>
-                              handleShowModal(res?.approvedStatus, res)
-                            }
-                            disabled={res?.approvedStatus == "APPROVED"}
+                            // onClick={() =>
+                            //   handleShowModal(res?.approvedStatus, res)
+                            // }
+                            // disabled={res?.approvedStatus == "APPROVED"}
                           >
                             {res?.approvedStatus}
                           </span>{" "}

@@ -13,6 +13,7 @@ import subAdminSlice from "./slices/subAdmin";
 import  dashboardSlice from "./slices/Dashboard";
 import bookingManagementSlice from "./slices/bookingManagementSlice";
 import vechileSlice from "./slices/vechileManagement/vechileManagement";
+import notificationSlice from "./slices/notification";
 
 const store = configureStore({
   reducer: {
@@ -30,6 +31,7 @@ const store = configureStore({
     dashboard: dashboardSlice,
     vechile: vechileSlice,
     bookingManagement: bookingManagementSlice,
+    notification: notificationSlice,
   },
 });
 export default store;

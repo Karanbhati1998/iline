@@ -1,11 +1,10 @@
-import React from "react";
-import BackButton from "../BackButton";
-import { useLocation } from "react-router-dom";
+import React from 'react'
+import BackButton from '../../BackButton';
+import { useLocation } from 'react-router-dom';
 
-const BookingManagementDetail = () => {
-  const { state } = useLocation();
-  console.log({ state });
-
+const CanceledDetail = () => {
+    const { state } = useLocation();
+    console.log({ state });
   return (
     <div className="WrapperArea">
       <div className="WrapperBox">
@@ -18,7 +17,7 @@ const BookingManagementDetail = () => {
         <div className="Small-Wrapper">
           <div className="DriverCountList">
             <div className="OrderHeader">
-              <h1>Ongoing Booking Details</h1>
+              <h1>Canceled Booking Details</h1>
               <p>
                 {state?.scheduledDate} {"  ,"}
                 {state?.scheduledTime} • ID: {state?.trip_number}
@@ -35,7 +34,7 @@ const BookingManagementDetail = () => {
                     <img
                       src={
                         state?.driverData?.profilePic ||
-                        require("../../assets/images/Driver.png")
+                        require("../../../assets/images/Driver.png")
                       }
                       alt="no img"
                     />
@@ -56,7 +55,7 @@ const BookingManagementDetail = () => {
                     <img
                       src={
                         state?.userData?.profilePic ||
-                        require("../../assets/images/Driver.png")
+                        require("../../../assets/images/Driver.png")
                       }
                     />
                   </span>
@@ -72,7 +71,7 @@ const BookingManagementDetail = () => {
                 <a href="driver-management-all-driver-details.html">
                   <span className="Icon">
                     <img
-                      src={require("../../assets/images/locationIcon.png")}
+                      src={require("../../../assets/images/locationIcon.png")}
                     />
                   </span>
                   <span className="Text">
@@ -86,7 +85,7 @@ const BookingManagementDetail = () => {
                 <a href="driver-management-all-driver-details.html">
                   <span className="Icon">
                     <img
-                      src={require("../../assets/images/locationIcon.png")}
+                      src={require("../../../assets/images/locationIcon.png")}
                     />
                   </span>
                   <span className="Text">
@@ -206,11 +205,7 @@ const BookingManagementDetail = () => {
                           <span> -</span>
                         </p>
                         <p>
-                          <strong>
-                            {" "}
-                            -
-                          </strong>{" "}
-                          -
+                          <strong> -</strong> -
                         </p>
                       </aside>
                     </article>
@@ -371,14 +366,21 @@ const BookingManagementDetail = () => {
                   />
                 </div>
               </div>
+              <div className="col-sm-6">
+                <div className="BookingBox">
+                  <h3>Reason of Cancellation</h3>
+                  <div className="RatingBox">
+                    <h6>Lorem Ipsum Lorem Ipsum lorem ipsum</h6>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-
         {/* </div> */}
       </div>
     </div>
   );
-};
+}
 
-export default BookingManagementDetail;
+export default CanceledDetail

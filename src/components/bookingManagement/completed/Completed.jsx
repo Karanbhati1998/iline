@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import BookingManagementComponent from '../BookingManagementComponent';
 import { useDispatch, useSelector } from 'react-redux';
 import { getCompletedBookingList } from '../../../features/slices/bookingManagementSlice';
-import { useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import CommonPagination from '../../CommonPagination';
 const initialState = {
   page: 1,
@@ -195,15 +195,11 @@ const Completed = ({ categoryId }) => {
 
                     <td>
                       <div className="Actions">
-                        <a
-                          className="Blue"
-                                                  >
+                        <Link to="completedetail" className="Blue" state={res}>
                           <i className="fa fa-info-circle" aria-hidden="true" />
-                        </a>
+                        </Link>
                         <span className="Orange">
-                          <a>
-                            View Track Status
-                          </a>
+                          <Link to="track">View Track Status</Link>
                         </span>
                       </div>
                     </td>
@@ -211,176 +207,7 @@ const Completed = ({ categoryId }) => {
                 );
               }
             )}
-            <tr>
-              <td>1</td>
-              <td>
-                <a
-                  className="Blue"
-                  data-toggle="modal"
-                  data-target="#ApprovalModal"
-                >
-                  B-141
-                </a>
-              </td>
-              <td>
-                <a href="">D-101</a>
-              </td>
-              <td>Kanha </td>
-              <td>
-                <a href="">202</a>
-              </td>
-              <td>Kanha</td>
-              <td>
-                <a href="">v-1</a>
-              </td>
-              <td>Delhi</td>
-              <td>Noida</td>
-              <td>1000</td>
-              <td>Local</td>
-              <td>dd/mm/yyyy &amp; hh:mm</td>
-              <td>I-Line Wallet</td>
-              <td>
-                <div className="Actions">
-                  <a
-                    className="Blue"
-                    href="booking-management-completed-booking-details.html"
-                  >
-                    <i className="fa fa-info-circle" aria-hidden="true" />
-                  </a>
-                  <span className="Orange">
-                    <a href="booking-management-completed-track-details.html">
-                      View Track Status
-                    </a>
-                  </span>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td>2</td>
-              <td>
-                <a
-                  className="Blue"
-                  data-toggle="modal"
-                  data-target="#ApprovalModal"
-                >
-                  B-142
-                </a>
-              </td>
-              <td>
-                <a href="">D-102</a>
-              </td>
-              <td>Kanha </td>
-              <td>
-                <a href="">202</a>
-              </td>
-              <td>Kanha</td>
-              <td>
-                <a href="">v-1</a>
-              </td>
-              <td>Delhi</td>
-              <td>Noida</td>
-              <td>1000</td>
-              <td>Local</td>
-              <td>dd/mm/yyyy &amp; hh:mm</td>
-              <td>I-Line Wallet</td>
-              <td>
-                <div className="Actions">
-                  <a
-                    className="Blue"
-                    href="booking-management-completed-booking-details.html"
-                  >
-                    <i className="fa fa-info-circle" aria-hidden="true" />
-                  </a>
-                  <span className="Orange">
-                    <a href="booking-management-completed-track-details.html">
-                      View Track Status
-                    </a>
-                  </span>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td>3</td>
-              <td>
-                <a
-                  className="Blue"
-                  data-toggle="modal"
-                  data-target="#ApprovalModal"
-                >
-                  B-143
-                </a>
-              </td>
-              <td>
-                <a href="">D-103</a>
-              </td>
-              <td>Kanha </td>
-              <td>
-                <a href="">202</a>
-              </td>
-              <td>Kanha</td>
-              <td>
-                <a href="">v-1</a>
-              </td>
-              <td>Delhi</td>
-              <td>Noida</td>
-              <td>1000</td>
-              <td>Local</td>
-              <td>dd/mm/yyyy &amp; hh:mm</td>
-              <td>I-Line Wallet</td>
-              <td>
-                <div className="Actions">
-                  <a className="Blue" data-toggle="modal" data-target="">
-                    <i className="fa fa-info-circle" aria-hidden="true" />
-                  </a>
-                  <span className="Orange">
-                    <a href="booking-management-completed-track-details.html">
-                      View Track Status
-                    </a>
-                  </span>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td>4</td>
-              <td>
-                <a
-                  className="Blue"
-                  data-toggle="modal"
-                  data-target="#ApprovalModal"
-                >
-                  B-144
-                </a>
-              </td>
-              <td>
-                <a href="">D-104</a>
-              </td>
-              <td>Kanha </td>
-              <td>
-                <a href="">202</a>
-              </td>
-              <td>Kanha</td>
-              <td>
-                <a href="">v-1</a>
-              </td>
-              <td>Delhi</td>
-              <td>Noida</td>
-              <td>1000</td>
-              <td>Local</td>
-              <td>dd/mm/yyyy &amp; hh:mm</td>
-              <td>I-Line Wallet</td>
-              <td>
-                <div className="Actions">
-                  <a className="Blue" data-toggle="modal" data-target="">
-                    <i className="fa fa-info-circle" aria-hidden="true" />
-                  </a>
-                  <span className="Orange">
-                    <a href="booking-management-completed-track-details.html">
-                      View Track Status
-                    </a>
-                  </span>
-                </div>
-              </td>
-            </tr>
+           
           </tbody>
         </table>
       </div>

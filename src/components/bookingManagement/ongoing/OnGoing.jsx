@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import BookingManagementComponent from "../BookingManagementComponent";
 import { useDispatch, useSelector } from "react-redux";
 import { getOngoingBookingList } from "../../../features/slices/bookingManagementSlice";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { toastService } from "../../../utils/toastify";
 import CommonPagination from "../../CommonPagination";
 import moment from "moment";
@@ -194,14 +194,14 @@ const OnGoing = ({ categoryId }) => {
                     {res?.scheduledDate} &amp; {res?.scheduledTime}{" "}
                   </td>
                   <td>{res?.paymentMode}</td>
-                  <td>{res?.is_report?"yes":"No"}</td>
+                  <td>{res?.is_report ? "yes" : "No"}</td>
                   <td>
                     <div className="Actions">
-                      <a className="Blue">
+                      <Link to="detail" className="Blue" state={res}>
                         <i className="fa fa-info-circle" aria-hidden="true" />
-                      </a>
+                      </Link>
                       <span className="Orange">
-                        <a>Track</a>
+                        <Link to="track">Track</Link>
                       </span>
                     </div>
                   </td>
@@ -209,132 +209,6 @@ const OnGoing = ({ categoryId }) => {
               );
             })}
 
-            <tr>
-              <td>2</td>
-              <td>
-                <a
-                  className="Blue"
-                  data-toggle="modal"
-                  data-target="#ApprovalModal"
-                >
-                  B-142
-                </a>
-              </td>
-              <td>
-                <a href="">D-102</a>
-              </td>
-              <td>Kanha </td>
-              <td>
-                <a href="">202</a>
-              </td>
-              <td>Kanha</td>
-              <td>
-                <a href="">v-1</a>
-              </td>
-              <td>Delhi</td>
-              <td>Noida</td>
-              <td>1000</td>
-              <td>Local</td>
-              <td>dd/mm/yyyy &amp; hh:mm</td>
-              <td>I-Line Wallet</td>
-              <td>No</td>
-              <td>
-                <div className="Actions">
-                  <a className="Blue" data-toggle="modal" data-target="">
-                    <i className="fa fa-info-circle" aria-hidden="true" />
-                  </a>
-                  <span className="Orange">
-                    <a href="driver-management-ride-details-completed.html">
-                      Track
-                    </a>
-                  </span>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td>3</td>
-              <td>
-                <a
-                  className="Blue"
-                  data-toggle="modal"
-                  data-target="#ApprovalModal"
-                >
-                  B-143
-                </a>
-              </td>
-              <td>
-                <a href="">D-103</a>
-              </td>
-              <td>Kanha </td>
-              <td>
-                <a href="">202</a>
-              </td>
-              <td>Kanha</td>
-              <td>
-                <a href="">v-1</a>
-              </td>
-              <td>Delhi</td>
-              <td>Noida</td>
-              <td>1000</td>
-              <td>Local</td>
-              <td>dd/mm/yyyy &amp; hh:mm</td>
-              <td>I-Line Wallet</td>
-              <td>No</td>
-              <td>
-                <div className="Actions">
-                  <a className="Blue" data-toggle="modal" data-target="">
-                    <i className="fa fa-info-circle" aria-hidden="true" />
-                  </a>
-                  <span className="Orange">
-                    <a href="driver-management-ride-details-completed.html">
-                      Track
-                    </a>
-                  </span>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td>4</td>
-              <td>
-                <a
-                  className="Blue"
-                  data-toggle="modal"
-                  data-target="#ApprovalModal"
-                >
-                  B-144
-                </a>
-              </td>
-              <td>
-                <a href="">D-104</a>
-              </td>
-              <td>Kanha </td>
-              <td>
-                <a href="">202</a>
-              </td>
-              <td>Kanha</td>
-              <td>
-                <a href="">v-1</a>
-              </td>
-              <td>Delhi</td>
-              <td>Noida</td>
-              <td>1000</td>
-              <td>Local</td>
-              <td>dd/mm/yyyy &amp; hh:mm</td>
-              <td>I-Line Wallet</td>
-              <td>No</td>
-              <td>
-                <div className="Actions">
-                  <a className="Blue" data-toggle="modal" data-target="">
-                    <i className="fa fa-info-circle" aria-hidden="true" />
-                  </a>
-                  <span className="Orange">
-                    <a href="driver-management-ride-details-completed.html">
-                      Track
-                    </a>
-                  </span>
-                </div>
-              </td>
-            </tr>
           </tbody>
         </table>
       </div>
