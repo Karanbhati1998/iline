@@ -1,6 +1,82 @@
-import React from 'react'
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+import { getUserRequestList } from "../../../features/slices/userManagementReducer";
+import CommonPagination from "../../CommonPagination";
+const initialState = {
+  page: 1,
+  search: "",
+  fromDate: "",
+  toDate: "",
+  timeframe: "",
+};
+const ExpressDelivery = ({state}) => {
+  const [iState, setUpdateState] = useState(initialState);
+  const { page, search, fromDate, toDate, timeframe } = iState;
 
-const ExpressDelivery = () => {
+  const dispatch = useDispatch();
+  const { userRequestList } = useSelector((state) => {
+    return state?.userManagement;
+  });
+  useEffect(() => {
+    dispatch(
+      getUserRequestList({
+        passengerId: state?._id,
+        rideType: "EXPRESS",
+      })
+    );
+  }, [page, timeframe, state]);
+  console.log({ userRequestList });
+  useEffect(() => {
+    const delayDebounceFunc = setTimeout(() => {
+      dispatch(
+        getUserRequestList({
+          passengerId: state?._id,
+          rideType: "EXPRESS",
+          search: search.trim(),
+          timeframe,
+        })
+      );
+    }, 1000);
+
+    return () => clearTimeout(delayDebounceFunc);
+  }, [search, timeframe, dispatch]);
+
+  const handlePageChange = (page) => {
+    setUpdateState({ ...iState, page });
+    dispatch(
+      getUserRequestList({
+        page,
+        passengerId: state?._id,
+        rideType: "EXPRESS",
+      })
+    );
+  };
+
+  const handleChange = (e) => {
+    setUpdateState({ ...iState, [e.target.name]: e.target.value });
+  };
+  const handleReset = () => {
+    setUpdateState(initialState);
+    dispatch(
+      getUserRequestList({
+        page: 1,
+        passengerId: state?._id,
+        rideType: "EXPRESS",
+      })
+    );
+  };
+  const handleApply = () => {
+    const data = {
+      search,
+      fromDate,
+      toDate,
+      page,
+      passengerId: state?._id,
+      rideType: "EXPRESS",
+    };
+    dispatch(getUserRequestList(data));
+  };
   return (
     <>
       {" "}
@@ -14,29 +90,54 @@ const ExpressDelivery = () => {
                   type="text"
                   className="form-control"
                   placeholder="Search"
+                  name="search"
+                  value={search}
+                  onChange={handleChange}
                 />
               </div>
               <div className="form-group">
                 <label>Select From</label>
-                <select className="form-control">
+                <select
+                  className="form-control"
+                  name="timeframe"
+                  onChange={handleChange}
+                  disabled={fromDate || toDate}
+                >
                   <option value="select">--Select--</option>
-                  <option value="Month">Today</option>
-                  <option value="Month">This week</option>
-                  <option value="Month">This month</option>
+                  <option value="Today">Today</option>
+                  <option value="Week">This Week</option>
+                  <option value="Month">This Month</option>
+                  <option value="Year">This Year</option>
                 </select>
               </div>
               <div className="form-group">
                 <label>From</label>
-                <input type="date" className="form-control" />
+                <input
+                  type="date"
+                  className="form-control"
+                  name="fromDate"
+                  value={fromDate}
+                  disabled={timeframe}
+                  onChange={handleChange}
+                />
               </div>
               <div className="form-group">
                 <label>To</label>
-                <input type="date" className="form-control" />
+                <input
+                  type="date"
+                  className="form-control"
+                  name="toDate"
+                  value={toDate}
+                  onChange={handleChange}
+                  disabled={timeframe}
+                />
               </div>
               <div className="form-group">
                 <label>&nbsp;</label>
-                <button className="Button">Apply</button>
-                <button className="Button Cancel">
+                <button className="Button" onClick={handleApply}>
+                  Apply
+                </button>
+                <button className="Button Cancel" onClick={handleReset}>
                   <i className="fa fa-refresh" />
                 </button>
               </div>
@@ -77,129 +178,73 @@ const ExpressDelivery = () => {
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>1</td>
-              <td>OR#11</td>
-              <td>DR-01</td>
-              <td>John</td>
-              <td>V-123</td>
-              <td>UP-12-1010</td>
-              <td>200</td>
-              <td>
-                <a href="user-management-ride-details-completed.html">
-                  <span className="Green">Completed</span>
-                </a>
-              </td>
-              <td>12-12-2024</td>
-              <td>Delhi</td>
-              <td>Agra</td>
-              <td>Mode 1</td>
-              <td>Completed</td>
-              <td>
-                <div className="Actions">
-                  <a className="Blue" href="">
-                    <i className="fa fa-info-circle" aria-hidden="true" />
-                  </a>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td>2</td>
-              <td>OR#11</td>
-              <td>DR-01</td>
-              <td>John</td>
-              <td>V-123</td>
-              <td>UP-12-1010</td>
-              <td>200</td>
-              <td>
-                <a href="user-management-ride-details-ongoing.html">
-                  <span className="Yellow">Ongoing</span>
-                </a>
-              </td>
-              <td>12-12-2024</td>
-              <td>Delhi</td>
-              <td>Agra</td>
-              <td>Mode 1</td>
-              <td>Completed</td>
-              <td>
-                <div className="Actions">
-                  <a className="Blue" href="">
-                    <i className="fa fa-info-circle" aria-hidden="true" />
-                  </a>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td>3</td>
-              <td>OR#11</td>
-              <td>DR-01</td>
-              <td>John</td>
-              <td>V-123</td>
-              <td>UP-12-1010</td>
-              <td>200</td>
-              <td>
-                <a href="user-management-ride-details-cancelled.html">
-                  <span className="Red">Cancelled</span>
-                </a>
-              </td>
-              <td>12-12-2024</td>
-              <td>Delhi</td>
-              <td>Agra</td>
-              <td>Mode 1</td>
-              <td>Completed</td>
-              <td>
-                <div className="Actions">
-                  <a className="Blue" href="">
-                    <i className="fa fa-info-circle" aria-hidden="true" />
-                  </a>
-                </div>
-              </td>
-            </tr>
+            {userRequestList?.payload?.result?.[0]?.paginationData?.map(
+              (res, i) => {
+                return (
+                  <tr>
+                    <td>{i + 1 + (page - 1) * 10}</td>
+                    <td>{res?.requestId}</td>
+                    <td>{res?.driverData?.driver_number}</td>
+                    <td>{res?.driverData?.fullName}</td>
+                    <td>{res?.vehicleData?.vehicleNumber}</td>
+                    <td>{res?.vehicleData?.vehicleNumberPlate}</td>
+                    <td>{res?.tripCharge}</td>
+                    <td>
+                      <Link to={"/userManagement/userBookingDetail"}>
+                        <span className="Green">{res?.requestStatus}</span>
+                      </Link>
+                    </td>
+                    <td>{res?.scheduledDate}</td>
+                    <td>{res?.pickUpLocationName}</td>
+                    <td>{res?.dropOffLocationName}</td>
+                    <td>{res?.paymentMode}</td>
+                    <td>-</td>
+                    <td>
+                      <div className="Actions">
+                        <Link to="/userManagement/detail_ride" className="Blue">
+                          <i className="fa fa-info-circle" aria-hidden="true" />
+                        </Link>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              }
+            )}
           </tbody>
         </table>
       </div>
       <div className="PaginationBox">
         <div className="PaginationLeft">
           <p>
-            Total Records : <span>200</span>
+            Total Records :{" "}
+            <span>
+              {userRequestList?.payload?.result?.[0]?.totalCount?.[0]?.count ||
+                0}
+            </span>
           </p>
         </div>
+
         <div className="PaginationRight">
-          <ul>
-            <li>
-              <a href="javascript:void(0);">
-                <i className="fa fa-angle-double-left" />
-              </a>
-            </li>
-            <li>
-              <a href="javascript:void(0);">
-                <i className="fa fa-angle-left" />
-              </a>
-            </li>
-            <li className="active">
-              <a href="javascript:void(0);">1</a>
-            </li>
-            <li>
-              <a href="javascript:void(0);">2</a>
-            </li>
-            <li>
-              <a href="javascript:void(0);">3</a>
-            </li>
-            <li>
-              <a href="javascript:void(0);">
-                <i className="fa fa-angle-right" />
-              </a>
-            </li>
-            <li>
-              <a href="javascript:void(0);">
-                <i className="fa fa-angle-double-right" />
-              </a>
-            </li>
-          </ul>
+          {userRequestList?.payload?.result?.[0]?.totalCount?.[0]?.count >
+            0 && (
+            <CommonPagination
+              activePage={page}
+              itemsCountPerPage={10}
+              totalItemsCount={
+                userRequestList?.payload?.result?.[0]?.totalCount?.[0]?.count ||
+                0
+              }
+              pageRangeDisplayed={4}
+              onChange={handlePageChange}
+              itemClass="page-item"
+              linkClass="page-link"
+            />
+          )}
         </div>
       </div>
     </>
   );
-}
+};
 
-export default ExpressDelivery
+
+export default ExpressDelivery;

@@ -72,14 +72,7 @@ const NotificationDetail = () => {
               <button className="Button" onClick={() => setSendModal(true)}>
                 Resend
               </button>
-              <button
-                className="Button"
-                data-toggle="modal"
-                data-target="#"
-                style={{ float: "right" }}
-              >
-                Send to all
-              </button>
+             
             </div>
           </div>
         </div>

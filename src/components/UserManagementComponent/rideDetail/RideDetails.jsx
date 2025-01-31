@@ -118,17 +118,25 @@ const RideDetails = ({state}) => {
               <div className="RiderBox">
                 <div className="RiderHead">
                   <figure>
-                    <img src={require("../../../assets/images/Avatar-1.png")} />
+                    <img
+                      src={
+                        state?.profilePic ||
+                        require("../../../assets/images/Avatar-1.png")
+                      }
+                    />
                   </figure>
                   <figcaption>
                     <div>
                       <h3>
-                        Simmi Sharma{" "}
+                        {state?.fullName}{" "}
                         <span>
-                          <i className="fa fa-star" aria-hidden="true" /> 4.5{" "}
+                          <i className="fa fa-star" aria-hidden="true" />{" "}
+                          {state?.avgRating
+                            ? state.avgRating.toFixed(2)
+                            : "0.00"}{" "}
                         </span>
                       </h3>
-                      <h4>User ID : #432394</h4>
+                      <h4>User ID : #{state?.user_number}</h4>
                     </div>
                   </figcaption>
                 </div>
@@ -163,9 +171,9 @@ const RideDetails = ({state}) => {
                 </li>
               </ul>
             </div>
-            {local && <LocalDelivery />}
-            {outstation && <OutStationDelivery />}
-            {express && <ExpressDelivery />}
+            {local && <LocalDelivery state={state} />}
+            {outstation && <OutStationDelivery state={state} />}
+            {express && <ExpressDelivery state={state} />}
           </div>
         </div>
       </div>

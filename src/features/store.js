@@ -14,6 +14,7 @@ import  dashboardSlice from "./slices/Dashboard";
 import bookingManagementSlice from "./slices/bookingManagementSlice";
 import vechileSlice from "./slices/vechileManagement/vechileManagement";
 import notificationSlice from "./slices/notification";
+import paymentSlice from "./slices/payment";
 
 const store = configureStore({
   reducer: {
@@ -32,6 +33,7 @@ const store = configureStore({
     vechile: vechileSlice,
     bookingManagement: bookingManagementSlice,
     notification: notificationSlice,
+    payment: paymentSlice,
   },
 });
 export default store;

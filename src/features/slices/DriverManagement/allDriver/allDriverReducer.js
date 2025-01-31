@@ -4,8 +4,9 @@ import axios from "axios";
 const initialState = {
   iLineDriverList: [],
   p2pDriverList: [],
-  vehicleListForAssign:[],
-  allDriverData:[],
+  vehicleListForAssign: [],
+  allDriverData: [],
+  driverRequestList:[],
   loading: false,
 };
 export const fetchAllDriverList = createAsyncThunk(
@@ -54,10 +55,7 @@ export const driverStatus = createAsyncThunk(
   "update/driveStatus",
   async (payload, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.put(
-        `/driverStatus`,
-        payload
-      );
+      const response = await axiosInstance.put(`/driverStatus`, payload);
       return response.data;
     } catch (error) {
       rejectWithValue(error);
@@ -96,7 +94,24 @@ export const assignVehicleToDriver = createAsyncThunk(
   "assign/VehicleToDriver",
   async (payload, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.put("/assignVehicleToDriver",  payload);
+      const response = await axiosInstance.put(
+        "/assignVehicleToDriver",
+        payload
+      );
+      return response.data;
+    } catch (error) {
+      rejectWithValue(error);
+      console.log({ error });
+    }
+  }
+);
+export const getDriverRequestList = createAsyncThunk(
+  "assign/driverRequestList",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get("/driverRequestList", {
+        params: payload,
+      });
       return response.data;
     } catch (error) {
       rejectWithValue(error);
@@ -146,6 +161,16 @@ const allDriver = createSlice({
       state.allDriverData = action.payload;
     });
     builder.addCase(fetchAllDriverList.rejected, (state, action) => {
+      state.loading = false;
+    });
+    builder.addCase(getDriverRequestList.pending, (state, action) => {
+      state.loading = true;
+    });
+    builder.addCase(getDriverRequestList.fulfilled, (state, action) => {
+      state.loading = false;
+      state.driverRequestList = action.payload;
+    });
+    builder.addCase(getDriverRequestList.rejected, (state, action) => {
       state.loading = false;
     });
   },

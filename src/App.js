@@ -25,6 +25,7 @@ import {
   OnlineBookingView,
   ChargingStation,
   SubAdmin,
+  PaymentAndRevenue,
 } from "./pages/index";
 import ProtectedRoute from "./components/ProtectedRoute";
 import CustomToastContainer from "./components/CustomToastContainer";
@@ -216,6 +217,10 @@ function App() {
                 <Route
                   path="/vehicleManagement/vehicleCategoryDetail"
                   element={<VechileCategoryDetail />}
+                />
+                <Route
+                  path="/paymentAndRevenueManagemnt"
+                  element={<PaymentAndRevenue />}
                 />
                 <Route path="/chargingStation" element={<ChargingStation />} />
                 <Route

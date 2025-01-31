@@ -83,7 +83,6 @@ const AssignedVichelHistory = () => {
                     <th>Out Station</th>
                     <th>Express Delivery</th>
                     <th>Action</th>
-                    <th>Details</th>
                     <th>Assigned By</th>
                   </tr>
                 </thead>
@@ -107,13 +106,7 @@ const AssignedVichelHistory = () => {
                         </a>
                       </div>
                     </td>
-                    <td>
-                      <div className="Actions">
-                        <a className="Blue" href="">
-                          <i className="fa fa-info-circle" aria-hidden="true" />
-                        </a>
-                      </div>
-                    </td>
+                   
                     <td>
                       <span className="Green">
                         <a href="">Admin</a>
@@ -139,13 +132,7 @@ const AssignedVichelHistory = () => {
                         </a>
                       </div>
                     </td>
-                    <td>
-                      <div className="Actions">
-                        <a className="Blue" href="">
-                          <i className="fa fa-info-circle" aria-hidden="true" />
-                        </a>
-                      </div>
-                    </td>
+                   
                     <td>
                       <span className="Orange">
                         <a href="">Sub-Admin</a>

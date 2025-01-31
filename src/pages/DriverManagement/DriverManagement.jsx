@@ -18,7 +18,7 @@ const DriverManagement = () => {
                     <img src={require("../../assets/images/Driver.png")} />
                   </span>
                   <span className="Text">All Drivers</span>
-                  <span className="Count">1000</span>
+                  <span className="Count">-</span>
                 </Link>
               </li>
               <li>
@@ -36,7 +36,7 @@ const DriverManagement = () => {
                     <img src={require("../../assets/images/Driver.png")} />
                   </span>
                   <span className="Text">Pending for Approval</span>
-                  <span className="Count">12</span>
+                  <span className="Count">-</span>
                 </Link>
               </li>
               <li>

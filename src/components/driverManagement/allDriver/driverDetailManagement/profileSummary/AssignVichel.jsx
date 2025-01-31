@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   getVehicleListForAssign,
   assignVehicleToDriver,
+  driverStatus,
 } from "../../../../../features/slices/DriverManagement/allDriver/allDriverReducer";
 import BackButton from "../../../../BackButton";
 import { toastService } from "../../../../../utils/toastify";
@@ -19,6 +20,7 @@ const initialState = {
 };
 const AssignVichel = () => {
   const [iState, setUpdateState] = useState(initialState);
+  const [status, setStatus] = useState(false);
   const { page, search, fromDate, toDate, timeframe } = iState;
   const dispatch = useDispatch();
   const {state}=useLocation()
@@ -42,6 +44,14 @@ const AssignVichel = () => {
 
     return () => clearTimeout(delayDebounceFunc);
   }, [search, timeframe, dispatch]);
+
+  useEffect(()=>{
+    if (state?.userStatus === "ACTIVE") {
+      setStatus(true);
+    } else {
+      setStatus(false);
+    }
+  },[])
 
   const handlePageChange = (page) => {
     setUpdateState({ ...iState, page });
@@ -77,7 +87,20 @@ const AssignVichel = () => {
     });
   };
   console.log({ vehicleListForAssign });
-  
+   const handleChecked = (e, id) => {
+        const { name, checked } = e?.target;
+        const status = checked ? "ACTIVE" : "INACTIVE";
+        const data = { id, status };
+        dispatch(driverStatus(data)).then((res) => {
+          console.log('status update api',res)
+          if (res?.payload?.code == 200) {
+            toastService.success("Status updated successfully");
+         setStatus(checked)
+          } else {
+            toastService.error("status update failed");
+          }
+        });
+      };
   return (
     <div className="WrapperArea">
       <div className="WrapperBox">
@@ -107,12 +130,14 @@ const AssignVichel = () => {
                 </figcaption>
                 <div className="Actions">
                   <label className="Switch">
-                    <input type="checkbox" />
+                    <input
+                      type="checkbox"
+                      checked={status}
+                      onChange={(e) => handleChecked(e, state?._id)}
+                    />
                     <span className="slider" />
                   </label>
-                  <a className="Green" href="business-partner-edit.html">
-                    <i className="fa fa-pencil" />
-                  </a>
+                 
                 </div>
               </div>
             </div>

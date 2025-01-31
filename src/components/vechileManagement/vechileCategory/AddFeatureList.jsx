@@ -1,16 +1,20 @@
-import React, { useEffect, useRef, useState } from 'react'
-import BackButton from '../../BackButton';
-import { toastService } from '../../../utils/toastify';
-import { useDispatch, useSelector } from 'react-redux';
-import { imageUpload } from '../../../features/slices/imageUpload';
-import LoaderForImage from '../../LoaderForImage';
-import { addFeature, deleteFeature, getFeaturesList } from '../../../features/slices/vechileManagement/vechileCategory';
-import { useLocation } from 'react-router-dom';
-import CommonPagination from '../../CommonPagination';
-import DeleteVechileModal from './DeleteVechileModal';
-import UpdateFeature from './UpdateFeature';
+import React, { useEffect, useRef, useState } from "react";
+import BackButton from "../../BackButton";
+import { toastService } from "../../../utils/toastify";
+import { useDispatch, useSelector } from "react-redux";
+import { imageUpload } from "../../../features/slices/imageUpload";
+import LoaderForImage from "../../LoaderForImage";
+import {
+  addFeature,
+  deleteFeature,
+  getFeaturesList,
+} from "../../../features/slices/vechileManagement/vechileCategory";
+import { useLocation } from "react-router-dom";
+import CommonPagination from "../../CommonPagination";
+import DeleteVechileModal from "./DeleteVechileModal";
+import UpdateFeature from "./UpdateFeature";
+import QuillEditor from "../../QuillEditor";
 const initialState = {
-  name: "",
   icon: "",
   categoryId: "",
   errors: {},
@@ -19,13 +23,13 @@ const initialState = {
   deleteModal: false,
   updateModal: false,
   id: "",
-  data:{}
+  data: {},
 };
 const AddFeatureList = () => {
   const [iState, setUpdateState] = useState(initialState);
+  const [name, SetName] = useState("");
   const dispatch = useDispatch();
   const {
-    name,
     icon,
     categoryId,
     errors,
@@ -34,143 +38,146 @@ const AddFeatureList = () => {
     deleteModal,
     updateModal,
     id,
-    data
+    data,
   } = iState;
   const { VechileFeatures } = useSelector((state) => {
     return state?.vechileCategory;
   });
   console.log({ VechileFeatures });
-  
-  const {state}=useLocation()
+
+  const { state } = useLocation();
   const fileInputRef = useRef(null);
-  useEffect(()=>{
-    setUpdateState(prev=>({
+  useEffect(() => {
+    setUpdateState((prev) => ({
       ...prev,
-      categoryId:state,
-    }))
-  },[])
-      useEffect(() => {
-        dispatch(getFeaturesList({ categoryId: state, page }));
-      }, [page, state]);
+      categoryId: state,
+    }));
+  }, [state]);
+  useEffect(() => {
+    dispatch(getFeaturesList({ categoryId: state, page }));
+  }, [page, state]);
   const handleEditClick = () => {
     if (fileInputRef.current) {
       fileInputRef.current.click();
     }
   };
   const uploadImage = (e) => {
-      console.log({ errors });
-      console.log(e.target.name);
-      setUpdateState((prev) => ({
-        ...prev,
-        imageLoader:true,
-        errors: {
-          ...prev.errors,
-          [e.target.name]: "",
+    console.log({ errors });
+    console.log(e.target.name);
+    setUpdateState((prev) => ({
+      ...prev,
+      imageLoader: true,
+      errors: {
+        ...prev.errors,
+        [e.target.name]: "",
+      },
+    }));
+    const file = e.target?.files[0];
+    if (file) {
+      const formData = new FormData();
+      formData.append("fileName", file);
+      dispatch(imageUpload(formData)).then((res) => {
+        if (res?.payload?.code == 200) {
+          toastService.success("image uploaded successfully");
+          setUpdateState((prev) => ({
+            ...prev,
+            [e.target.name]: res?.payload?.url,
+            imageLoader: false,
+          }));
+        } else {
+          toastService.error("image upload failed");
+          setUpdateState((prev) => ({
+            ...prev,
+            [e.target.name]: "",
+            imageLoader: false,
+          }));
         }
-      }));
-      const file = e.target?.files[0];
-      if (file) {
-        const formData = new FormData();
-        formData.append("fileName", file);
-        dispatch(imageUpload(formData)).then((res) => {
-          if (res?.payload?.code == 200) {
-            toastService.success("image uploaded successfully");
-            setUpdateState((prev) => ({
-              ...prev,
-              [e.target.name]: res?.payload?.url,
-              imageLoader: false,
-            }));
-  
-          } else {
-            toastService.error("image upload failed");
-            setUpdateState((prev) => ({
-              ...prev,
-              [e.target.name]: "",
-              imageLoader: false,
-            }));
-          }
-        });
-      } else {
-        toastService.error("File not found");
-      }
-    };
-    const handleChange=(e)=>{
-      const {name,value}=e.target
-      setUpdateState((prev) => ({
-         ...prev,
-          [name]:value,
-          errors:{
-           ...prev.errors,
-            [name]: "",
-          }
-        }));
+      });
+    } else {
+      toastService.error("File not found");
     }
-    const handleValidation=()=>{
-       let formErrors = {};
-       let isValid = true;
-         if (!name.trim()) {
-           formErrors.name = " Name is required";
-           isValid = false;
-         }
-         if (!icon.trim()) {
-           formErrors.icon = "Icon is required";
-           isValid = false;
-         }
-         setUpdateState(prev=>({
-          ...prev,
-           errors:formErrors,
-         }))
+  };
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setUpdateState((prev) => ({
+      ...prev,
+      [name]: value,
+      errors: {
+        ...prev.errors,
+        [name]: "",
+      },
+    }));
+  };
+  const handleValidation = () => {
+    let formErrors = {};
+    let isValid = true;
+    if (!name.trim()) {
+      formErrors.name = " Name is required";
+      isValid = false;
+    }
+    if (!icon.trim()) {
+      formErrors.icon = "Icon is required";
+      isValid = false;
+    }
+    setUpdateState((prev) => ({
+      ...prev,
+      errors: formErrors,
+    }));
     return isValid;
+  };
+  const handleSubmit = () => {
+    const data = {
+      name,
+      icon,
+      categoryId,
+    };
+    if (handleValidation()) {
+      dispatch(addFeature(data)).then((res) => {
+        if (res?.payload?.code == 200) {
+          toastService.success("Vehicle category features added successfully");
+              dispatch(getFeaturesList({ categoryId: state, page }));
+          setUpdateState(initialState);
+          SetName("")
+        } else {
+          toastService.error("Failed to add vehicle category features");
+        }
+      });
     }
-    const handleSubmit=()=>{
-      const data={
-        name,
-        icon,
-        categoryId
+  };
+  useEffect(() => {
+    dispatch(getFeaturesList({ categoryId: state, page }));
+  }, [page]);
+  const handlePageChange = (page) => {
+    setUpdateState({ ...iState, page });
+  };
+  const handleDelete = () => {
+    dispatch(deleteFeature({ id })).then((res) => {
+      if (res?.payload?.code == 200) {
+        toastService.success("feature deleted successfully");
+        dispatch(getFeaturesList({ categoryId: state, page }));
+        setUpdateState(initialState);
+      } else {
+        toastService.error("Failed to delete feature");
       }
-      if(handleValidation()){
-        dispatch(addFeature(data)).then(res=>{
-          if(res?.payload?.code==200){
-            toastService.success("Vehicle category features added successfully")
-            setUpdateState(initialState)
-          }else{
-            toastService.error("Failed to add vehicle category features");
-          }
-        })
-      }
-    }
-    useEffect(()=>{
-      dispatch(getFeaturesList({ categoryId: state,page }));
-
-    },[page])
-     const handlePageChange = (page) => {
-       setUpdateState({ ...iState, page });
-     };
-      const handleDelete = () => {
-         dispatch(deleteFeature({ id })).then((res) => {
-           if (res?.payload?.code == 200) {
-             toastService.success("feature deleted successfully");
-             dispatch(getFeaturesList({ categoryId: state, page }));
-             setUpdateState(initialState);
-           } else {
-             toastService.error("Failed to delete feature");
-           }
-         });
-       };
-       const handleClose = () => {
-         setUpdateState((prev) => ({
-           ...prev,
-           deleteModal: false,
-           updateModal: false,
-         }));
-       };
-       const handleUpdate = (res) => {
-         setUpdateState((prev) => ({
-           ...prev,
-           updateModal: true,
-           data: res,
-         }));
-       };
+    });
+  };
+  const handleClose = () => {
+    setUpdateState((prev) => ({
+      ...prev,
+      deleteModal: false,
+      updateModal: false,
+    }));
+  };
+  const handleUpdate = (res) => {
+    setUpdateState((prev) => ({
+      ...prev,
+      updateModal: true,
+      data: res,
+    }));
+  };
+  const handleQuillChange = (name, value) => {
+    SetName(value); // Dynamically update the corresponding state field
+  };
   return (
     <>
       <div className="WrapperArea">
@@ -190,13 +197,19 @@ const AddFeatureList = () => {
                 <div className="col-sm-6">
                   <div className="form-group">
                     <label>Enter Features</label>
-                    <input
+                    {/* <input
                       type="text"
                       className="form-control"
                       placeholder="Enter the feature"
                       name="name"
                       value={name}
                       onChange={handleChange}
+                    /> */}
+                    <QuillEditor
+                      name="name"
+                      value={name}
+                      onChange={handleQuillChange}
+                      // Optional custom height
                     />
                     {errors?.name && (
                       <p className="d-flex justify-content-start text-danger mt-2 error">
@@ -369,7 +382,9 @@ const AddFeatureList = () => {
                       return (
                         <tr>
                           <td>{i + 1 + (page - 1) * 10}</td>
-                          <td> {res?.name}</td>
+                          <td
+                            dangerouslySetInnerHTML={{ __html: res?.name }}
+                          ></td>
 
                           <td>
                             <figure>
@@ -445,9 +460,9 @@ const AddFeatureList = () => {
           deletedText="feature"
         />
       )}
-      {updateModal && <UpdateFeature state={data} handleClose={handleClose}/>}
+      {updateModal && <UpdateFeature state={data} handleClose={handleClose} />}
     </>
   );
-}
+};
 
-export default AddFeatureList
+export default AddFeatureList;

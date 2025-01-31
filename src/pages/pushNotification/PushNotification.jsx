@@ -119,7 +119,7 @@ const PushNotification = () => {
             <div className="TitleLink">
               {" "}
               <Link to="add" className="TitleLink">
-                Add Vehicle
+                Add Notification
               </Link>
             </div>
           </div>
@@ -218,7 +218,6 @@ const PushNotification = () => {
                       <th>Notification Title </th>
                       <th>User Group</th>
                       <th>Date Sent</th>
-                      <th>Send To All</th>
                       <th>Resend</th>
                       <th>Action</th>
                     </tr>
@@ -237,9 +236,7 @@ const PushNotification = () => {
                             <td>
                               {moment(res?.createdAt).format("DD-MM-YYYY")}
                             </td>
-                            <td>
-                              <span className="Green">Send to all</span>
-                            </td>
+
                             <td>
                               <span
                                 className="Red"

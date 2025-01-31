@@ -3,21 +3,23 @@ import LocalDelivery from './LocalDelivery';
 import OutStationDelivery from './OutStationDelivery';
 import ExpressDelivery from './ExpressDelivery';
 
-const BookingSummary = () => {
-   const [showState,setShowState]=useState({
-    local:true,
-    outstation:false,
-    express:false
-  })
-  const {local,outstation,express}=showState;
-  const handleClick=(name)=>{
+const BookingSummary = ({ state }) => {
+  const [showState, setShowState] = useState({
+    local: true,
+    outstation: false,
+    express: false,
+  });
+  const { local, outstation, express } = showState;
+  const handleClick = (name) => {
     setShowState((prev) => ({
       local: false,
       outstation: false,
       express: false,
-      [name]:true
+      [name]: true,
     }));
-  }
+  };
+  console.log({state});
+  
   return (
     <div className="Small-Wrapper">
       <div className="tab-content">
@@ -37,12 +39,15 @@ const BookingSummary = () => {
                   <figcaption>
                     <div>
                       <h3>
-                        Simmi Sharma{" "}
+                        {state?.fullName}{" "}
                         <span>
-                          <i className="fa fa-star" aria-hidden="true" /> 4.5{" "}
+                          <i className="fa fa-star" aria-hidden="true" />{" "}
+                          {state?.avgRating
+                            ? state.avgRating.toFixed(2)
+                            : "0.00"}{" "}
                         </span>
                       </h3>
-                      <h4>User ID : #432394</h4>
+                      <h4>User ID : #{state?.driver_number}</h4>
                     </div>
                     <div className="Actions">
                       <label className="Switch">
@@ -114,18 +119,23 @@ const BookingSummary = () => {
                 <div className="RiderHead">
                   <figure>
                     <img
-                      src={require("../../../../../assets/images/Avatar-1.png")}
+                      src={state?.profilePic || require(
+                        "../../../../../assets/images/Avatar-1.png"
+                      )}
                     />
                   </figure>
                   <figcaption>
                     <div>
                       <h3>
-                        Simmi Sharma{" "}
+                        {state?.fullName}{" "}
                         <span>
-                          <i className="fa fa-star" aria-hidden="true" /> 4.5{" "}
+                          <i className="fa fa-star" aria-hidden="true" />{" "}
+                          {state?.avgRating
+                            ? state.avgRating.toFixed(2)
+                            : "0.00"}{" "}
                         </span>
                       </h3>
-                      <h4>User ID : #432394</h4>
+                      <h4>User ID : #{state?.driver_number}</h4>
                     </div>
                   </figcaption>
                 </div>
@@ -160,15 +170,14 @@ const BookingSummary = () => {
                 </li>
               </ul>
             </div>
-            {local && <LocalDelivery />}
-            {outstation && <OutStationDelivery />}
-            {express && <ExpressDelivery />}
+            {local && <LocalDelivery state={state} />}
+            {outstation && <OutStationDelivery state={state} />}
+            {express && <ExpressDelivery state={state} />}
           </div>
         </div>
       </div>
     </div>
   );
-  
-}
+};
 
 export default BookingSummary

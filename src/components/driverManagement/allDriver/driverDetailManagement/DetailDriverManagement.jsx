@@ -41,10 +41,10 @@ const DetailDriverManagement = () => {
               </li>
             </ul>
           </div>
-      <BackButton/>
+          <BackButton />
         </div>
         {showBookingSummary ? (
-          <RideDetails state={state} />
+          <BookingSummary state={state} />
         ) : (
           <ProfileSummary state={state} />
         )}

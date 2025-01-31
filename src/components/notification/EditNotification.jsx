@@ -36,192 +36,277 @@ const EditNotification = () => {
     error,
     imageLoader,
   } = iState;
-    const [options, setOptions] = useState([{ value: "All", label: "All" }]);
+  const [options, setOptions] = useState([{ value: "All", label: "All" }]);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { state } = useLocation();
-  useEffect(()=>{
-    setUpdateState(prev=>({
+  useEffect(() => {
+    setUpdateState((prev) => ({
       ...prev,
       title: state?.title || "",
       content: state?.content || "",
-      userSelect: state?.userSelect || [],
+      userSelect:
+        state?.userSelect == "All" ? { value: "All", label: "All" } : [],
+      selectedValue:
+        state?.userSelect == "All" ? { value: "All", label: "All" } : [],
+      isMultiple: state?.userSelect == "All" ? false : true,
       userType: state?.userType || "",
       contentUrl: state?.contentUrl || "",
-    }))
-  },[state])
-   const { users } = useSelector((state) => state.userManagement);
-    const { allDriverData } = useSelector((state) => {
-       return state?.driverManagementAllDrivers;
-     });
+    }));
+    if (state?.userSelect=="All"){
+       setUpdateState((prev) => ({
+         ...prev,
+         selectedValue: [{ value: "All", label: "All" }],
+         isMultiple: false,
+       }));
+    }else if (state?.userType === "USER") {
+        dispatch(userList({ limit: 999999 })).then((res) => {
+          if (res?.payload?.code == 200) {
+            const mappedOptions =
+              res?.payload?.result?.[0]?.paginationData?.map((item) => ({
+                value: item._id,
+                label: item.fullName,
+              })) || [];
+            const mapData = mappedOptions.filter((val) => {
+              return state?.users?.includes(val?.value);
+            });
+            setUpdateState((prev) => ({
+              ...prev,
+              selectedValue: mapData,
+              isMultiple: true,
+            }));
+          }
+        });
+      } else if (state?.userType === "DRIVER") {
+        dispatch(fetchAllDriverList({ limit: 999999 })).then((res) => {
+          console.log({res});
+          
+          if (res?.payload?.code == 200) {
+            const mappedOptions =
+              res?.payload?.result?.map((item) => ({
+                value: item._id,
+                label: item.fullName,
+              })) || [];
+  console.log({ mappedOptions });
+            const mapData = mappedOptions.filter((val) => {
+              return state?.users?.includes(val?.value);
+            });
+            console.log({ mapData });
+            
+            setUpdateState((prev) => ({
+              ...prev,
+              selectedValue: mapData,
+              isMultiple: true,
+            }));
+          }
+        });
+      }
+  }, [state]);
+
+  const { users } = useSelector((state) => state.userManagement);
+  const { allDriverData } = useSelector((state) => {
+    return state?.driverManagementAllDrivers;
+  });
+
   console.log({ state });
- useEffect(() => {
-     if (userType === "USER") {
-       const mappedOptions =
-         users?.payload?.result?.[0]?.paginationData?.map((item) => ({
-           value: item._id,
-           label: item.fullName,
-         })) || [];
- 
-       setOptions([{ value: "All", label: "All" }, ...mappedOptions]);
-     } else if (userType === "DRIVER") {
-       const mappedOptions =
-         allDriverData?.result?.map((item) => ({
-           value: item._id,
-           label: item.fullName,
-         })) || [];
-       console.log({ mappedOptions });
- 
-       setOptions([{ value: "All", label: "All" }, ...mappedOptions]);
-     }
-   }, [users, allDriverData, userType]);
- 
-   useEffect(() => {
-     if (userType == "USER") {
+  useEffect(() => {
+    if (userType === "USER") {
+      const mappedOptions =
+        users?.payload?.result?.[0]?.paginationData?.map((item) => ({
+          value: item._id,
+          label: item.fullName,
+        })) || [];
+
+      setOptions([{ value: "All", label: "All" }, ...mappedOptions]);
+   
+    } else if (userType === "DRIVER" ) {
+      const mappedOptions =
+        allDriverData?.result?.map((item) => ({
+          value: item._id,
+          label: item.fullName,
+        })) || [];
+
+      setOptions([{ value: "All", label: "All" }, ...mappedOptions]);
+    }
+  }, [users, allDriverData, userType]);
+
+
+  // useEffect(() => {
+  //   if (userType == "USER" ) {
+  //     dispatch(userList({ limit: 999999 }));
+  //     setUpdateState((prev) => ({
+  //       ...prev,
+  //       userSelect: "",
+  //       selectedValue: [],
+  //     }));
+  //   } else if (userType == "DRIVER" ) {
+  //     dispatch(fetchAllDriverList({ limit: 999999 }));
+  //     setUpdateState((prev) => ({
+  //       ...prev,
+  //       userSelect: "",
+  //       selectedValue: [],
+  //     }));
+  //   }
+  // }, [userType]);
+
+  
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setUpdateState((prev) => ({
+      ...prev,
+      [name]: value,
+      error: {
+        ...prev.error,
+        [name]: false,
+      },
+    }));
+  };
+  const handleChangeType=(e)=>{
+     const { name, value } = e.target;
+    setUpdateState((prev) => ({
+     ...prev,
+      userType: value,
+      error: {
+       ...prev.error,
+        userType: false,
+      },
+    }));
+     if (value == "USER") {
        dispatch(userList({ limit: 999999 }));
        setUpdateState((prev) => ({
          ...prev,
          userSelect: "",
          selectedValue: [],
        }));
-     } else if (userType == "DRIVER") {
+     } else if (value == "DRIVER") {
        dispatch(fetchAllDriverList({ limit: 999999 }));
        setUpdateState((prev) => ({
          ...prev,
          userSelect: "",
-         selectedValue:[],
+         selectedValue: [],
        }));
      }
-   }, [userType]);
-   const handleChange = (e) => {
-     const { name, value } = e.target;
-     setUpdateState((prev) => ({
-       ...prev,
-       [name]: value,
-       error: {
-         ...prev.error,
-         [name]: false,
-       },
-     }));
-   };
-   const handleSelectChange = (selectedOptions) => {
-   console.log({ selectedOptions });
-   
-   if (
-     selectedOptions?.[selectedOptions?.length - 1]?.value === "All" || 
-     selectedOptions?.value === "All"
-   ) {
-     // If "All" is selected
-     setUpdateState((prev) => ({
-       ...prev,
-       userSelect: "All",
-       userIdArr: [],
-       selectedValue: [{ value: "All", label: "All" }],
-       isMultiple: false,
-       error: {
-         ...prev.error,
-         userSelect: "",
-       },
-     }));
-   } else {
-     // For any other selection
-     const selectedValues = Array.isArray(selectedOptions)
-       ? selectedOptions.map((opt) => opt?.value)
-       : [selectedOptions?.value];
- 
-     setUpdateState((prev) => ({
-       ...prev,
-       userIdArr: selectedValues,
-       userSelect: "",
-       selectedValue: selectedOptions,
-       isMultiple: true,
-       error: {
-         ...prev.error,
-         userSelect: "",
-       },
-     }));
-   }
- };
-   const uploadImage = (e) => {
-     const file = e.target?.files[0];
-     const fieldName = e.target.name;
- 
-     if (!file) {
-       toastService.error("File not found");
-       return;
-     }
- 
-     setUpdateState((prev) => ({
-       ...prev,
-       imageLoader: true,
-       error: { ...prev.error, [fieldName]: "" },
-     }));
- 
-     const formData = new FormData();
-     formData.append("fileName", file);
- 
-     dispatch(imageUpload(formData)).then((res) => {
-       if (res?.payload?.code === 200) {
-         toastService.success("Image uploaded successfully");
-         setUpdateState((prev) => ({
-           ...prev,
-           [fieldName]: res.payload.url,
-           imageLoader: false,
-         }));
-       } else {
-         toastService.error("Image upload failed");
-         setUpdateState((prev) => ({
-           ...prev,
-           [fieldName]: "",
-           imageLoader: false,
-         }));
-       }
-     });
-   };
- 
-   const handleValidation = () => {
-     const formErrors = {};
-     let isValid = true;
- 
-     if (!userType.trim()) {
-       formErrors.userType = "User type is required";
-       isValid = false;
-     }
-     // if (!userSelect.trim()) {
-     //   formErrors.userSelect = "User select is required";
-     //   isValid = false;
-     // }
-     if (!title.trim()) {
-       formErrors.title = "Title is required";
-       isValid = false;
-     }
-     if (!content.trim()) {
-       formErrors.content = "Content is required";
-       isValid = false;
-     }
-     if (!contentUrl.trim()) {
-       formErrors.contentUrl = "Content URL is required";
-       isValid = false;
-     }
- 
-     setUpdateState((prev) => ({ ...prev, error: formErrors }));
-     return isValid;
-   };
- 
-   const handleSubmit = () => {
-     if (handleValidation()) {
-       console.log(iState);
-       const data = {
-         userType,
-         title,
-         content,
-         contentUrl,
-         ...(userSelect === "All"
-           ? { userSelect }
-           : userIdArr?.length
-           ? { userIdArr }
-           : {}),
-       };
+
+  }
+  const handleSelectChange = (selectedOptions) => {
+    console.log({ selectedOptions });
+
+    if (
+      selectedOptions?.[selectedOptions?.length - 1]?.value === "All" ||
+      selectedOptions?.value === "All"
+    ) {
+      // If "All" is selected
+      setUpdateState((prev) => ({
+        ...prev,
+        userSelect: "All",
+        userIdArr: [],
+        selectedValue: [{ value: "All", label: "All" }],
+        isMultiple: false,
+        error: {
+          ...prev.error,
+          userSelect: "",
+        },
+      }));
+    } else {
+      // For any other selection
+      const selectedValues = Array.isArray(selectedOptions)
+        ? selectedOptions.map((opt) => opt?.value)
+        : [selectedOptions?.value];
+
+      setUpdateState((prev) => ({
+        ...prev,
+        userIdArr: selectedValues,
+        userSelect: "",
+        selectedValue: selectedOptions,
+        isMultiple: true,
+        error: {
+          ...prev.error,
+          userSelect: "",
+        },
+      }));
+    }
+  };
+  const uploadImage = (e) => {
+    const file = e.target?.files[0];
+    const fieldName = e.target.name;
+
+    if (!file) {
+      toastService.error("File not found");
+      return;
+    }
+
+    setUpdateState((prev) => ({
+      ...prev,
+      imageLoader: true,
+      error: { ...prev.error, [fieldName]: "" },
+    }));
+
+    const formData = new FormData();
+    formData.append("fileName", file);
+
+    dispatch(imageUpload(formData)).then((res) => {
+      if (res?.payload?.code === 200) {
+        toastService.success("Image uploaded successfully");
+        setUpdateState((prev) => ({
+          ...prev,
+          [fieldName]: res.payload.url,
+          imageLoader: false,
+        }));
+      } else {
+        toastService.error("Image upload failed");
+        setUpdateState((prev) => ({
+          ...prev,
+          [fieldName]: "",
+          imageLoader: false,
+        }));
+      }
+    });
+  };
+
+  const handleValidation = () => {
+    const formErrors = {};
+    let isValid = true;
+
+    if (!userType.trim()) {
+      formErrors.userType = "User type is required";
+      isValid = false;
+    }
+    // if (!userSelect.trim()) {
+    //   formErrors.userSelect = "User select is required";
+    //   isValid = false;
+    // }
+    if (!title.trim()) {
+      formErrors.title = "Title is required";
+      isValid = false;
+    }
+    if (!content.trim()) {
+      formErrors.content = "Content is required";
+      isValid = false;
+    }
+    if (!contentUrl.trim()) {
+      formErrors.contentUrl = "Content URL is required";
+      isValid = false;
+    }
+
+    setUpdateState((prev) => ({ ...prev, error: formErrors }));
+    return isValid;
+  };
+
+  const handleSubmit = () => {
+    if (handleValidation()) {
+      console.log(iState);
+      const data = {
+        id:state?._id,
+        userType,
+        title,
+        content,
+        contentUrl,
+        ...(userSelect === "All"
+          ? { userSelect }
+          : userIdArr?.length
+          ? { userIdArr }
+          : {}),
+      };
       dispatch(editNotification(data)).then((res) => {
         if (res?.payload?.code === 200) {
           setUpdateState(initialState);
@@ -233,6 +318,7 @@ const EditNotification = () => {
       });
     }
   };
+  console.log({ iState });
 
   return (
     <div className="WrapperArea">
@@ -256,7 +342,8 @@ const EditNotification = () => {
                         className="form-control"
                         name="userType"
                         value={userType}
-                        onChange={handleChange}
+                        onChange={handleChangeType}
+                        disabled
                       >
                         <option value="">Select User Group</option>
                         <option value="DRIVER">Driver</option>
@@ -271,13 +358,13 @@ const EditNotification = () => {
                     <div className="form-group">
                       <label>Select *</label>
                       <Select
-                        isMulti
+                        key={userType || isMultiple}
+                        isMulti={isMultiple}
                         isClearable
                         isSearchable
-                        defaultInputValue={userSelect}
                         name="userSelect"
-                        onChange={handleSelectChange}
-                        options={options}
+                        value={selectedValue}
+                        isDisabled
                       />
                       {error.userSelect && (
                         <p className="text-danger mt-2">{error.userSelect}</p>

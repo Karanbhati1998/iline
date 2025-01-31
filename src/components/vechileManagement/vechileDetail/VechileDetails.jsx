@@ -58,7 +58,7 @@ const VechileDetails = () => {
           {!showVechileDetail ? (
             <VechileData state={state} />
           ) : (
-            <AllAssignedUser />
+            <AllAssignedUser state={state} />
           )}
         </div>
         {/* </div> */}

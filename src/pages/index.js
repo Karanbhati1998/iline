@@ -20,6 +20,7 @@ import SupportTicketManagement from "./supportTicketManagement/SupportTicketMana
 import PushNotification from "./pushNotification/PushNotification";
 import ChangeManagement from "./changeManagement/ChangeManagement";
 import SubAdmin from "./subAdmin/SubAdmin";
+import PaymentAndRevenue from "./payment/PaymentAndRevenue";
 
 export {
   Login,
@@ -44,4 +45,5 @@ export {
   PushNotification,
   ChangeManagement,
   SubAdmin,
+  PaymentAndRevenue,
 };

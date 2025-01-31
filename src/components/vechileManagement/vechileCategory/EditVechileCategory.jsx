@@ -90,11 +90,17 @@ const EditVechileCategory = () => {
     setUpdateState((prev) => ({
       ...prev,
       categoryName: state?.categoryName || "",
-      categoryId:state?._id,
+      categoryId: state?._id,
       tagLine: state?.tagLine || "",
       weightCapicity: state?.weightCapicity || "",
       uploadIcon: state?.uploadIcon || "",
       fareData: state?.fareData[0]?.fareData || [],
+      length: state?.length,
+      width: state?.width,
+      height: state?.height,
+      volume: state?.volume,
+      loadingTime: state?.loadingTime,
+      unloadingTime: state?.unloadingTime,
     }));
   }, [state]);
   const handleEditClick = () => {
@@ -317,6 +323,8 @@ const EditVechileCategory = () => {
 
   const handleSubmit = () => {
     if (handleValidation()) {
+      console.log({iState});
+      
       dispatch(editVechileCategory(iState)).then((res) => {
         if (res?.payload?.code == 200) {
           toastService.success("Vehicle category added successfully");
@@ -331,7 +339,7 @@ const EditVechileCategory = () => {
     <div className="WrapperArea">
       <div className="WrapperBox">
         <div className="TitleBox">
-          <h4 className="Title">Add Vehicle Category</h4>
+          <h4 className="Title">Edit Vehicle Category</h4>
           <a className="TitleLink">
             <BackButton />
           </a>

@@ -1,9 +1,33 @@
-import moment from 'moment';
-import React from 'react'
+import moment from "moment";
+import React, { useEffect, useState } from "react";
+import {
+  userList,
+  userStatus,
+} from "../../../features/slices/userManagementReducer";
+import { toastService } from "../../../utils/toastify";
+import { useDispatch } from "react-redux";
 
 const PersonalDetail = ({ state }) => {
-  console.log({state});
-  
+  const [status,setStatus]=useState()
+  const dispatch = useDispatch();
+  console.log({ state });
+  useEffect(()=>{
+    setStatus(state?.userStatus);
+  },[state])
+  const handleChecked = (e, id) => {
+    const { name, checked } = e?.target;
+    const status = checked ? "ACTIVE" : "INACTIVE";
+    const data = { id, status };
+    dispatch(userStatus(data)).then((res) => {
+      if (res?.payload?.code == 200) {
+        toastService.success("Status updated successfully");
+         setStatus(checked);
+        dispatch(userList());
+      } else {
+        toastService.error("status update failed");
+      }
+    });
+  };
   return (
     <div className="Small-Wrapper">
       <div className="tab-content">
@@ -28,14 +52,21 @@ const PersonalDetail = ({ state }) => {
                       <h3>
                         {state?.fullName}{" "}
                         <span>
-                          <i className="fa fa-star" aria-hidden="true" /> 0{" "}
+                          <i className="fa fa-star" aria-hidden="true" />{" "}
+                          {state?.avgRating
+                            ? state.avgRating.toFixed(2)
+                            : "0.00"}{" "}
                         </span>
                       </h3>
                       <h4>User ID : #{state?.user_number}</h4>
                     </div>
                     <div className="Actions">
                       <label className="Switch">
-                        <input type="checkbox" />
+                        <input
+                          type="checkbox"
+                          checked={status}
+                          onChange={(e) => handleChecked(e, state?._id)}
+                        />
                         <span className="slider" />
                       </label>
                       {/* <a className="Green" href="#">
@@ -76,7 +107,8 @@ const PersonalDetail = ({ state }) => {
                     <p>
                       <label>Average Rating</label>{" "}
                       <span>
-                        0 <i className="fa fa-star" aria-hidden="true" />
+                        {state?.avgRating ? state.avgRating.toFixed(2) : "0.00"}{" "}
+                        <i className="fa fa-star" aria-hidden="true" />
                       </span>
                     </p>
                     <p>
@@ -349,4 +381,4 @@ const PersonalDetail = ({ state }) => {
   );
 };
 
-export default PersonalDetail
+export default PersonalDetail;

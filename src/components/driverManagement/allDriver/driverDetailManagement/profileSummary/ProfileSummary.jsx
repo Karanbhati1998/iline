@@ -1,10 +1,32 @@
-import moment from 'moment';
-import React from 'react'
-import { Link } from 'react-router-dom';
+import moment from "moment";
+import React, { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import { Link } from "react-router-dom";
+import { driverStatus, fetchP2pDriverList } from "../../../../../features/slices/DriverManagement/allDriver/allDriverReducer";
+import { toastService } from "../../../../../utils/toastify";
 
-const ProfileSummary = ({state}) => {
-  console.log({state});
-  
+const ProfileSummary = ({ state }) => {
+  const [status, setStatus] = useState();
+  const dispatch = useDispatch();
+  console.log({ state });
+  useEffect(() => {
+    setStatus(state?.userStatus);
+  }, [state]);
+  console.log({ state });
+  const handleChecked = (e, id) => {
+    const { name, checked } = e?.target;
+    const status = checked ? "ACTIVE" : "INACTIVE";
+    const data = { id, status };
+    dispatch(driverStatus(data)).then((res) => {
+      if (res?.payload?.code == 200) {
+        toastService.success("Status updated successfully");
+        setStatus(checked);
+        dispatch(fetchP2pDriverList({ page:1 }));
+      } else {
+        toastService.error("status update failed");
+      }
+    });
+  };
   return (
     <div className="tab-content">
       <div className="tab-pane show active" id="profile-summary">
@@ -23,7 +45,8 @@ const ProfileSummary = ({state}) => {
                 <h3>
                   {state?.fullName}
                   <span>
-                    <i className="fa fa-star" aria-hidden="true" /> 4.5
+                    <i className="fa fa-star" aria-hidden="true" />{" "}
+                    {state?.avgRating ? state.avgRating.toFixed(2) : "0.00"}
                   </span>
                 </h3>
                 <p>Driver ID: {state?.driver_number}</p>
@@ -33,19 +56,17 @@ const ProfileSummary = ({state}) => {
                   <img src="images/download.png" alt="" />
                 </a>
                 <label className="Switch">
-                  <input type="checkbox" />
+                  <input
+                    type="checkbox"
+                    checked={status}
+                    onChange={(e) => handleChecked(e, state?._id)}
+                  />
                   <span className="slider" />
                 </label>
                 {/* <a class="Green" href="#">
                 <i class="fa fa-pencil"></i>
               </a> */}
-                <a
-                  className="Red"
-                  data-toggle="modal"
-                  data-target="#BusinessDeleteModal"
-                >
-                  <i className="fa fa-trash" />
-                </a>
+               
                 {/* <div class="Button"> */}
                 <a className="Button mt-4" href="">
                   Add Money
@@ -271,12 +292,14 @@ const ProfileSummary = ({state}) => {
                       <p>
                         <strong>Vehicle Number </strong>
                         <span>
-                          {state?.vehicleData?.[0]?.vehicleNumberPlate}
+                          {state?.vehicleData?.[0]?.vehicleNumberPlate || "N/A"}
                         </span>
                       </p>
                       <p>
                         <strong>Vehicle Type </strong>
-                        <span>{state?.vehicleData?.[0]?.vehicleType}</span>
+                        <span>
+                          {state?.vehicleData?.[0]?.vehicleType || "N/A"}
+                        </span>
                       </p>
                       <p>
                         <strong>Assigned on </strong>
@@ -309,6 +332,6 @@ const ProfileSummary = ({state}) => {
       </div>
     </div>
   );
-}
+};
 
-export default ProfileSummary
+export default ProfileSummary;

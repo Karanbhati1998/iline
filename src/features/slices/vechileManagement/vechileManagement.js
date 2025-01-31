@@ -5,6 +5,7 @@ const initialState = {
   PendingVechileList: [],
   serviceBasedVehicleList: [],
   categoryWiseVehicleData: [],
+  vehicleHistory: [],
   loading: false,
   error: null,
 };
@@ -13,6 +14,20 @@ export const getIlineOrP2pVechileList = createAsyncThunk(
   async (payload, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get("/vehicleList", {
+        params: payload,
+      });
+      return response.data;
+    } catch (error) {
+      console.log({ error });
+      rejectWithValue(error);
+    }
+  }
+);
+export const getVechileHistory = createAsyncThunk(
+  "get/vehicleHistory",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get("/vehicleHistory", {
         params: payload,
       });
       return response.data;
@@ -167,6 +182,16 @@ const vechileSlice = createSlice({
       state.categoryWiseVehicleData = action.payload;
     });
     builder.addCase(getCategoryWiseVehicleData.rejected, (state, action) => {
+      state.loading = false;
+    });
+    builder.addCase(getVechileHistory.pending, (state, action) => {
+      state.loading = true;
+    });
+    builder.addCase(getVechileHistory.fulfilled, (state, action) => {
+      state.loading = false;
+      state.vehicleHistory = action.payload;
+    });
+    builder.addCase(getVechileHistory.rejected, (state, action) => {
       state.loading = false;
     });
   },

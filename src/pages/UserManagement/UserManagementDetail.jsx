@@ -34,7 +34,11 @@ const UserManagementDetail = () => {
           </div>
           <BackButton />
         </div>
-        {!showRideDetail ? <PersonalDetail state={state} /> : <RideDetails />}
+        {!showRideDetail ? (
+          <PersonalDetail state={state} />
+        ) : (
+          <RideDetails state={state} />
+        )}
       </div>
     </div>
   );

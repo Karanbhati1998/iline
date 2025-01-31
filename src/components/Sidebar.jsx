@@ -37,6 +37,10 @@ const Sidebar = () => {
     navigate("/bookingManagementTwoWheller", { state: id });
     setCatId(id);
   };
+  const handleNavigateToPayment = (id) => {
+    navigate("/paymentAndRevenueManagemnt", { state: id });
+    setCatId(id);
+  };
   return (
     <>
       <div className="SidenavBar">
@@ -87,7 +91,7 @@ const Sidebar = () => {
                 return (
                   <li key={res?._id}>
                     <a
-                    className={catId == res?._id ? "textactive" : ""}
+                      className={catId == res?._id ? "textactive" : ""}
                       onClick={() => {
                         handleNavigate(res?._id);
                       }}
@@ -124,13 +128,20 @@ const Sidebar = () => {
               Logistics Partner Management
             </a>
           </li>
-          <li className="dropdown">
+         
+          <li
+            className={
+              url.includes("paymentAndRevenueManagemnt")
+                ? "active dropdown"
+                : "dropdown"
+            }
+          >
             <a
               href="javascript:void(0)"
               id="navbardrop"
               className="dropdown-toggle"
               data-toggle="dropdown"
-              aria-expanded="false"
+              // aria-expanded="false"
             >
               <span>
                 <i className="fa fa-text-width" />
@@ -138,18 +149,20 @@ const Sidebar = () => {
               Payment and Revenue Management
             </a>
             <ol className="dropdown-menu">
-              <li>
-                <a>Two-Wheeler</a>
-              </li>
-              <li>
-                <a>Three-Wheeler</a>
-              </li>
-              <li>
-                <a>Four-Wheeler</a>
-              </li>
-              <li>
-                <a>Freight Truck</a>
-              </li>
+              {VechileCategories?.result?.[0]?.paginationData?.map((res) => {
+                return (
+                  <li key={res?._id}>
+                    <a
+                      className={catId == res?._id ? "textactive" : ""}
+                      onClick={() => {
+                        handleNavigateToPayment(res?._id);
+                      }}
+                    >
+                      {res?.categoryName}
+                    </a>
+                  </li>
+                );
+              })}
             </ol>
           </li>
           <li className={url == "chargingStation" ? "active" : ""}>

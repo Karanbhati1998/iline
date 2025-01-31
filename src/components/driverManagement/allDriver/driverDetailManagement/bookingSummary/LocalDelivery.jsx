@@ -1,7 +1,98 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-
-const LocalDelivery = () => {
+import { getDriverRequestList } from '../../../../../features/slices/DriverManagement/allDriver/allDriverReducer';
+import CommonPagination from '../../../../CommonPagination';
+import { toastService } from '../../../../../utils/toastify';
+import moment from 'moment';
+const initialState = {
+  page: 1,
+  search: "",
+  fromDate: "",
+  toDate: "",
+  timeframe: "",
+};
+const LocalDelivery = ({state}) => {
+   const [iState, setUpdateState] = useState(initialState);
+    const { page, search, fromDate, toDate, timeframe } = iState;
+    
+  const dispatch=useDispatch()
+  const {driverRequestList}=useSelector(state=>{
+    return state?.driverManagementAllDrivers;
+  })
+  useEffect(() => {
+    dispatch(
+      getDriverRequestList({
+        driverId: state?._id,
+        rideType: "LOCAL",
+      })
+    );
+  }, [page, timeframe,state]);
+  console.log({ driverRequestList });
+   useEffect(() => {
+      const delayDebounceFunc = setTimeout(() => {
+        dispatch(
+          getDriverRequestList({
+            driverId: state?._id,
+            rideType: "LOCAL",
+            search: search.trim(),
+            timeframe,
+          })
+        );
+      }, 1000);
+  
+      return () => clearTimeout(delayDebounceFunc);
+    }, [search, timeframe, dispatch]);
+  
+    const handlePageChange = (page) => {
+      setUpdateState({ ...iState, page });
+      dispatch(
+        getDriverRequestList({ page, driverId: state?._id, rideType: "LOCAL" })
+      );
+    };
+    // const handleChecked = (e, id) => {
+    //   const { name, checked } = e?.target;
+    //   const status = checked ? "ACTIVE" : "INACTIVE";
+    //   const data = { id, status };
+    //   dispatch(driverStatus(data)).then((res) => {
+    //     if (res?.payload?.code == 200) {
+    //       toastService.success("Status updated successfully");
+    //       dispatch(
+    //         getDriverRequestList({
+    //           page,
+    //           driverId: state?._id,
+    //           rideType: "LOCAL",
+    //         })
+    //       );
+    //     } else {
+    //       toastService.error("status update failed");
+    //     }
+    //   });
+    // };
+    const handleChange = (e) => {
+      setUpdateState({ ...iState, [e.target.name]: e.target.value });
+    };
+    const handleReset = () => {
+      setUpdateState(initialState);
+      dispatch(
+        getDriverRequestList({
+          page: 1,
+          driverId: state?._id,
+          rideType: "LOCAL",
+        })
+      );
+    };
+    const handleApply = () => {
+      const data = {
+        search,
+        fromDate,
+        toDate,
+        page,
+        driverId: state?._id,
+        rideType: "LOCAL",
+      };
+      dispatch(getDriverRequestList(data));
+    };
   return (
     <>
       {" "}
@@ -15,29 +106,54 @@ const LocalDelivery = () => {
                   type="text"
                   className="form-control"
                   placeholder="Search"
+                  name="search"
+                  value={search}
+                  onChange={handleChange}
                 />
               </div>
               <div className="form-group">
                 <label>Select From</label>
-                <select className="form-control">
+                <select
+                  className="form-control"
+                  name="timeframe"
+                  onChange={handleChange}
+                  disabled={fromDate || toDate}
+                >
                   <option value="select">--Select--</option>
-                  <option value="Month">Today</option>
-                  <option value="Month">This week</option>
-                  <option value="Month">This month</option>
+                  <option value="Today">Today</option>
+                  <option value="Week">This Week</option>
+                  <option value="Month">This Month</option>
+                  <option value="Year">This Year</option>
                 </select>
               </div>
               <div className="form-group">
                 <label>From</label>
-                <input type="date" className="form-control" />
+                <input
+                  type="date"
+                  className="form-control"
+                  name="fromDate"
+                  value={fromDate}
+                  disabled={timeframe}
+                  onChange={handleChange}
+                />
               </div>
               <div className="form-group">
                 <label>To</label>
-                <input type="date" className="form-control" />
+                <input
+                  type="date"
+                  className="form-control"
+                  name="toDate"
+                  value={toDate}
+                  onChange={handleChange}
+                  disabled={timeframe}
+                />
               </div>
               <div className="form-group">
                 <label>&nbsp;</label>
-                <button className="Button">Apply</button>
-                <button className="Button Cancel">
+                <button className="Button" onClick={handleApply}>
+                  Apply
+                </button>
+                <button className="Button Cancel" onClick={handleReset}>
                   <i className="fa fa-refresh" />
                 </button>
               </div>
@@ -78,125 +194,64 @@ const LocalDelivery = () => {
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>1</td>
-              <td>OR#11</td>
-              <td>DR-01</td>
-              <td>John</td>
-              <td>V-123</td>
-              <td>UP-12-1010</td>
-              <td>200</td>
-              <td>
-                <Link to={"/userManagement/userBookingDetail"}>
-                  <span className="Green">Completed</span>
-                </Link>
-              </td>
-              <td>12-12-2024</td>
-              <td>Delhi</td>
-              <td>Agra</td>
-              <td>Mode 1</td>
-              <td>Completed</td>
-              <td>
-                <div className="Actions">
-                  <Link to="/userManagement/detail_ride" className="Blue">
-                    <i className="fa fa-info-circle" aria-hidden="true" />
-                  </Link>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td>2</td>
-              <td>OR#11</td>
-              <td>DR-01</td>
-              <td>John</td>
-              <td>V-123</td>
-              <td>UP-12-1010</td>
-              <td>200</td>
-              <td>
-                <a href="user-management-ride-details-ongoing.html">
-                  <span className="Yellow">Ongoing</span>
-                </a>
-              </td>
-              <td>12-12-2024</td>
-              <td>Delhi</td>
-              <td>Agra</td>
-              <td>Mode 1</td>
-              <td>Completed</td>
-              <td>
-                <div className="Actions">
-                  <a className="Blue" href="">
-                    <i className="fa fa-info-circle" aria-hidden="true" />
-                  </a>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td>3</td>
-              <td>OR#11</td>
-              <td>DR-01</td>
-              <td>John</td>
-              <td>V-123</td>
-              <td>UP-12-1010</td>
-              <td>200</td>
-              <td>
-                <a href="user-management-ride-details-cancelled.html">
-                  <span className="Red">Cancelled</span>
-                </a>
-              </td>
-              <td>12-12-2024</td>
-              <td>Delhi</td>
-              <td>Agra</td>
-              <td>Mode 1</td>
-              <td>Completed</td>
-              <td>
-                <div className="Actions">
-                  <a className="Blue" href="">
-                    <i className="fa fa-info-circle" aria-hidden="true" />
-                  </a>
-                </div>
-              </td>
-            </tr>
+            {driverRequestList?.result?.[0]?.paginationData?.map((res,i) => {
+              return (
+                <tr>
+                  <td>{i + 1 + (page - 1) * 10}</td>
+                  <td>{res?.requestId}</td>
+                  <td>{res?.driverData?.driver_number}</td>
+                  <td>{res?.driverData?.fullName}</td>
+                  <td>{res?.vehicleData?.vehicleNumber}</td>
+                  <td>{res?.vehicleData?.vehicleNumberPlate}</td>
+                  <td>{res?.tripCharge}</td>
+                  <td>
+                    <Link to={"/userManagement/userBookingDetail"}>
+                      <span className="Green">{res?.requestStatus}</span>
+                    </Link>
+                  </td>
+                  <td>{res?.scheduledDate}</td>
+                  <td>{res?.pickUpLocationName}</td>
+                  <td>{res?.dropOffLocationName}</td>
+                  <td>{res?.paymentMode}</td>
+                  <td>-</td>
+                  <td>
+                    <div className="Actions">
+                      <Link to="/userManagement/detail_ride" className="Blue">
+                        <i className="fa fa-info-circle" aria-hidden="true" />
+                      </Link>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
+           
           </tbody>
         </table>
       </div>
       <div className="PaginationBox">
         <div className="PaginationLeft">
           <p>
-            Total Records : <span>200</span>
+            Total Records :{" "}
+            <span>
+              {driverRequestList?.result?.[0]?.totalCount?.[0]?.count || 0}
+            </span>
           </p>
         </div>
+
         <div className="PaginationRight">
-          <ul>
-            <li>
-              <a href="javascript:void(0);">
-                <i className="fa fa-angle-double-left" />
-              </a>
-            </li>
-            <li>
-              <a href="javascript:void(0);">
-                <i className="fa fa-angle-left" />
-              </a>
-            </li>
-            <li className="active">
-              <a href="javascript:void(0);">1</a>
-            </li>
-            <li>
-              <a href="javascript:void(0);">2</a>
-            </li>
-            <li>
-              <a href="javascript:void(0);">3</a>
-            </li>
-            <li>
-              <a href="javascript:void(0);">
-                <i className="fa fa-angle-right" />
-              </a>
-            </li>
-            <li>
-              <a href="javascript:void(0);">
-                <i className="fa fa-angle-double-right" />
-              </a>
-            </li>
-          </ul>
+          {driverRequestList?.result?.[0]?.totalCount?.[0]?.count > 0 && (
+            <CommonPagination
+              activePage={page}
+              itemsCountPerPage={10}
+              totalItemsCount={
+                driverRequestList?.result?.[0]?.totalCount?.[0]?.count || 0
+              }
+              pageRangeDisplayed={4}
+              onChange={handlePageChange}
+              itemClass="page-item"
+              linkClass="page-link"
+            />
+          )}
         </div>
       </div>
     </>
