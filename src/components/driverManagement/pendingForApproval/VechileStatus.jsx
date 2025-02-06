@@ -71,11 +71,11 @@ const VechileStatus = () => {
                       <div>
                         <h3>
                           {state?.fullName}{" "}
-                          <span>
+                          {/* <span>
                             <i className="fa fa-star" aria-hidden="true" /> 4.5{" "}
-                          </span>
+                          </span> */}
                         </h3>
-                        <h4>User ID : #-</h4>
+                        <h4>Driver ID : {state?.driver_number}</h4>
                       </div>
                     </figcaption>
                   </div>
@@ -153,10 +153,9 @@ const VechileStatus = () => {
                               <figure>
                                 <img
                                   src={
-                                    state?.driverDocumentData?.[0]
-                                      ?.aadharFront 
+                                    state?.driverDocumentData?.[0]?.aadharFront
                                   }
-                                  alt='no img'
+                                  alt="no img"
                                 />
                               </figure>
                               <figure
@@ -166,9 +165,9 @@ const VechileStatus = () => {
                               >
                                 <img
                                   src={
-                                    state?.driverDocumentData?.[0]
-                                      ?.aadharBack    }
-                                      alt='no img'
+                                    state?.driverDocumentData?.[0]?.aadharBack
+                                  }
+                                  alt="no img"
                                 />
                               </figure>
                             </li>
@@ -250,7 +249,7 @@ const VechileStatus = () => {
                   className="Reject"
                   onClick={() => {
                     setShowDisApproveModal(true);
-                    setId()
+                    setId();
                   }}
                 >
                   Disapprove

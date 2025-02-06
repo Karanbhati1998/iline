@@ -23,7 +23,11 @@ const initialState = {
   email: "",
   errors: {},
   imageLoader: false,
-  location: "",
+  location: {
+    address: "",
+    lat: "",
+    long: "",
+  },
 };
 const AddNewDriver = () => {
   const [iState, setUpdateState] = useState(initialState);
@@ -306,7 +310,7 @@ const AddNewDriver = () => {
                   <label>Location</label>
                   <ReactPlaceAutocomplete
                     setUpdateState={setUpdateState}
-                    address={location}
+                    address={location?.address}
                   />
                   {errors.location && (
                     <p className="d-flex justify-content-start text-danger mt-2 ">

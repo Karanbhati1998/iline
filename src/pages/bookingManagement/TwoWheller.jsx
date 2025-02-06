@@ -39,14 +39,14 @@ const TwoWheller = () => {
                 Ongoing
               </a>
             </li>
-            <li className="nav-item">
+            {/* <li className="nav-item">
               <a
                 className={scheduled ? "nav-link active" : "nav-link"}
                 onClick={() => activeTabFunc("scheduled")}
               >
                 Scheduled
               </a>
-            </li>
+            </li> */}
             <li className="nav-item">
               <a
                 className={completed ? "nav-link active" : "nav-link"}

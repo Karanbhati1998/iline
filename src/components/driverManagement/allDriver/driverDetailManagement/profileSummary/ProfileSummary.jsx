@@ -31,6 +31,41 @@ const ProfileSummary = ({ state }) => {
       }
     });
   };
+  const [location, setLocation] = useState(false);
+  const getAddressFromLatLng = async (lat, lng) => {
+    const API_KEY = "AIzaSyAy14lzjUql2GchyraO4bHHj4oAwW_GH3Y";
+    const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${API_KEY}`;
+
+    try {
+      const response = await fetch(url);
+      const data = await response.json();
+
+      if (data.status === "OK") {
+        return data?.results?.[0]?.formatted_address || "Address not found";
+      } else {
+        return "Location not found";
+      }
+    } catch (error) {
+      console.error("Error fetching address:", error);
+      return "Error fetching location";
+    }
+  };
+
+  useEffect(() => {
+    if (state.location.coordinates) {
+      getAddressFromLatLng(
+        state?.location?.coordinates?.[1],
+        state?.location?.coordinates?.[0]
+      )
+        .then((location) => {
+          setLocation(location);
+        })
+        .catch((error) => {
+          console.error("Error fetching location:", error);
+        });
+    }
+  }, []);
+  console.log({ location });
   return (
     <div className="tab-content">
       <div className="tab-pane show active" id="profile-summary">
@@ -106,7 +141,15 @@ const ProfileSummary = ({ state }) => {
                       </p>
                       <p>
                         <strong>Location</strong>
-                        <span>Agra</span>
+                        <span
+                          style={{
+                            marginLeft: "50px",
+                            paddingLeft: "150px",
+                            marginTop: "-20px",
+                          }}
+                        >
+                          {location}
+                        </span>
                       </p>
                       <p>
                         <strong>Gender</strong>
@@ -156,11 +199,19 @@ const ProfileSummary = ({ state }) => {
                       </p>
                       <p>
                         <strong>Total Cancelled Delivery</strong>
-                        <span>0</span>
+                        <span>{state?.cancelCount}</span>
                       </p>
                       <p>
                         <strong>Last Location</strong>
-                        <span>-</span>
+                        <span
+                          style={{
+                            marginLeft: "50px",
+                            paddingLeft: "150px",
+                            marginTop: "-20px",
+                          }}
+                        >
+                          {location}
+                        </span>
                       </p>
                       {/* <p>
                         <strong>Current Location</strong>
@@ -168,16 +219,16 @@ const ProfileSummary = ({ state }) => {
                       </p> */}
                       <p>
                         <strong>Earnings</strong>
-                        <span>-</span>
+                        <span>{state?.totalTripAmount}</span>
                       </p>
                       {/* <p>
                         <strong>Last Time Online</strong>
                         <span>-</span>
                       </p> */}
-                      <p>
+                      {/* <p>
                         <strong>Average Waiting Time for pickup</strong>
                         <span>-</span>
-                      </p>
+                      </p> */}
                     </aside>
                   </article>
                 </div>
@@ -323,9 +374,11 @@ const ProfileSummary = ({ state }) => {
                         <p>
                           <strong>Assigned on </strong>
                           <span>
-                            {moment(state?.vehicleData?.[0]?.assignOn).format(
-                              "DD-MM-YYYY"
-                            )}
+                            {state?.vehicleData?.[0]
+                              ?.assignOn ? moment(
+                                state?.vehicleData?.[0]?.assignOn
+                              )
+                              .format("DD-MM-YYYY"):"-"}
                           </span>
                         </p>
                       )}

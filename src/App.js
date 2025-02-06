@@ -26,6 +26,7 @@ import {
   ChargingStation,
   SubAdmin,
   PaymentAndRevenue,
+  
 } from "./pages/index";
 import ProtectedRoute from "./components/ProtectedRoute";
 import CustomToastContainer from "./components/CustomToastContainer";
@@ -72,6 +73,7 @@ import NotificationDetail from "./components/notification/NotificationDetail";
 import { denieAccess, denyAccess } from "./utils/deniedAccess";
 import PaymentDetail from "./components/payment/PaymentDetail";
 import CommonBookingDetail from "./components/driverManagement/allDriver/driverDetailManagement/bookingSummary/CommonBookingDetail";
+import DisApprovedList from "./pages/DriverManagement/DisApprovedList";
 function App() {
   const isAuthenticated = getToken("ilineLogin", "token");
   useEffect(() => {
@@ -133,6 +135,10 @@ function App() {
                 <Route
                   path="driverManagement/pendingForApproval"
                   element={<PendingForApproval />}
+                />
+                <Route
+                  path="driverManagement/disApproveList"
+                  element={<DisApprovedList />}
                 />
                 <Route
                   path="driverManagement/assignVechileHistory"

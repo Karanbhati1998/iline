@@ -43,13 +43,13 @@ const DriverManagement = () => {
                 </Link>
               </li>
               <li>
-                <a>
+                <Link to="disApproveList">
                   <span className="Icon">
                     <img src={require("../../assets/images/Driver.png")} />
                   </span>
-                  <span className="Text">Insurance Management</span>
+                  <span className="Text">Disapproved Drivers</span>
                   {/* <span class="Count">123</span> */}
-                </a>
+                </Link>
               </li>
             </ul>
           </div>

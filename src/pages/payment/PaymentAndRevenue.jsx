@@ -88,7 +88,7 @@ const PaymentAndRevenue = () => {
                   Total Revenue from P2P Driver
                 </a>
               </li>
-              <li className="nav-item">
+              {/* <li className="nav-item">
                 <a
                   className={
                     totalPaymentfromP2pDriver ? "active nav-link" : "nav-link"
@@ -97,12 +97,12 @@ const PaymentAndRevenue = () => {
                 >
                   Total Payment To P2P Driver{" "}
                 </a>
-              </li>
-              <li className="nav-item">
+              </li> */}
+              {/* <li className="nav-item">
                 <a className={totalRevenue ? " nav-link" : "nav-link"}>
                   Total Commission Earned from P2P Drivers{" "}
                 </a>
-              </li>
+              </li> */}
             </ul>
             <div className="tab-content">
               {totalRevenue && <TotalRevenueTab categoryId={state} />}

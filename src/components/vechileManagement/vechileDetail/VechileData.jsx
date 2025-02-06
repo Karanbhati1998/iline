@@ -100,10 +100,10 @@ const VechileData = ({ state }) => {
                     <strong>Vehicle Manufacturer </strong>
                     <span>{state?.vehicleManufacturer}</span>
                   </p>
-                  <p>
+                  {/* <p>
                     <strong>Load Capacity </strong>
                     <span>-</span>
-                  </p>
+                  </p> */}
                   <p>
                     <strong>Vehicle Plate Number</strong>
                     <span>{state?.vehicleNumberPlate}</span>
@@ -115,8 +115,19 @@ const VechileData = ({ state }) => {
                 </aside>
                 <aside>
                   <p>
-                    <strong>Approved on</strong>
-                    <span>-</span>
+                    <strong>
+                      {state.vehicleType == "ILINE"
+                        ? "Assign on"
+                        : "Approved on"}
+                    </strong>
+                    <span>
+                      {" "}
+                      {state.vehicleType == "ILINE"
+                        ? moment(state?.assignOn).format("DD-MM-YYYY")
+                        : moment(state?.driverData?.[0]?.approvedOn).format(
+                            "DD-MM-YYYY"
+                          )}
+                    </span>
                   </p>
                   <p>
                     <strong>Total Booking Received</strong>
@@ -139,8 +150,17 @@ const VechileData = ({ state }) => {
                     <span>{state?.totalOngoingBooking}</span>
                   </p>
                   <p>
-                    <strong>Approved By </strong>
-                    <span>{state?.assignBy}</span>
+                    <strong>
+                      {" "}
+                      {state.vehicleType == "ILINE"
+                        ? "Assign By"
+                        : "Approved By"}
+                    </strong>
+                    <span>
+                      {state.vehicleType == "ILINE"
+                        ? state?.assignBy
+                        : state?.driverData?.[0]?.approvedBy}
+                    </span>
                   </p>
                 </aside>
               </article>
