@@ -1,11 +1,16 @@
-import React, { useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux';
-import { callRequestList, statusChangedCallRequest, ticketReply } from '../../features/slices/supportTicketManagement';
-import { toastService } from '../../utils/toastify';
-import moment from 'moment';
-import CloseChat from '../../pages/supportTicketManagement/CloseChat';
-import CommonPagination from '../CommonPagination';
-import BackButton from '../BackButton';
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  callRequestList,
+  statusChangedCallRequest,
+  ticketReply,
+} from "../../features/slices/supportTicketManagement";
+import { toastService } from "../../utils/toastify";
+import moment from "moment";
+import CloseChat from "../../pages/supportTicketManagement/CloseChat";
+import CommonPagination from "../CommonPagination";
+import BackButton from "../BackButton";
+import { canPerformAction } from "../../utils/deniedAccess";
 const initialState = {
   page: 1,
   search: "",
@@ -15,72 +20,71 @@ const initialState = {
   closeChat: false,
 };
 const CallRequest = () => {
-    const [iState, setUpdateState] = useState(initialState);
-     const { page, search, fromDate, toDate, timeframe, closeChat, id } =
-       iState;
-     const dispatch = useDispatch();
-     const { callRequestData } = useSelector((state) => {
-       return state?.supportTicket;
-     });
-     console.log({ callRequestData });
-     
-       useEffect(() => {
-         dispatch(callRequestList({ page, timeframe }));
-       }, [page, timeframe]);
-        useEffect(() => {
-           const delayDebounceFunc = setTimeout(() => {
-             dispatch(
-               callRequestList({
-                 search: search.trim(),
-                 timeframe,
-               })
-             );
-           }, 1000);
-       
-           return () => clearTimeout(delayDebounceFunc);
-         }, [search, timeframe, dispatch]);
-         
-         const handleChange = (e) => {
-           setUpdateState({ ...iState, [e.target.name]: e.target.value });
-         };
-         const handleApply = () => {
-           const data = {
-             search,
-             fromDate,
-             toDate,
-             page,
-           };
-           dispatch(callRequestList(data));
-         };
-         const handleReset = () => {
-           setUpdateState(initialState);
-           dispatch(callRequestList({ page: 1 }));
-         };
-         const handleOpenChatClose = (id, type) => {
-           if (type == "PENDING") setUpdateState({ ...iState, closeChat: true, id });
-         };
-         const handlecloseChatClose = (id) => {
-           setUpdateState({ ...iState, closeChat: false });
-         };
-         const handlecloseChat = () => {
-           const data = {
-             id,
-             status: "Solved",
-           };
-           dispatch(statusChangedCallRequest(data)).then((res) => {
-             if (res?.payload?.code === 200) {
-               toastService.success("Ticket closed successfully");
-               dispatch(callRequestList());
-               handlecloseChatClose();
-             } else {
-               toastService.error("Failed to close ticket");
-             }
-           });
-         };
-         const handlePageChange = (page) => {
-           setUpdateState({ ...iState, page });
-           dispatch(callRequestList({ page }));
-         };
+  const [iState, setUpdateState] = useState(initialState);
+  const { page, search, fromDate, toDate, timeframe, closeChat, id } = iState;
+  const dispatch = useDispatch();
+  const { callRequestData } = useSelector((state) => {
+    return state?.supportTicket;
+  });
+  console.log({ callRequestData });
+
+  useEffect(() => {
+    dispatch(callRequestList({ page, timeframe }));
+  }, [page, timeframe]);
+  useEffect(() => {
+    const delayDebounceFunc = setTimeout(() => {
+      dispatch(
+        callRequestList({
+          search: search.trim(),
+          timeframe,
+        })
+      );
+    }, 1000);
+
+    return () => clearTimeout(delayDebounceFunc);
+  }, [search, timeframe, dispatch]);
+
+  const handleChange = (e) => {
+    setUpdateState({ ...iState, [e.target.name]: e.target.value });
+  };
+  const handleApply = () => {
+    const data = {
+      search,
+      fromDate,
+      toDate,
+      page,
+    };
+    dispatch(callRequestList(data));
+  };
+  const handleReset = () => {
+    setUpdateState(initialState);
+    dispatch(callRequestList({ page: 1 }));
+  };
+  const handleOpenChatClose = (id, type) => {
+    if (type == "PENDING") setUpdateState({ ...iState, closeChat: true, id });
+  };
+  const handlecloseChatClose = (id) => {
+    setUpdateState({ ...iState, closeChat: false });
+  };
+  const handlecloseChat = () => {
+    const data = {
+      id,
+      status: "Solved",
+    };
+    dispatch(statusChangedCallRequest(data)).then((res) => {
+      if (res?.payload?.code === 200) {
+        toastService.success("Ticket closed successfully");
+        dispatch(callRequestList());
+        handlecloseChatClose();
+      } else {
+        toastService.error("Failed to close ticket");
+      }
+    });
+  };
+  const handlePageChange = (page) => {
+    setUpdateState({ ...iState, page });
+    dispatch(callRequestList({ page }));
+  };
   return (
     <>
       <div className="WrapperArea">
@@ -169,7 +173,9 @@ const CallRequest = () => {
                     <th>Number</th>
                     <th>Date</th>
                     <th>Reason for request</th>
-                    <th>Action</th>
+                    {canPerformAction("Support Ticket Management") && (
+                      <th>Action</th>
+                    )}
                   </tr>
                 </thead>
                 <tbody>
@@ -185,19 +191,21 @@ const CallRequest = () => {
                           <td>{res?.phoneNumber}</td>
                           <td>{moment(res?.createdAt).format("DD-MM-YYYY")}</td>
                           <td>App Not Working</td>
-                          <td>
-                            <span
-                              className={
-                                res?.status == "PENDING" ? "Red" : "Green"
-                              }
-                              disabled={res?.status == "SOLVED"}
-                              onClick={() =>
-                                handleOpenChatClose(res?._id, res?.status)
-                              }
-                            >
-                              {res?.status !== "PENDING" ? "Closed" : "Open"}
-                            </span>
-                          </td>
+                          {canPerformAction("Support Ticket Management") && (
+                            <td>
+                              <span
+                                className={
+                                  res?.status == "PENDING" ? "Red" : "Green"
+                                }
+                                disabled={res?.status == "SOLVED"}
+                                onClick={() =>
+                                  handleOpenChatClose(res?._id, res?.status)
+                                }
+                              >
+                                {res?.status !== "PENDING" ? "Closed" : "Open"}
+                              </span>
+                            </td>
+                          )}
                         </tr>
                       );
                     }
@@ -242,6 +250,6 @@ const CallRequest = () => {
       )}
     </>
   );
-}
+};
 
-export default CallRequest
+export default CallRequest;

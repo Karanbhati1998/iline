@@ -13,6 +13,7 @@ import DeleteModal from "../../DeleteModal";
 import DisApprovedModal from "./DisApprovedModal";
 import PendingForApproval from "./PendingForApproval";
 import { Link } from "react-router-dom";
+import { canPerformAction } from "../../../utils/deniedAccess";
 const initialState = {
   page: 1,
   search: "",
@@ -23,7 +24,7 @@ const initialState = {
   deleteModal: false,
   PENDING: false,
   DISAPPROVED: false,
-  data:{}
+  data: {},
 };
 const PendingVechileTable = () => {
   const [iState, setUpdateState] = useState(initialState);
@@ -37,7 +38,7 @@ const PendingVechileTable = () => {
     deleteModal,
     PENDING,
     DISAPPROVED,
-    data
+    data,
   } = iState;
   const dispatch = useDispatch();
   const { PendingVechileList } = useSelector((state) => {
@@ -101,33 +102,32 @@ const PendingVechileTable = () => {
   console.log({ PendingVechileList });
   const handleClose = () => {
     setUpdateState((prev) => ({
-     ...prev,
+      ...prev,
       deleteModal: false,
       PENDING: false,
       DISAPPROVED: false,
     }));
   };
-  const handleShowModal = (val,res) => {
+  const handleShowModal = (val, res) => {
     setUpdateState((prev) => ({
       ...prev,
       [val]: true,
-      data:res,
-      id:res?._id
+      data: res,
+      id: res?._id,
     }));
   };
 
   const handleDelete = () => {
-     dispatch(pendingVehicleStatus({ id, status: "DELETED" })).then((res) => {
-       if (res?.payload?.code == 200) {
-         toastService.success("Delete successfully");
-         setUpdateState({ ...iState, deleteModal: false, id: "" });
-         dispatch(getPendingVehicleList());
-       } else {
-         toastService.error("Delete failed");
-       }
-     });
+    dispatch(pendingVehicleStatus({ id, status: "DELETED" })).then((res) => {
+      if (res?.payload?.code == 200) {
+        toastService.success("Delete successfully");
+        setUpdateState({ ...iState, deleteModal: false, id: "" });
+        dispatch(getPendingVehicleList());
+      } else {
+        toastService.error("Delete failed");
+      }
+    });
   };
-
 
   return (
     <>
@@ -228,7 +228,7 @@ const PendingVechileTable = () => {
                   <th>Driver Name</th>
                   <th>Driver Approval Status</th>
                   <th>View Vehicle Details</th>
-                  <th>Action</th>
+                  {canPerformAction("Vehicle Management") && <th>Action</th>}
                 </tr>
               </thead>
               <tbody>
@@ -272,9 +272,9 @@ const PendingVechileTable = () => {
                         <td>
                           <div className="Actions">
                             <Link
-                            to="/vehicleManagement/details"
-                            state={res}
-                            className="Blue"
+                              to="/vehicleManagement/details"
+                              state={res}
+                              className="Blue"
                             >
                               <i
                                 className="fa fa-info-circle"
@@ -283,6 +283,8 @@ const PendingVechileTable = () => {
                             </Link>
                           </div>
                         </td>
+                        {
+                          canPerformAction("Vehicle Management") &&
                         <td>
                           <div className="Actions">
                             <a
@@ -313,6 +315,7 @@ const PendingVechileTable = () => {
                             </a>
                           </div>
                         </td>
+                        }
                       </tr>
                     );
                   }
@@ -355,9 +358,7 @@ const PendingVechileTable = () => {
           statement="vechile"
         />
       )}
-      {DISAPPROVED && (
-        <DisApprovedModal handleClose={handleClose} id={id} />
-      )}
+      {DISAPPROVED && <DisApprovedModal handleClose={handleClose} id={id} />}
       {PENDING && <PendingForApproval handleClose={handleClose} data={data} />}
     </>
   );

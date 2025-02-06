@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getIlineRevenueList } from "../../features/slices/payment";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import CommonPagination from "../../components/CommonPagination";
 const initialState = {
   page: 1,
@@ -212,15 +212,16 @@ const TotalRevenuefromILineDriverTab = ({ categoryId }) => {
                         <td>{res?.requestData?.is_report ? "yes" : "No"}</td>
                         <td>
                           <div className="Actions">
-                            <a
+                            <Link
                               className="Blue"
-                              href="booking-management-sheduled-booking-details.html"
+                              to="paymentDetail"
+                              state={res}
                             >
                               <i
                                 className="fa fa-info-circle"
                                 aria-hidden="true"
                               />
-                            </a>
+                            </Link>
                           </div>
                         </td>
                       </tr>

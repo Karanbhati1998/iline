@@ -8,6 +8,7 @@ import {
 import { toastService } from "../../../utils/toastify";
 import moment from "moment";
 import CommonPagination from "../../CommonPagination";
+import { canPerformAction } from "../../../utils/deniedAccess";
 const initialState = {
   page: 1,
   search: "",
@@ -74,18 +75,18 @@ const P2PDriver = () => {
     };
     dispatch(fetchP2pDriverList(data));
   };
-   const handleDelete=(id)=>{
-         const data = { id, status:"DELETED" };
-         dispatch(driverStatus(data)).then((res) => {
-           console.log("status update api", res);
-           if (res?.payload?.code == 200) {
-             toastService.success("Delete successfully");
-             dispatch(fetchP2pDriverList({ page }));
-           } else {
-             toastService.error(" Delete failed");
-           }
-         });
+  const handleDelete = (id) => {
+    const data = { id, status: "DELETED" };
+    dispatch(driverStatus(data)).then((res) => {
+      console.log("status update api", res);
+      if (res?.payload?.code == 200) {
+        toastService.success("Delete successfully");
+        dispatch(fetchP2pDriverList({ page }));
+      } else {
+        toastService.error(" Delete failed");
       }
+    });
+  };
   return (
     <div className="tab-pane active">
       <div className="Small-Wrapper">
@@ -180,30 +181,31 @@ const P2PDriver = () => {
                 <th>Out Station</th>
                 <th>Express Delivery</th>
                 <th>Driver Status</th>
-                <th>Action</th>
+                {canPerformAction("Driver Management") && <th>Action</th>}
                 <th>Details</th>
               </tr>
             </thead>
             <tbody>
               {p2pDriverList?.result?.[0]?.paginationData?.map((res, i) => {
+                
                 return (
                   <tr>
                     <td>{i + 1 + (page - 1) * 10}</td>
                     <td>{res?.driver_number}</td>
                     <td>{res?.fullName}</td>
                     <td>{res?.phoneNumber}</td>
-                    <td>-</td>
+                    <td>{res?.vechicleData?.[0]?.vehicleNumber}</td>
                     <td>{res?.vehicleNumber}</td>
-                    <td>0</td>
+                    <td>{res?.totalRides}</td>
                     <td>
                       <span className={res?.is_online ? "Green" : "Red"}>
                         {res?.is_online ? "Online" : "Offline"}
                       </span>{" "}
                     </td>
                     <td>{moment(res?.createdAt).format("DD-MM-YYYY")}</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
+                    <td>{res?.localRideCount}</td>
+                    <td>{res?.outstationRideCount}</td>
+                    <td>{res?.expressRideCount}</td>
                     <td>
                       <span
                         className={
@@ -213,26 +215,28 @@ const P2PDriver = () => {
                         {res?.userStatus}
                       </span>{" "}
                     </td>
-                    <td>
-                      {" "}
-                      <div className="Actions">
-                        <label className="Switch">
-                          <input
-                            type="checkbox"
-                            name="status"
-                            checked={res?.userStatus == "ACTIVE"}
-                            onChange={(e) => handleChecked(e, res?._id)}
-                          />
-                          <span className="slider" />
-                        </label>
-                        <a
-                          className="Red"
-                          onClick={() => handleDelete(res?._id)}
-                        >
-                          <i className="fa fa-trash" aria-hidden="true" />
-                        </a>
-                      </div>
-                    </td>
+                    {canPerformAction("Driver Management") && (
+                      <td>
+                        {" "}
+                        <div className="Actions">
+                          <label className="Switch">
+                            <input
+                              type="checkbox"
+                              name="status"
+                              checked={res?.userStatus == "ACTIVE"}
+                              onChange={(e) => handleChecked(e, res?._id)}
+                            />
+                            <span className="slider" />
+                          </label>
+                          <a
+                            className="Red"
+                            onClick={() => handleDelete(res?._id)}
+                          >
+                            <i className="fa fa-trash" aria-hidden="true" />
+                          </a>
+                        </div>
+                      </td>
+                    )}
                     <td>
                       <div className="Actions">
                         <Link
@@ -247,7 +251,6 @@ const P2PDriver = () => {
                   </tr>
                 );
               })}
-            
             </tbody>
           </table>
         </div>

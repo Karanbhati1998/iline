@@ -3,6 +3,7 @@ import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import LogoutModal from "./LogoutModal";
 import { getVechileCategory } from "../features/slices/vechileManagement/vechileCategory";
 import { useDispatch, useSelector } from "react-redux";
+import { denyAccess } from "../utils/deniedAccess";
 
 const Sidebar = () => {
   const [catId, setCatId] = useState("");
@@ -14,6 +15,7 @@ const Sidebar = () => {
   const handleClose = () => {
     setLogoutModal(false);
   };
+
   const { VechileCategories } = useSelector((state) => {
     return state?.vechileCategory;
   });
@@ -45,81 +47,94 @@ const Sidebar = () => {
     <>
       <div className="SidenavBar">
         <ul>
-          <li className={url == "dashboard" ? "active" : ""}>
-            <Link to="/dashboard">
-              <span>
-                <i className="fa fa-tachometer" />
-              </span>{" "}
-              Dashboard
-            </Link>
-          </li>
-          <li className={url == "userManagement" ? "active" : ""}>
-            <Link to="/userManagement">
-              <span>
-                <i className="fa fa-user" />
-              </span>{" "}
-              User Management
-            </Link>
-          </li>
-          <li>
-            <a>
-              <span>
-                <i className="fa fa-car" />
-              </span>{" "}
-              Enterprise Management
-            </a>
-          </li>
-          <li
-            className={
-              url.includes("bookingManagement") ? "active dropdown" : "dropdown"
-            }
-          >
-            <a
-              href="javascript:void(0)"
-              id="navbardrop"
-              className="dropdown-toggle"
-              data-toggle="dropdown"
-              // aria-expanded="false"
+          {denyAccess("Dashboard") && (
+            <li className={url == "dashboard" ? "active" : ""}>
+              <Link to="/dashboard">
+                <span>
+                  <i className="fa fa-tachometer" />
+                </span>{" "}
+                Dashboard
+              </Link>
+            </li>
+          )}
+          {denyAccess("User Management") && (
+            <li className={url == "userManagement" ? "active" : ""}>
+              <Link to="/userManagement">
+                <span>
+                  <i className="fa fa-user" />
+                </span>{" "}
+                User Management
+              </Link>
+            </li>
+          )}
+          {
+            <li>
+              <a>
+                <span>
+                  <i className="fa fa-car" />
+                </span>{" "}
+                Enterprise Management
+              </a>
+            </li>
+          }
+          {denyAccess("Booking Management") && (
+            <li
+              className={
+                url.includes("bookingManagement")
+                  ? "active dropdown"
+                  : "dropdown"
+              }
             >
-              <span>
-                <i className="fa fa-text-width" />
-              </span>{" "}
-              Booking Management
-            </a>
-            <ol className="dropdown-menu">
-              {VechileCategories?.result?.[0]?.paginationData?.map((res) => {
-                return (
-                  <li key={res?._id}>
-                    <a
-                      className={catId == res?._id ? "textactive" : ""}
-                      onClick={() => {
-                        handleNavigate(res?._id);
-                      }}
-                    >
-                      {res?.categoryName}
-                    </a>
-                  </li>
-                );
-              })}
-            </ol>
-          </li>
-
-          <li className={url == "driverManagement" ? "active" : ""}>
-            <Link to="/driverManagement">
-              <span>
-                <i className="fa fa-taxi" />
-              </span>{" "}
-              Driver Management
-            </Link>
-          </li>
-          <li className={url == "vehicleManagement" ? "active" : ""}>
-            <Link to="/vehicleManagement">
-              <span>
-                <i className="fa fa-taxi" />
-              </span>{" "}
-              Vehicle Management
-            </Link>
-          </li>
+              <a
+                href="javascript:void(0)"
+                id="navbardrop"
+                className="dropdown-toggle"
+                data-toggle="dropdown"
+                // aria-expanded="false"
+              >
+                <span>
+                  <i className="fa fa-text-width" />
+                </span>{" "}
+                Booking Management
+              </a>
+              <ol className="dropdown-menu">
+                {VechileCategories?.result?.[0]?.paginationData?.map((res) => {
+                  return (
+                    <li key={res?._id}>
+                      <a
+                        className={catId == res?._id ? "textactive" : ""}
+                        onClick={() => {
+                          handleNavigate(res?._id);
+                        }}
+                      >
+                        {res?.categoryName}
+                      </a>
+                    </li>
+                  );
+                })}
+              </ol>
+            </li>
+          )}
+          {denyAccess("Driver Management") && (
+            <li className={url == "driverManagement" ? "active" : ""}>
+              <Link to="/driverManagement">
+                <span>
+                  <i className="fa fa-taxi" />
+                </span>{" "}
+                Driver Management
+              </Link>
+            </li>
+          )}
+          {denyAccess("Vehicle Management") && (
+            <li className={url == "vehicleManagement" ? "active" : ""}>
+              <Link to="/vehicleManagement">
+                <span>
+                  <i className="fa fa-taxi" />
+                </span>{" "}
+                Vehicle Management
+              </Link>
+            </li>
+          )}
           <li>
             <a>
               <span>
@@ -128,7 +143,7 @@ const Sidebar = () => {
               Logistics Partner Management
             </a>
           </li>
-         
+
           <li
             className={
               url.includes("paymentAndRevenueManagemnt")
@@ -197,38 +212,46 @@ const Sidebar = () => {
               Reports
             </a>
           </li>
-          <li className={url == "contentManagement" ? "active" : ""}>
-            <Link to="/contentManagement">
-              <span>
-                <i className="fa fa-font" />
-              </span>{" "}
-              Content Management
-            </Link>
-          </li>
-          <li className={url == "supportTicketManagement" ? "active" : ""}>
-            <Link to="/supportTicketManagement">
-              <span>
-                <i className="fa fa-volume-control-phone" />
-              </span>{" "}
-              Support Ticket Management
-            </Link>
-          </li>
-          <li className={url == "pushNotification" ? "active" : ""}>
-            <Link to="/pushNotification">
-              <span>
-                <i className="fa fa-adn" />
-              </span>
-              Push Notifications
-            </Link>
-          </li>
-          <li className={url == "subAdmin" ? "active" : ""}>
-            <Link to="/subAdmin">
-              <span>
-                <i className="fa fa-eercast" />
-              </span>{" "}
-              Sub-Admin Management
-            </Link>
-          </li>
+          {denyAccess("Content Management") && (
+            <li className={url == "contentManagement" ? "active" : ""}>
+              <Link to="/contentManagement">
+                <span>
+                  <i className="fa fa-font" />
+                </span>{" "}
+                Content Management
+              </Link>
+            </li>
+          )}
+          {denyAccess("Support Ticket Management") && (
+            <li className={url == "supportTicketManagement" ? "active" : ""}>
+              <Link to="/supportTicketManagement">
+                <span>
+                  <i className="fa fa-volume-control-phone" />
+                </span>{" "}
+                Support Ticket Management
+              </Link>
+            </li>
+          )}
+          {denyAccess("Push Notifications") && (
+            <li className={url == "pushNotification" ? "active" : ""}>
+              <Link to="/pushNotification">
+                <span>
+                  <i className="fa fa-adn" />
+                </span>
+                Push Notifications
+              </Link>
+            </li>
+          )}
+          {denyAccess("Sub-Admin Management") && (
+            <li className={url == "subAdmin" ? "active" : ""}>
+              <Link to="/subAdmin">
+                <span>
+                  <i className="fa fa-eercast" />
+                </span>{" "}
+                Sub-Admin Management
+              </Link>
+            </li>
+          )}
           <li className={url == "changeManagement" ? "active" : ""}>
             <Link to="/changeManagement">
               <span>
@@ -237,6 +260,8 @@ const Sidebar = () => {
               Change Management
             </Link>
           </li>
+          {
+            denyAccess("Blog") &&
           <li className={url == "blogManagement" ? "active" : ""}>
             <Link to="/blogManagement">
               <span>
@@ -245,6 +270,7 @@ const Sidebar = () => {
               Blog
             </Link>
           </li>
+          }
           <li>
             <a
               onClick={() => {

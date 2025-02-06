@@ -1,7 +1,11 @@
-import React from 'react'
-import BackButton from '../../BackButton';
+import React from "react";
+import BackButton from "../../BackButton";
+import { useLocation } from "react-router-dom";
+import moment from "moment";
 
 const Detail_ride = () => {
+  const { state } = useLocation();
+  console.log({ state });
   return (
     <div className="WrapperArea">
       <div className="WrapperBox">
@@ -14,22 +18,29 @@ const Detail_ride = () => {
         <div className="Small-Wrapper">
           <div className="DriverCountList">
             <div className="OrderHeader">
-              <h1>Ongoing Booking Details</h1>
-              <p>Tue, 23 Feb 2020 12:00PM • ID: 2130812309</p>
+              <h1> Booking Details</h1>
+              <p>
+                {state?.scheduledDate} {"  ,"}
+                {state?.scheduledTime} • ID: {state?.trip_number}
+              </p>
             </div>
             <ul>
               <li>
                 <h2>
-                  Driver Details <span> #21335</span>
+                  Driver Details{" "}
+                  <span> #{state?.driverData?.driver_number}</span>
                 </h2>
                 <a href="driver-management-all-driver-details.html">
                   <span className="Icon">
                     <img src={require("../../../assets/images/Driver.png")} />
                   </span>
                   <span className="Text">
-                    Akshit Kumar <p>+918382482473</p>
+                    {state?.driverData?.fullName}{" "}
+                    <p>{state?.driverData?.phoneNumber}</p>
                   </span>
-                  <span className="Count">⭐ 4.5</span>
+                  <span className="Count">
+                    ⭐ {state?.driverData?.avgRating}
+                  </span>
                 </a>
               </li>
               <li>
@@ -38,12 +49,18 @@ const Detail_ride = () => {
                 </h2>
                 <a href="driver-management-all-driver-details.html">
                   <span className="Icon">
-                    <img src={require("../../../assets/images/Driver.png")} />
+                    <img
+                      src={
+                        state?.userData?.profilePic ||
+                        require("../../../assets/images/Driver.png")
+                      }
+                    />
                   </span>
                   <span className="Text">
-                    Gregory <p>+918382482473</p>
+                    {state?.userData?.fullName}{" "}
+                    <p>{state?.userData?.phoneNumber}</p>
                   </span>
-                  <span className="Count">⭐ 4.5</span>
+                  <span className="Count">⭐ {state?.userData?.avgRating}</span>
                 </a>
               </li>
               <li>
@@ -53,7 +70,28 @@ const Detail_ride = () => {
                     <img src={require("../../../assets/images/Driver.png")} />
                   </span>
                   <span className="Text">
-                    East Coast Hill<p>Drop off 12:28PM, 23 Feb</p>
+                    {state?.pickUpLocationName}
+                    <p>
+                      Drop off{" "}
+                      {moment(state?.beginAt).format("DD-MM-YYYY, HH:mm")}
+                    </p>
+                  </span>
+                </a>
+              </li>
+              <li>
+                <h2>Drop Location</h2>
+                <a href="driver-management-all-driver-details.html">
+                  <span className="Icon">
+                    <img
+                      src={require("../../../assets/images/locationIcon.png")}
+                    />
+                  </span>
+                  <span className="Text">
+                    {state?.dropOffLocationName}
+                    <p>
+                      Drop off{" "}
+                      {moment(state?.endAt).format("DD-MM-YYYY, HH:mm")}
+                    </p>
                   </span>
                 </a>
               </li>
@@ -64,8 +102,10 @@ const Detail_ride = () => {
                     <img src={require("../../../assets/images/Driver.png")} />
                   </span>
                   <span className="Text">
-                    Poonam Vashisht<p>+918382482473</p>
-                    <p>Address details</p>
+                    {state?.pickUpUserName}
+                    <p>{state?.pickUpPhoneNumber}</p>
+
+                    {state?.pickUpLocationName}
                   </span>
                 </a>
               </li>
@@ -76,21 +116,24 @@ const Detail_ride = () => {
                     <img src={require("../../../assets/images/Driver.png")} />
                   </span>
                   <span className="Text">
-                    Poonam Vashisht<p>+918382482473</p>
-                    <p>Address details</p>
+                    {state?.dropOffUserName}
+                    <p>{state?.dropOffPhoneNumber}</p>
+                    <p>{state?.dropOffLocationName}</p>
                   </span>
                 </a>
               </li>
               <li>
                 <h2>
-                  Vehicle Details <span> #21335</span>
+                  Vehicle Details{" "}
+                  <span> {state?.vehicleData?.vehicleNumber}</span>
                 </h2>
                 <a href="driver-management-all-driver-details.html">
                   <span className="Icon">
-                    <img src={require("../../../assets/images/car.png")} />
+                    <img src={state?.vehicleData?.vehicleFrontImage} />
                   </span>
                   <span className="Text">
-                    UP16-BV-0000 <p>• Sedan</p>
+                    {state?.vehicleData?.vehicleNumberPlate}
+                    <p>• {state?.vehicleData?.vehicleModel}</p>
                   </span>
                 </a>
               </li>
@@ -106,23 +149,43 @@ const Detail_ride = () => {
                         </p>
                         <p>
                           <strong> Weight</strong>
-                          <span> 13.6 Kg</span>
+                          <span> {state?.weight} Kg</span>
                         </p>
                         <p>
                           <strong> Dimensions</strong>
-                          <span> 100 m x 500 m x 25 m</span>
+                          <span>
+                            {" "}
+                            {state?.length} m x {state?.width} m x{" "}
+                            {state?.height} m
+                          </span>
                         </p>
                         <p>
                           <strong> Cargo Volume</strong>
-                          <span> 33.2 cubic feet</span>
+                          <span>
+                            {" "}
+                            {(
+                              state?.length *
+                              state?.width *
+                              state?.height *
+                              35.3147
+                            ).toFixed(2)}{" "}
+                            cubic feet
+                          </span>
                         </p>
                         <p>
                           <strong>Delivery Instructions</strong>
-                          <span> loremipusm</span>
+                          <span>
+                            {" "}
+                            {state?.deliveryInstructions || "no Instructions"}
+                          </span>
                         </p>
                         <p>
                           <strong>Special Handling Instructions:</strong>
-                          <span> loremipusm</span>
+                          <span>
+                            {" "}
+                            {state?.specialHandlingInstructions ||
+                              "no Instructions"}
+                          </span>
                         </p>
                       </aside>
                       <aside>
@@ -130,30 +193,32 @@ const Detail_ride = () => {
                           <strong>Image </strong>
                           <span>
                             <img
-                              src={require("../../../assets/images/akshit.png")}
+                              src={state?.parcelImages?.[0]}
+                              style={{
+                                width: "50px",
+
+                                height: "50px",
+                                objectFit: "cover",
+                                borderRadius: "50%",
+                              }}
                             />
-                            
                           </span>
                         </p>
                         <p>
                           <strong> No. of Parcels</strong>
-                          <span> 2</span>
+                          <span> {state?.numberOfParcel}</span>
                         </p>
                         <p>
                           <strong> Loading Time</strong>
-                          <span> 1 hr 30 min</span>
+                          <span> {state.loadingTime}</span>
                         </p>
                         <p>
                           <strong> Unloading Time</strong>
-                          <span> 1 hr 30 min</span>
+                          <span>{state?.unloadingTime}</span>
                         </p>
-                        <p>
-                          <strong>
-                            {" "}
-                            Has the purchased trip insurance for a safe journey?
-                          </strong>{" "}
-                          Yes
-                        </p>
+                        {/* <p>
+                          <strong> -</strong> -
+                        </p> */}
                       </aside>
                     </article>
                   </div>
@@ -168,85 +233,34 @@ const Detail_ride = () => {
                     <aside>
                       <p>
                         <strong>Trip Charges</strong>
-                        <span> Rs 210</span>
+                        <span> Rs {state?.tripCharge}</span>
                       </p>
                       <p>
                         <strong>Loading/Unloading Charges</strong>
-                        <span> Rs 100</span>
+                        <span> Rs {state?.loadingUnloadingCharge}</span>
                       </p>
-                      <p>
+                      {/* <p>
                         <strong>Insurance</strong>
-                        <span> Rs 100</span>
-                      </p>
+                        <span> Rs -</span>
+                      </p> */}
                     </aside>
                     <aside>
                       {" "}
                       <p>
-                        <strong>SGST (5%)</strong>
-                        <span> Rs 10.5</span>
+                        <strong>GST (5%)</strong>
+                        <span> Rs {state?.gstCharge}</span>
                       </p>
-                      <p>
-                        <strong>CGST (5%)</strong>
-                        <span> Rs 10.5</span>
-                      </p>
-                      <p>
+                      {/* <p>
                         <strong>Coupon Discount</strong>
-                        <span> -Rs 10.5</span>
-                      </p>
+                        <span> -Rs -</span>
+                      </p> */}
                     </aside>
                   </article>
                 </div>
               </div>
-              <h3>Total Amount to Pay: Rs 231</h3>
+              <h3>Total Amount to Pay: Rs {state?.withoutGst}</h3>
             </div>
-            <div className="InformationBox">
-              <h3>Load Details</h3>
-              <div className="Informations">
-                <div className="ProfileInfo">
-                  <article>
-                    <aside>
-                      <p>
-                        <strong>Package Type</strong>
-                        <span> Standard Package</span>
-                      </p>
-                      <p>
-                        <strong>Weight</strong>
-                        <span> 13.6 Kg</span>
-                      </p>
-                      <p>
-                        <strong>Dimensions</strong>
-                        <span> 100 m x 500 m x 25 m</span>
-                      </p>
-                      <p>
-                        <strong>Cargo Volume</strong>
-                        <span> 33.2 cubic feet</span>
-                      </p>
-                    </aside>
-                    <aside>
-                      <p>
-                        <strong>No. of Parcels</strong>
-                        <span> 2</span>
-                      </p>
-                      <p>
-                        <strong>Loading Time</strong>
-                        <span> 1 hr 30 min</span>
-                      </p>
-                      <p>
-                        <strong>Unloading Time</strong>
-                        <span> 1 hr 30 min</span>
-                      </p>
-                      <p>
-                        <strong>
-                          Has the purchased trip insurance for a safe journey?
-                        </strong>
-                        <span>Yes</span>
-                      </p>
-                    </aside>
-                  </article>
-                </div>
-              </div>
-            </div>
-            <div className="InformationBox mt-4">
+            {/* <div className="InformationBox mt-4">
               <h3>Documents</h3>
               <div className="Informations">
                 <div className="ProfileInfo">
@@ -256,9 +270,9 @@ const Detail_ride = () => {
                         <strong>Document 1</strong>
                         <span>
                           {" "}
-                           <img
-                              src={require("../../../assets/images/akshit.png")}
-                            />
+                          <img
+                            src={require("../../../assets/images/akshit.png")}
+                          />
                         </span>
                       </p>
                     </aside>
@@ -266,9 +280,9 @@ const Detail_ride = () => {
                       <p>
                         <strong>Document 2</strong>
                         <span>
-                           <img
-                              src={require("../../../assets/images/akshit.png")}
-                            />
+                          <img
+                            src={require("../../../assets/images/akshit.png")}
+                          />
                         </span>
                       </p>
                     </aside>
@@ -286,9 +300,9 @@ const Detail_ride = () => {
                         <strong>Document 1</strong>
                         <span>
                           {" "}
-                           <img
-                              src={require("../../../assets/images/akshit.png")}
-                            />
+                          <img
+                            src={require("../../../assets/images/akshit.png")}
+                          />
                         </span>
                       </p>
                     </aside>
@@ -296,9 +310,9 @@ const Detail_ride = () => {
                       <p>
                         <strong>Document 2</strong>
                         <span>
-                           <img
-                              src={require("../../../assets/images/akshit.png")}
-                            />
+                          <img
+                            src={require("../../../assets/images/akshit.png")}
+                          />
                         </span>
                       </p>
                     </aside>
@@ -363,13 +377,13 @@ const Detail_ride = () => {
                   />
                 </div>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
         {/* </div> */}
       </div>
     </div>
   );
-}
+};
 
-export default Detail_ride
+export default Detail_ride;

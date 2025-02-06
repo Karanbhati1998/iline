@@ -198,10 +198,20 @@ const LocalDelivery = ({ state }) => {
                     <td>{res?.pickUpLocationName}</td>
                     <td>{res?.dropOffLocationName}</td>
                     <td>{res?.paymentMode}</td>
-                    <td>-</td>
+                    <td>
+                      {res?.requestStatus == "ENDED"
+                        ? "COMPLETED"
+                        : res?.requestStatus == "PENDING"
+                        ? "PENDING"
+                        : "CANCELLED"}
+                    </td>
                     <td>
                       <div className="Actions">
-                        <Link to="/userManagement/detail_ride" className="Blue">
+                        <Link
+                          to="/userManagement/detail_ride"
+                          className="Blue"
+                          state={res}
+                        >
                           <i className="fa fa-info-circle" aria-hidden="true" />
                         </Link>
                       </div>

@@ -73,6 +73,8 @@ const Canceled = ({ categoryId }) => {
     };
     dispatch(getCanceledBookingList(data));
   };
+  console.log({ canceledBookingList });
+  
   return (
     <div className="Small-Wrapper">
       <div className="FilterArea">
@@ -193,7 +195,7 @@ const Canceled = ({ categoryId }) => {
                   </td>
                   <td>{res?.userData?.fullName}</td>
                   <td>
-                    <a>-</a>
+                    <a>{res?.vehicleData?.vehicleNumber ||"-"}</a>
                   </td>
                   <td>{res?.pickUpLocationName}</td>
                   <td>{res?.dropOffLocationName}</td>

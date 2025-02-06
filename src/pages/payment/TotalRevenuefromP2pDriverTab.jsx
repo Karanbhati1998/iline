@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getP2pRevenueList } from "../../features/slices/payment";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import CommonPagination from "../../components/CommonPagination";
 const initialState = {
   page: 1,
@@ -209,15 +209,16 @@ const TotalRevenuefromP2pDriverTab = ({ categoryId }) => {
                       <td>{res?.requestData?.is_report ? "yes" : "No"}</td>
                       <td>
                         <div className="Actions">
-                          <a
-                            className="Blue"
-                            href="booking-management-completed-booking-details.html"
+                          <Link
+                              className="Blue"
+                              to="paymentDetail"
+                              state={res}
                           >
                             <i
                               className="fa fa-info-circle"
                               aria-hidden="true"
                             />
-                          </a>
+                          </Link>
                           <span className="Orange">
                             <a href="booking-management-completed-track-details.html">
                               View Track Status

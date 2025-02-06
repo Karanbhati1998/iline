@@ -5,46 +5,46 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchPendingForApproval } from "../../features/slices/DriverManagement/pendingForApproval/pendingForApproval";
 import moment from "moment";
 import CommonPagination from "../../components/CommonPagination";
+import { canPerformAction } from "../../utils/deniedAccess";
 const initialState = {
   page: 1,
   search: "",
 };
 const PendingForApproval = () => {
-   const [iState, setUpdateState] = useState(initialState);
-    const { page, search} = iState;
-    const dispatch = useDispatch();
-    const { pendingForApprovalList } = useSelector(
-      (state) => state.driverManagementPendingForApproval
-    );
-    console.log({ pendingForApprovalList });
-    
-      useEffect(() => {
-        dispatch(fetchPendingForApproval({ page }));
-      }, [ page]);
-      useEffect(() => {
-          const delayDebounceFunc = setTimeout(() => {
-            dispatch(
-              fetchPendingForApproval({
-                search: search.trim(),
-               
-              })
-            );
-          }, 1000);
-      
-          return () => clearTimeout(delayDebounceFunc);
-        }, [search, dispatch]); 
-         const handleChange = (e) => {
-           setUpdateState({ ...iState, [e.target.name]: e.target.value });
-         };
-       const handleReset = () => {
-          setUpdateState(initialState);
-          dispatch(fetchPendingForApproval({ page: 1 }));
-        };
-const handlePageChange = (page) => {
+  const [iState, setUpdateState] = useState(initialState);
+  const { page, search } = iState;
+  const dispatch = useDispatch();
+  const { pendingForApprovalList } = useSelector(
+    (state) => state.driverManagementPendingForApproval
+  );
+  console.log({ pendingForApprovalList });
+
+  useEffect(() => {
+    dispatch(fetchPendingForApproval({ page }));
+  }, [page]);
+  useEffect(() => {
+    const delayDebounceFunc = setTimeout(() => {
+      dispatch(
+        fetchPendingForApproval({
+          search: search.trim(),
+        })
+      );
+    }, 1000);
+
+    return () => clearTimeout(delayDebounceFunc);
+  }, [search, dispatch]);
+  const handleChange = (e) => {
+    setUpdateState({ ...iState, [e.target.name]: e.target.value });
+  };
+  const handleReset = () => {
+    setUpdateState(initialState);
+    dispatch(fetchPendingForApproval({ page: 1 }));
+  };
+  const handlePageChange = (page) => {
     setUpdateState({ ...iState, page });
     dispatch(fetchPendingForApproval({ page }));
   };
- 
+
   return (
     <div className="WrapperArea">
       <div className="WrapperBox">
@@ -80,7 +80,6 @@ const handlePageChange = (page) => {
                 />
               </div>
               <div className="form-group">
-                
                 <button className="Button Cancel" onClick={handleReset}>
                   <i className="fa fa-refresh" />
                 </button>
@@ -99,7 +98,7 @@ const handlePageChange = (page) => {
                   <th>Registered On</th>
                   <th>Status</th>
                   <th>Vehicle Status</th>
-                  <th>Action</th>
+                  {canPerformAction("Driver Management") && <th>Action</th>}
                 </tr>
               </thead>
               <tbody>
@@ -121,14 +120,16 @@ const handlePageChange = (page) => {
                             </span>
                           </a>
                         </td>
-                        <td>
-                          <Link
-                            to={"/driverManagement/pendingForApprovalDetail"}
-                            state={res}
-                          >
-                            <span className="Green">Verify</span>
-                          </Link>
-                        </td>
+                        {canPerformAction("Driver Management") && (
+                          <td>
+                            <Link
+                              to={"/driverManagement/pendingForApprovalDetail"}
+                              state={res}
+                            >
+                              <span className="Green">Verify</span>
+                            </Link>
+                          </td>
+                        )}
                       </tr>
                     );
                   }

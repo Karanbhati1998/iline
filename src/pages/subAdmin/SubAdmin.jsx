@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import SubAminComponent from "../../components/subAdmin/SubAminComponent";
 import RoleComponent from "../../components/subAdmin/RoleComponent";
 import AddSubAdmin from "../../components/subAdmin/AddSubAdmin";
+import { canPerformAction } from "../../utils/deniedAccess";
 
 const SubAdmin = () => {
   const [showRole, setShowRole] = useState(false);
@@ -19,7 +20,9 @@ const SubAdmin = () => {
         <div className="WrapperBox">
           <div className="TitleBox">
             <h4 className="Title">Sub Admin Management</h4>
-            {!showRole ? (
+            {
+              canPerformAction("Sub-Admin Management") &&
+            !showRole ? (
               <a
                 className="TitleLink"
                 onClick={() => {
@@ -32,7 +35,8 @@ const SubAdmin = () => {
               <Link className="TitleLink" to="createRole">
                 Create Role
               </Link>
-            )}
+            )
+            }
           </div>
           <div className="CommonLinks">
             <ul>

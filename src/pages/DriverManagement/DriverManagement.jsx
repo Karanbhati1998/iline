@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { canPerformAction } from "../../utils/deniedAccess";
 
 const DriverManagement = () => {
   return (
@@ -21,15 +22,17 @@ const DriverManagement = () => {
                   <span className="Count">-</span>
                 </Link>
               </li>
-              <li>
-                <Link to={"addNewDriver"}>
-                  <span className="Icon">
-                    <img src={require("../../assets/images/Driver.png")} />
-                  </span>
-                  <span className="Text">Add new Driver</span>
-                  {/* <span class="Count">12</span> */}
-                </Link>
-              </li>
+              {canPerformAction("Driver Management") && (
+                <li>
+                  <Link to={"addNewDriver"}>
+                    <span className="Icon">
+                      <img src={require("../../assets/images/Driver.png")} />
+                    </span>
+                    <span className="Text">Add new Driver</span>
+                    {/* <span class="Count">12</span> */}
+                  </Link>
+                </li>
+              )}
               <li>
                 <Link to="pendingForApproval">
                   <span className="Icon">

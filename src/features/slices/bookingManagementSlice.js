@@ -20,7 +20,22 @@ export const getOngoingBookingList = createAsyncThunk(
       return response.data;
     } catch (error) {
       console.log({ error });
-      return rejectWithValue(error); 
+      return rejectWithValue(error);
+    }
+  }
+);
+
+export const getAllOngoingBookingList = createAsyncThunk(
+  "get/AllOngoingBookingList",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get("/ongoingRequestList", {
+        params: payload,
+      });
+      return response.data;
+    } catch (error) {
+      console.log({ error });
+      return rejectWithValue(error);
     }
   }
 );
@@ -52,6 +67,20 @@ export const getCompletedBookingList = createAsyncThunk(
     }
   }
 );
+export const getAllCompletedBookingList = createAsyncThunk(
+  "get/AllcompletedBookingList",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get("/completedRequestList", {
+        params: payload,
+      });
+      return response.data;
+    } catch (error) {
+      console.log({ error });
+      return rejectWithValue(error);
+    }
+  }
+);
 export const getCanceledBookingList = createAsyncThunk(
   "get/canceledBookingList",
   async (payload, { rejectWithValue }) => {
@@ -67,8 +96,6 @@ export const getCanceledBookingList = createAsyncThunk(
   }
 );
 
-
-
 export const ongoingBookingStatus = createAsyncThunk(
   "status/ongoingBooking",
   async (payload, { rejectWithValue }) => {
@@ -77,7 +104,7 @@ export const ongoingBookingStatus = createAsyncThunk(
       return response.data;
     } catch (error) {
       console.log({ error });
-      return rejectWithValue(error); 
+      return rejectWithValue(error);
     }
   }
 );
@@ -130,7 +157,7 @@ const bookingManagementSlice = createSlice({
       .addCase(getCanceledBookingList.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || action.error.message; // Access the error message
-      })
+      });
   },
 });
 

@@ -12,6 +12,7 @@ import moment from "moment";
 import { Link } from "react-router-dom";
 import DeleteModal from "../DeleteModal";
 import EditModal from "./EditModal";
+import { canPerformAction } from "../../utils/deniedAccess";
 const initialState = {
   page: 1,
   search: "",
@@ -197,7 +198,7 @@ const SubAminComponent = () => {
                 return (
                   <tr>
                     <td>{i + 1 + (page - 1) * 10}</td>
-                    <td>-</td>
+                    <td>{res?.subadmin_number}</td>
                     <td>{res?.name}</td>
                     <td>{res?.roleId?.[0]?.title}</td>
                     <td>{res?.email}</td>
@@ -210,39 +211,46 @@ const SubAminComponent = () => {
                         {res?.status}
                       </span>{" "}
                     </td>
+
                     <td>
                       {" "}
                       <div className="Actions">
-                        <label className="Switch">
-                          <input
-                            type="checkbox"
-                            name="status"
-                            checked={res?.status == "ACTIVE"}
-                            onChange={(e) => handleChecked(e, res?._id)}
-                          />
-                          <span className="slider" />
-                        </label>
+                        {canPerformAction("Sub-Admin Management") && (
+                          <label className="Switch">
+                            <input
+                              type="checkbox"
+                              name="status"
+                              checked={res?.status == "ACTIVE"}
+                              onChange={(e) => handleChecked(e, res?._id)}
+                            />
+                            <span className="slider" />
+                          </label>
+                        )}
                         <Link className="Blue" to="detail" state={res}>
                           <i className="fa fa-eye" aria-hidden="true" />
                         </Link>
-                        <a
-                          className="Green"
-                          onClick={() => showUpdateModal(res)}
-                        >
-                          <i className="fa fa-pencil" aria-hidden="true" />
-                        </a>
-                        <a
-                          className="Red"
-                          onClick={() => {
-                            setUpdateState({
-                              ...iState,
-                              deleteModal: true,
-                              id: res?._id,
-                            });
-                          }}
-                        >
-                          <i className="fa fa-trash" />
-                        </a>
+                        {canPerformAction("Sub-Admin Management") && (
+                          <>
+                            <a
+                              className="Green"
+                              onClick={() => showUpdateModal(res)}
+                            >
+                              <i className="fa fa-pencil" aria-hidden="true" />
+                            </a>
+                            <a
+                              className="Red"
+                              onClick={() => {
+                                setUpdateState({
+                                  ...iState,
+                                  deleteModal: true,
+                                  id: res?._id,
+                                });
+                              }}
+                            >
+                              <i className="fa fa-trash" />
+                            </a>
+                          </>
+                        )}
                       </div>
                     </td>
                   </tr>

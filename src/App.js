@@ -69,8 +69,14 @@ import ScheduledDetail from "./components/bookingManagement/scheduled/ScheduledD
 import AddNotification from "./components/notification/AddNotification";
 import EditNotification from "./components/notification/EditNotification";
 import NotificationDetail from "./components/notification/NotificationDetail";
+import { denieAccess, denyAccess } from "./utils/deniedAccess";
+import PaymentDetail from "./components/payment/PaymentDetail";
+import CommonBookingDetail from "./components/driverManagement/allDriver/driverDetailManagement/bookingSummary/CommonBookingDetail";
 function App() {
   const isAuthenticated = getToken("ilineLogin", "token");
+  useEffect(() => {
+    denyAccess();
+  }, []);
   return (
     <>
       <HashRouter>
@@ -111,6 +117,10 @@ function App() {
                 <Route
                   path="driverManagement/detailDriverManagement"
                   element={<DetailDriverManagement />}
+                />
+                <Route
+                  path="driverManagement/bookingSummaryDetails"
+                  element={<CommonBookingDetail />}
                 />
                 <Route
                   path="driverManagement/assignVechile"
@@ -221,6 +231,10 @@ function App() {
                 <Route
                   path="/paymentAndRevenueManagemnt"
                   element={<PaymentAndRevenue />}
+                />
+                <Route
+                  path="/paymentAndRevenueManagemnt/paymentDetail"
+                  element={<PaymentDetail />}
                 />
                 <Route path="/chargingStation" element={<ChargingStation />} />
                 <Route

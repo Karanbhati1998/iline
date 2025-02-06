@@ -1,7 +1,10 @@
 import React from 'react'
 import BackButton from '../../BackButton';
+import { useLocation } from 'react-router-dom';
 
 const BookingDetail = () => {
+   const { state } = useLocation();
+   console.log({ state });
   return (
     <div className="WrapperArea">
       <div className="WrapperBox">

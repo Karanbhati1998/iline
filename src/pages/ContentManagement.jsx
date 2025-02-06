@@ -6,13 +6,14 @@ import {
 } from "../features/slices/staticContentManagement";
 import { Link, useNavigate } from "react-router-dom";
 import DeleteFaq from "../components/FAQ/DeleteFaq";
+import { canPerformAction } from "../utils/deniedAccess";
 const initialState = {
   deleteModal: "",
-  id:""
+  id: "",
 };
 const ContentManagement = () => {
   const [iState, setUpdateState] = useState(initialState);
-  const { deleteModal,id } = iState;
+  const { deleteModal, id } = iState;
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { supportContent, faq } = useSelector((state) => {
@@ -30,19 +31,19 @@ const ContentManagement = () => {
   const handleAddFaq = () => {
     navigate("/addFaq");
   };
-  const handleopenFaq=(id)=>{
-      setUpdateState(prev=>({
-        ...prev,
-        deleteModal:true,
-        id:id
-      }))
-  }
-  const handleCloseFaq=()=>{
-      setUpdateState(prev=>({
-        ...prev,
-        deleteModal:false
-      }))
-  }
+  const handleopenFaq = (id) => {
+    setUpdateState((prev) => ({
+      ...prev,
+      deleteModal: true,
+      id: id,
+    }));
+  };
+  const handleCloseFaq = () => {
+    setUpdateState((prev) => ({
+      ...prev,
+      deleteModal: false,
+    }));
+  };
   return (
     <>
       <div className="WrapperArea">
@@ -62,9 +63,11 @@ const ContentManagement = () => {
                   onClick={() => handleClick("PRIVACY")}
                 >
                   <h4>Privacy Policy</h4>
-                  <Link to="/editContentManagemnt" state={"PRIVACY"}>
-                    <i className="fa fa-pencil" />
-                  </Link>
+                  {canPerformAction("Content Management") && (
+                    <Link to="/editContentManagemnt" state={"PRIVACY"}>
+                      <i className="fa fa-pencil" />
+                    </Link>
+                  )}
                 </div>
                 <div
                   id="collapse1"
@@ -88,9 +91,11 @@ const ContentManagement = () => {
                   onClick={() => handleClick("TERMS")}
                 >
                   <h4>Terms and condition</h4>
-                  <Link to="/editContentManagemnt" state={"TERMS"}>
-                    <i className="fa fa-pencil" />
-                  </Link>
+                  {canPerformAction("Content Management") && (
+                    <Link to="/editContentManagemnt" state={"TERMS"}>
+                      <i className="fa fa-pencil" />
+                    </Link>
+                  )}
                 </div>
                 <div
                   id="collapse2"
@@ -114,9 +119,11 @@ const ContentManagement = () => {
                   onClick={() => handleClick("ABOUT")}
                 >
                   <h4>About this App</h4>
-                  <Link to="/editContentManagemnt" state={"ABOUT"}>
-                    <i className="fa fa-pencil" />
-                  </Link>
+                  {canPerformAction("Content Management") && (
+                    <Link to="/editContentManagemnt" state={"ABOUT"}>
+                      <i className="fa fa-pencil" />
+                    </Link>
+                  )}
                 </div>
                 <div
                   id="collapse3"
@@ -140,9 +147,11 @@ const ContentManagement = () => {
                   onClick={() => handleClick("CONTACT")}
                 >
                   <h4>Contact Us</h4>
-                  <Link to="/editContentManagemnt" state={"CONTACT"}>
-                    <i className="fa fa-pencil" />
-                  </Link>
+                  {canPerformAction("Content Management") && (
+                    <Link to="/editContentManagemnt" state={"CONTACT"}>
+                      <i className="fa fa-pencil" />
+                    </Link>
+                  )}
                 </div>
                 <div
                   id="collapse4"
@@ -166,9 +175,11 @@ const ContentManagement = () => {
                   onClick={() => handleClick("REFUND")}
                 >
                   <h4>Refund Policy</h4>
-                  <Link to="/editContentManagemnt" state="REFUND">
-                    <i className="fa fa-pencil" />
-                  </Link>
+                  {canPerformAction("Content Management") && (
+                    <Link to="/editContentManagemnt" state="REFUND">
+                      <i className="fa fa-pencil" />
+                    </Link>
+                  )}
                 </div>
                 <div
                   id="collapse5"
@@ -193,15 +204,17 @@ const ContentManagement = () => {
                   onClick={handleOpenFaq}
                 >
                   <h4>FAQs</h4>
-                  <a
-                    className="Button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleAddFaq();
-                    }}
-                  >
-                    Add More Questions
-                  </a>
+                  {canPerformAction("Content Management") && (
+                    <a
+                      className="Button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleAddFaq();
+                      }}
+                    >
+                      Add More Questions
+                    </a>
+                  )}
                 </div>
                 <div
                   id="collapse6"
@@ -212,17 +225,19 @@ const ContentManagement = () => {
                     {faq?.addData?.map((res, i) => {
                       return (
                         <div className="FaqBox">
-                          <aside>
-                            <Link to="/editFaq" state={res} className="Green">
-                              <i className="fa fa-pencil" />
-                            </Link>
-                            <a
-                              className="Red"
-                              onClick={() => handleopenFaq(res?._id)}
-                            >
-                              <i className="fa fa-trash" />
-                            </a>
-                          </aside>
+                          {canPerformAction("Content Management") && (
+                            <aside>
+                              <Link to="/editFaq" state={res} className="Green">
+                                <i className="fa fa-pencil" />
+                              </Link>
+                              <a
+                                className="Red"
+                                onClick={() => handleopenFaq(res?._id)}
+                              >
+                                <i className="fa fa-trash" />
+                              </a>
+                            </aside>
+                          )}
                           <h5>
                             {i + 1}. {res?.question}
                           </h5>

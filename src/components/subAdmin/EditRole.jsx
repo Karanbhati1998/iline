@@ -6,7 +6,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 const initialState = {
   title: "",
-  roleId:"",
+  roleId: "",
   permission: [
     {
       name: "Dashboard",
@@ -95,6 +95,11 @@ const initialState = {
     },
     {
       name: "Settings",
+      read: false,
+      fullAccess: false,
+    },
+    {
+      name: "Blog",
       read: false,
       fullAccess: false,
     },

@@ -1,9 +1,12 @@
-import React, { useEffect, useState } from 'react'
-import BookingManagementComponent from '../BookingManagementComponent';
-import { useDispatch, useSelector } from 'react-redux';
-import { getCompletedBookingList } from '../../../features/slices/bookingManagementSlice';
-import { Link, useLocation } from 'react-router-dom';
-import CommonPagination from '../../CommonPagination';
+import React, { useEffect, useState } from "react";
+import BookingManagementComponent from "../BookingManagementComponent";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  getAllCompletedBookingList,
+  getCompletedBookingList,
+} from "../../../features/slices/bookingManagementSlice";
+import { Link, useLocation } from "react-router-dom";
+import CommonPagination from "../../CommonPagination";
 const initialState = {
   page: 1,
   search: "",
@@ -16,60 +19,77 @@ const initialState = {
 };
 const Completed = ({ categoryId }) => {
   const [iState, setUpdateState] = useState(initialState);
-   const { page, search, fromDate, toDate, timeframe, id } = iState;
-   const dispatch = useDispatch();
+  const { page, search, fromDate, toDate, timeframe, id } = iState;
+  const dispatch = useDispatch();
   const { state } = useLocation();
   const { completedBookingList } = useSelector((state) => {
     return state.bookingManagement;
   });
+  const [allData, setAllData] = useState([]);
   useEffect(() => {
-      if (categoryId) {
-        dispatch(
-          getCompletedBookingList({
-            categoryId,
-            page
-          })
-        );
+    const data = {
+      search,
+      fromDate,
+      toDate,
+      timeframe,
+      limit: 999999,
+    };
+    dispatch(getAllCompletedBookingList(data)).then((res) => {
+      if (res?.payload?.code == 200) {
+        console.log({ res });
+        setAllData(res?.payload);
       }
-    }, [page, categoryId]);
-    useEffect(() => {
-      const delayDebounceFunc = setTimeout(() => {
-        dispatch(
-          getCompletedBookingList({
-            categoryId,
-            search: search.trim(),
-            timeframe,
-          })
-        );
-      }, 1000);
-  
-      return () => clearTimeout(delayDebounceFunc);
-    }, [search, timeframe, dispatch]);
-  
-    const handlePageChange = (page) => {
-      setUpdateState({ ...iState, page });
-      dispatch(getCompletedBookingList({ categoryId, page }));
+    });
+  }, [timeframe, page, toDate, search, fromDate]);
+
+  useEffect(() => {
+    if (categoryId) {
+      dispatch(
+        getCompletedBookingList({
+          categoryId,
+          page,
+        })
+      );
+    }
+  }, [page, categoryId]);
+  useEffect(() => {
+    const delayDebounceFunc = setTimeout(() => {
+      dispatch(
+        getCompletedBookingList({
+          categoryId,
+          search: search.trim(),
+          timeframe,
+        })
+      );
+    }, 1000);
+
+    return () => clearTimeout(delayDebounceFunc);
+  }, [search, timeframe, dispatch]);
+
+  const handlePageChange = (page) => {
+    setUpdateState({ ...iState, page });
+    dispatch(getCompletedBookingList({ categoryId, page }));
+  };
+
+  const handleChange = (e) => {
+    setUpdateState({ ...iState, [e.target.name]: e.target.value });
+  };
+  const handleReset = () => {
+    setUpdateState(initialState);
+    dispatch(getCompletedBookingList({ categoryId, page: 1 }));
+  };
+  const handleApply = () => {
+    const data = {
+      search,
+      fromDate,
+      toDate,
+      page,
+      categoryId,
     };
-  
-    const handleChange = (e) => {
-      setUpdateState({ ...iState, [e.target.name]: e.target.value });
-    };
-    const handleReset = () => {
-      setUpdateState(initialState);
-      dispatch(getCompletedBookingList({ categoryId, page: 1 }));
-    };
-    const handleApply = () => {
-      const data = {
-        search,
-        fromDate,
-        toDate,
-        page,
-        categoryId,
-      };
-      dispatch(getCompletedBookingList(data));
-    };
-    console.log({ completedBookingList });
-  
+    dispatch(getCompletedBookingList(data));
+  };
+  console.log({ completedBookingList });
+
   return (
     <div className="Small-Wrapper">
       <div className="FilterArea">
@@ -182,7 +202,7 @@ const Completed = ({ categoryId }) => {
                     </td>
                     <td>{res?.userData?.fullName}</td>
                     <td>
-                      <a>-</a>
+                      <a>{res?.vehicleData?.vehicleNumber}</a>
                     </td>
                     <td>{res?.pickUpLocationName}</td>
                     <td>{res?.dropOffLocationName}</td>
@@ -207,7 +227,6 @@ const Completed = ({ categoryId }) => {
                 );
               }
             )}
-           
           </tbody>
         </table>
       </div>
@@ -240,4 +259,4 @@ const Completed = ({ categoryId }) => {
   );
 };
 
-export default Completed
+export default Completed;

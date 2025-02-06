@@ -135,9 +135,9 @@ const AddFeatureList = () => {
       dispatch(addFeature(data)).then((res) => {
         if (res?.payload?.code == 200) {
           toastService.success("Vehicle category features added successfully");
-              dispatch(getFeaturesList({ categoryId: state, page }));
+          dispatch(getFeaturesList({ categoryId: state, page }));
           setUpdateState(initialState);
-          SetName("")
+          SetName("");
         } else {
           toastService.error("Failed to add vehicle category features");
         }

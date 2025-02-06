@@ -12,7 +12,7 @@ const initialState = {
   toDate: "",
   timeframe: "",
 };
-const OutStationDelivery = ({state}) => {
+const OutStationDelivery = ({ state }) => {
   const [iState, setUpdateState] = useState(initialState);
   const { page, search, fromDate, toDate, timeframe } = iState;
 
@@ -47,7 +47,11 @@ const OutStationDelivery = ({state}) => {
   const handlePageChange = (page) => {
     setUpdateState({ ...iState, page });
     dispatch(
-      getDriverRequestList({ page, driverId: state?._id, rideType: "OUTSTATION" })
+      getDriverRequestList({
+        page,
+        driverId: state?._id,
+        rideType: "OUTSTATION",
+      })
     );
   };
 
@@ -195,10 +199,20 @@ const OutStationDelivery = ({state}) => {
                   <td>{res?.pickUpLocationName}</td>
                   <td>{res?.dropOffLocationName}</td>
                   <td>{res?.paymentMode}</td>
-                  <td>-</td>
+                  <td>
+                    {res?.requestStatus == "ENDED"
+                      ? "COMPLETED"
+                      : res?.requestStatus == "PENDING"
+                      ? "PENDING"
+                      : "CANCELLED"}
+                  </td>
                   <td>
                     <div className="Actions">
-                      <Link to="/userManagement/detail_ride" className="Blue">
+                      <Link
+                        to="/driverManagement/bookingSummaryDetails"
+                        className="Blue"
+                        state={res}
+                      >
                         <i className="fa fa-info-circle" aria-hidden="true" />
                       </Link>
                     </div>

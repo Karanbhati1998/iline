@@ -2,8 +2,12 @@ import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
-import { driverStatus, fetchP2pDriverList } from "../../../../../features/slices/DriverManagement/allDriver/allDriverReducer";
+import {
+  driverStatus,
+  fetchP2pDriverList,
+} from "../../../../../features/slices/DriverManagement/allDriver/allDriverReducer";
 import { toastService } from "../../../../../utils/toastify";
+import { canPerformAction } from "../../../../../utils/deniedAccess";
 
 const ProfileSummary = ({ state }) => {
   const [status, setStatus] = useState();
@@ -21,7 +25,7 @@ const ProfileSummary = ({ state }) => {
       if (res?.payload?.code == 200) {
         toastService.success("Status updated successfully");
         setStatus(checked);
-        dispatch(fetchP2pDriverList({ page:1 }));
+        dispatch(fetchP2pDriverList({ page: 1 }));
       } else {
         toastService.error("status update failed");
       }
@@ -51,28 +55,30 @@ const ProfileSummary = ({ state }) => {
                 </h3>
                 <p>Driver ID: {state?.driver_number}</p>
               </figcaption>
-              <div className="Actions">
-                <a href="#">
-                  <img src="images/download.png" alt="" />
-                </a>
-                <label className="Switch">
-                  <input
-                    type="checkbox"
-                    checked={status}
-                    onChange={(e) => handleChecked(e, state?._id)}
-                  />
-                  <span className="slider" />
-                </label>
-                {/* <a class="Green" href="#">
+              {canPerformAction("Driver Management") && (
+                <div className="Actions">
+                  <a href="#">
+                    <img src="images/download.png" alt="" />
+                  </a>
+                  <label className="Switch">
+                    <input
+                      type="checkbox"
+                      checked={status}
+                      onChange={(e) => handleChecked(e, state?._id)}
+                    />
+                    <span className="slider" />
+                  </label>
+                  {/* <a class="Green" href="#">
                 <i class="fa fa-pencil"></i>
               </a> */}
-               
-                {/* <div class="Button"> */}
-                <a className="Button mt-4" href="">
-                  Add Money
-                </a>
-                {/* </div> */}
-              </div>
+
+                  {/* <div class="Button"> */}
+                  {/* <a className="Button mt-4" href="">
+                    Add Money
+                  </a> */}
+                  {/* </div> */}
+                </div>
+              )}
             </div>
             <div className="InformationBox">
               <div className="TitleBox">
@@ -116,31 +122,37 @@ const ProfileSummary = ({ state }) => {
                         <strong>DOB</strong>
                         <span>{moment(state?.dob).format("DD-MM-YYYY")}</span>
                       </p>
-                      <p>
-                        <strong>Approved on</strong>
-                        <span>-</span>
-                      </p>
-                      <p>
-                        <strong>Approved By</strong>
-                        <span>-</span>
-                      </p>
+                      {state?.driverType == "P2P" && (
+                        <p>
+                          <strong>Approved on</strong>
+                          <span>
+                            {moment(state?.approvedOn).format("DD-MM-YYYY")}
+                          </span>
+                        </p>
+                      )}
+                      {state?.driverType == "P2P" && (
+                        <p>
+                          <strong>Approved By</strong>
+                          <span>{state?.approvedBy}</span>
+                        </p>
+                      )}
                     </aside>
                     <aside>
                       <p>
                         <strong>Total No. of Booking</strong>
-                        <span>0</span>
+                        <span>{state?.totalRides}</span>
                       </p>
                       <p>
                         <strong>Total No. of Local Delivery</strong>
-                        <span>0</span>
+                        <span>{state?.localRideCount}</span>
                       </p>
                       <p>
                         <strong>Total No. of Out Station Delivery</strong>
-                        <span>0</span>
+                        <span>{state?.outstationRideCount}</span>
                       </p>
                       <p>
                         <strong>Total No. of Express Delivery</strong>
-                        <span>0</span>
+                        <span>{state?.expressRideCount}</span>
                       </p>
                       <p>
                         <strong>Total Cancelled Delivery</strong>
@@ -150,18 +162,18 @@ const ProfileSummary = ({ state }) => {
                         <strong>Last Location</strong>
                         <span>-</span>
                       </p>
-                      <p>
+                      {/* <p>
                         <strong>Current Location</strong>
                         <span>-</span>
-                      </p>
+                      </p> */}
                       <p>
                         <strong>Earnings</strong>
                         <span>-</span>
                       </p>
-                      <p>
+                      {/* <p>
                         <strong>Last Time Online</strong>
                         <span>-</span>
-                      </p>
+                      </p> */}
                       <p>
                         <strong>Average Waiting Time for pickup</strong>
                         <span>-</span>
@@ -263,27 +275,29 @@ const ProfileSummary = ({ state }) => {
               </div>
             </div>
             <div className="InformationBox mt-4">
-              {state?.driverType == "ILINE" && (
-                <div className="TitleBox">
-                  <h4 className="Title">3.Assign Vehicle</h4>
-                  <div className="TitleLink">
-                    <Link
-                      to="/driverManagement/assignVechile"
-                      className="TitleLink"
-                      state={state}
-                    >
-                      Assign
-                    </Link>
-                    &nbsp;
-                    <Link
-                      to="/driverManagement/assignVechileHistory"
-                      className="TitleLink"
-                    >
-                      History
-                    </Link>
+              {state?.driverType == "ILINE" &&
+                canPerformAction("Driver Management") && (
+                  <div className="TitleBox">
+                    <h4 className="Title">3.Assign Vehicle</h4>
+                    <div className="TitleLink">
+                      <Link
+                        to="/driverManagement/assignVechile"
+                        className="TitleLink"
+                        state={state}
+                      >
+                        Assign
+                      </Link>
+                      &nbsp;
+                      <Link
+                        to="/driverManagement/assignVechileHistory"
+                        className="TitleLink"
+                        state={state}
+                      >
+                        History
+                      </Link>
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
               <div className="Informations">
                 <div className="ProfileInfo">
                   <h3 className="mb-4">Current Assigned Vehicle Details</h3>
@@ -292,23 +306,35 @@ const ProfileSummary = ({ state }) => {
                       <p>
                         <strong>Vehicle Number </strong>
                         <span>
-                          {state?.vehicleData?.[0]?.vehicleNumberPlate || "N/A"}
+                          {state?.vechicleData?.[0]?.vehicleNumberPlate ||
+                            state?.vehicleData?.[0]?.vehicleNumberPlate ||
+                            "N/A"}
                         </span>
                       </p>
                       <p>
                         <strong>Vehicle Type </strong>
                         <span>
-                          {state?.vehicleData?.[0]?.vehicleType || "N/A"}
+                          {state?.vechicleData?.[0]?.vehicleType ||
+                            state?.vehicleData?.[0]?.vehicleType ||
+                            "N/A"}
                         </span>
                       </p>
-                      <p>
-                        <strong>Assigned on </strong>
-                        <span>-</span>
-                      </p>
-                      <p>
-                        <strong> Assigned by </strong>
-                        <span>-</span>
-                      </p>
+                      {state?.driverType == "ILINE" && (
+                        <p>
+                          <strong>Assigned on </strong>
+                          <span>
+                            {moment(state?.vehicleData?.[0]?.assignOn).format(
+                              "DD-MM-YYYY"
+                            )}
+                          </span>
+                        </p>
+                      )}
+                      {state?.driverType == "ILINE" && (
+                        <p>
+                          <strong> Assigned by </strong>
+                          <span>{state?.vehicleData?.[0]?.assignBy}</span>
+                        </p>
+                      )}
                     </aside>
                   </article>
                 </div>

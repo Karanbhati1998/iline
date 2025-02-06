@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { getCategoryWiseVehicleData } from "../../features/slices/vechileManagement/vechileManagement";
+import { canPerformAction } from "../../utils/deniedAccess";
 
 const VehicleManagement = () => {
   const dispatch = useDispatch();
@@ -17,9 +18,11 @@ const VehicleManagement = () => {
         <div className="TitleBox">
           <h4 className="Title">Vehicle Management</h4>
           <div className="TitleLink">
-            <Link to="addVechile" className="TitleLink">
-              Add Vehicle
-            </Link>
+            {canPerformAction("Vehicle Management") && (
+              <Link to="addVechile" className="TitleLink">
+                Add Vehicle
+              </Link>
+            )}
             <Link to="vehicleCategory" className="TitleLink ml-2">
               Vehicle Category
             </Link>
@@ -34,7 +37,7 @@ const VehicleManagement = () => {
               <div className="DriverCountList">
                 <ul>
                   <li>
-                    <a href="">
+                    <a >
                       <span className="Icon">
                         <img src={require("../../assets/images/car.png")} />
                       </span>
@@ -112,7 +115,7 @@ const VehicleManagement = () => {
                       </span>
                     </Link>
                   </li>
-                  <li>
+                  {/* <li>
                     <a>
                       <span className="Icon">
                         <img src={require("../../assets/images/car.png")} />
@@ -129,7 +132,7 @@ const VehicleManagement = () => {
                       <span className="Text">Online Vehicles</span>
                       <span className="Count">-</span>
                     </a>
-                  </li>
+                  </li> */}
                   <li>
                     <Link to="pendingVechilePage">
                       <span className="Icon">

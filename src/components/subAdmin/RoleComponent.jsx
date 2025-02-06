@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux';
-import { getRoleList, roleStatus } from '../../features/slices/subAdmin';
-import { toastService } from '../../utils/toastify';
-import CommonPagination from '../CommonPagination';
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { getRoleList, roleStatus } from "../../features/slices/subAdmin";
+import { toastService } from "../../utils/toastify";
+import CommonPagination from "../CommonPagination";
 import DeleteModal from "../DeleteModal";
-import moment from 'moment';
-import { Link } from 'react-router-dom';
+import moment from "moment";
+import { Link } from "react-router-dom";
+import { canPerformAction } from "../../utils/deniedAccess";
 const initialState = {
   page: 1,
   search: "",
@@ -17,13 +18,13 @@ const initialState = {
 };
 const RoleComponent = () => {
   const [iState, setUpdateState] = useState(initialState);
-  const { page, search, fromDate, toDate, timeframe, deleteModal ,id} = iState;
+  const { page, search, fromDate, toDate, timeframe, deleteModal, id } = iState;
   const dispatch = useDispatch();
   const { role } = useSelector((state) => {
     return state?.subAdmin;
   });
   console.log({ role });
-  
+
   useEffect(() => {
     dispatch(getRoleList({ page, timeframe }));
   }, [page, timeframe]);
@@ -47,7 +48,7 @@ const RoleComponent = () => {
   const handleChecked = (e, id) => {
     const { name, checked } = e?.target;
     const status = checked ? "ACTIVE" : "INACTIVE";
-    const data = {roleId: id, status };
+    const data = { roleId: id, status };
     dispatch(roleStatus(data)).then((res) => {
       console.log("status update api", res);
       if (res?.payload?.code == 200) {
@@ -74,21 +75,21 @@ const RoleComponent = () => {
     };
     dispatch(getRoleList(data));
   };
-  const handleDelete=()=>{
-    dispatch(roleStatus({id,status:"DELETED"})).then(res=>{
+  const handleDelete = () => {
+    dispatch(roleStatus({ id, status: "DELETED" })).then((res) => {
       console.log("status update api", res);
       if (res?.payload?.code == 200) {
         toastService.success("Delete successfully");
-        setUpdateState({...iState, deleteModal:false });
+        setUpdateState({ ...iState, deleteModal: false });
         dispatch(getRoleList({ page }));
       } else {
         toastService.error("Delete failed");
       }
-    })
-  }
-  const handleClose=()=>{
-    setUpdateState({...iState, deleteModal:false });
-  }
+    });
+  };
+  const handleClose = () => {
+    setUpdateState({ ...iState, deleteModal: false });
+  };
   return (
     <>
       <div className="Small-Wrapper">
@@ -166,7 +167,7 @@ const RoleComponent = () => {
                 <th>Role Name</th>
                 <th>Created on</th>
                 <th>Status</th>
-                <th>Action</th>
+                {canPerformAction("Sub-Admin Management") && <th>Action</th>}
               </tr>
             </thead>
             <tbody>
@@ -184,31 +185,37 @@ const RoleComponent = () => {
                         {res?.status}
                       </span>{" "}
                     </td>
-                    <td>
-                      {" "}
-                      <div className="Actions">
-                        <label className="Switch">
-                          <input
-                            type="checkbox"
-                            name="status"
-                            checked={res?.status == "ACTIVE"}
-                            onChange={(e) => handleChecked(e, res?._id)}
-                          />
-                          <span className="slider" />
-                        </label>
-                        <Link className="Green" to="editRole" state={res}>
-                          <i className="fa fa-pencil" aria-hidden="true" />
-                        </Link>
-                        <a
-                          className="Red"
-                          onClick={()=>{
-                            setUpdateState({...iState, deleteModal: true, id: res?._id });
-                          }}
-                        >
-                          <i className="fa fa-trash" />
-                        </a>
-                      </div>
-                    </td>
+                    {canPerformAction("Sub-Admin Management") && (
+                      <td>
+                        {" "}
+                        <div className="Actions">
+                          <label className="Switch">
+                            <input
+                              type="checkbox"
+                              name="status"
+                              checked={res?.status == "ACTIVE"}
+                              onChange={(e) => handleChecked(e, res?._id)}
+                            />
+                            <span className="slider" />
+                          </label>
+                          <Link className="Green" to="editRole" state={res}>
+                            <i className="fa fa-pencil" aria-hidden="true" />
+                          </Link>
+                          <a
+                            className="Red"
+                            onClick={() => {
+                              setUpdateState({
+                                ...iState,
+                                deleteModal: true,
+                                id: res?._id,
+                              });
+                            }}
+                          >
+                            <i className="fa fa-trash" />
+                          </a>
+                        </div>
+                      </td>
+                    )}
                   </tr>
                 );
               })}
@@ -238,9 +245,15 @@ const RoleComponent = () => {
           </div>
         </div>
       </div>
-      {deleteModal && <DeleteModal handleClose={handleClose} handleDelete={handleDelete} statement="role"/>}
+      {deleteModal && (
+        <DeleteModal
+          handleClose={handleClose}
+          handleDelete={handleDelete}
+          statement="role"
+        />
+      )}
     </>
   );
-}
+};
 
-export default RoleComponent
+export default RoleComponent;

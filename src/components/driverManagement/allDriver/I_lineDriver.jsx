@@ -1,10 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { driverStatus, fetchILineDriverList } from "../../../features/slices/DriverManagement/allDriver/allDriverReducer";
+import {
+  driverStatus,
+  fetchILineDriverList,
+} from "../../../features/slices/DriverManagement/allDriver/allDriverReducer";
 import { toastService } from "../../../utils/toastify";
 import moment from "moment";
 import CommonPagination from "../../CommonPagination";
+import { canPerformAction } from "../../../utils/deniedAccess";
 const initialState = {
   page: 1,
   search: "",
@@ -13,75 +17,75 @@ const initialState = {
   timeframe: "",
 };
 const I_lineDriver = () => {
-    const [iState, setUpdateState] = useState(initialState);
-    const { page, search, fromDate, toDate, timeframe } = iState;
-    const dispatch = useDispatch();
-    const iLineRef = useRef();
-  const {iLineDriverList} =useSelector(state=>{
+  const [iState, setUpdateState] = useState(initialState);
+  const { page, search, fromDate, toDate, timeframe } = iState;
+  const dispatch = useDispatch();
+  const iLineRef = useRef();
+  const { iLineDriverList } = useSelector((state) => {
     return state?.driverManagementAllDrivers;
-  })
+  });
   useEffect(() => {
     dispatch(fetchILineDriverList({ page, timeframe }));
   }, [page, timeframe]);
   useEffect(() => {
-      const delayDebounceFunc = setTimeout(() => {
-        dispatch(
-          fetchILineDriverList({
-            search: search.trim(), 
-            timeframe,
-          })
-        );
-      }, 1000);
-  
-      return () => clearTimeout(delayDebounceFunc);
-    }, [search, timeframe, dispatch]); 
-  
-    const handlePageChange = (page) => {
-      setUpdateState({ ...iState, page });
-      dispatch(fetchILineDriverList({ page }));
+    const delayDebounceFunc = setTimeout(() => {
+      dispatch(
+        fetchILineDriverList({
+          search: search.trim(),
+          timeframe,
+        })
+      );
+    }, 1000);
+
+    return () => clearTimeout(delayDebounceFunc);
+  }, [search, timeframe, dispatch]);
+
+  const handlePageChange = (page) => {
+    setUpdateState({ ...iState, page });
+    dispatch(fetchILineDriverList({ page }));
+  };
+  const handleChecked = (e, id) => {
+    const { name, checked } = e?.target;
+    const status = checked ? "ACTIVE" : "INACTIVE";
+    const data = { id, status };
+    dispatch(driverStatus(data)).then((res) => {
+      console.log("status update api", res);
+      if (res?.payload?.code == 200) {
+        toastService.success("Status updated successfully");
+        dispatch(fetchILineDriverList({ page }));
+      } else {
+        toastService.error("status update failed");
+      }
+    });
+  };
+  const handleChange = (e) => {
+    setUpdateState({ ...iState, [e.target.name]: e.target.value });
+  };
+  const handleReset = () => {
+    setUpdateState(initialState);
+    dispatch(fetchILineDriverList({ page: 1 }));
+  };
+  const handleApply = () => {
+    const data = {
+      search,
+      fromDate,
+      toDate,
+      page,
     };
-    const handleChecked = (e, id) => {
-      const { name, checked } = e?.target;
-      const status = checked ? "ACTIVE" : "INACTIVE";
-      const data = { id, status };
-      dispatch(driverStatus(data)).then((res) => {
-        console.log('status update api',res)
-        if (res?.payload?.code == 200) {
-          toastService.success("Status updated successfully");
-          dispatch(fetchILineDriverList({ page }));
-        } else {
-          toastService.error("status update failed");
-        }
-      });
-    };
-    const handleChange = (e) => {
-      setUpdateState({ ...iState, [e.target.name]: e.target.value });
-    };
-    const handleReset = () => {
-      setUpdateState(initialState);
-      dispatch(fetchILineDriverList({ page: 1 }));
-    };
-    const handleApply = () => {
-      const data = {
-        search,
-        fromDate,
-        toDate,
-        page,
-      };
-      dispatch(fetchILineDriverList(data));
-    };
-    const handleDelete=(id)=>{
-       const data = { id, status:"DELETED" };
-       dispatch(driverStatus(data)).then((res) => {
-         console.log("status update api", res);
-         if (res?.payload?.code == 200) {
-           toastService.success("Delete successfully");
-           dispatch(fetchILineDriverList({ page }));
-         } else {
-           toastService.error(" Delete failed");
-         }
-       });
-    }
+    dispatch(fetchILineDriverList(data));
+  };
+  const handleDelete = (id) => {
+    const data = { id, status: "DELETED" };
+    dispatch(driverStatus(data)).then((res) => {
+      console.log("status update api", res);
+      if (res?.payload?.code == 200) {
+        toastService.success("Delete successfully");
+        dispatch(fetchILineDriverList({ page }));
+      } else {
+        toastService.error(" Delete failed");
+      }
+    });
+  };
   return (
     <div className="tab-pane active">
       <div className="Small-Wrapper">
@@ -176,31 +180,40 @@ const I_lineDriver = () => {
                 <th>Out Station</th>
                 <th>Express Delivery</th>
                 <th>Driver Status</th>
-                <th>Action</th>
+                {canPerformAction("Driver Management") && <th>Action</th>}
                 <th>Details</th>
               </tr>
             </thead>
             <tbody>
               {iLineDriverList?.result?.[0]?.paginationData?.map((res, i) => {
+                console.log({res});
+                
                 return (
                   <tr>
                     <td>{i + 1 + (page - 1) * 10}</td>
                     <td>{res?.driver_number}</td>
-                    <td>{res?.fullName}</td>
+                    <td>
+                      <Link
+                        to="/driverManagement/detailDriverManagement"
+                        className="Blue"
+                        state={res}
+                      >
+                        {res?.fullName}
+                      </Link>
+                    </td>
                     <td>{res?.phoneNumber}</td>
-                    <td>-</td>
-                    <td>{res?.vehicleData?.[0]?.vehicleNumberPlate ?? "-"}</td>
-
-                    <td>-</td>
+                    <td>{res?.vehicleData?.[0]?.vehicleNumber}</td>
+                    <td>{res?.vehicleData?.[0]?.vehicleNumberPlate}</td>
+                    <td>{res?.totalRides}</td>
                     <td>
                       <span className={res?.is_online ? "Green" : "Red"}>
                         {res?.is_online ? "Online" : "Offline"}
                       </span>{" "}
                     </td>
                     <td>{moment(res?.createdAt).format("DD-MM-YYYY")}</td>
-                    <td>-</td>
-                    <td>-</td>
-                    <td>-</td>
+                    <td>{res?.localRideCount}</td>
+                    <td>{res?.outstationRideCount}</td>
+                    <td>{res?.expressRideCount}</td>
                     <td>
                       <span
                         className={
@@ -210,26 +223,28 @@ const I_lineDriver = () => {
                         {res?.userStatus}
                       </span>{" "}
                     </td>
-                    <td>
-                      {" "}
-                      <div className="Actions">
-                        <label className="Switch">
-                          <input
-                            type="checkbox"
-                            name="status"
-                            checked={res?.userStatus == "ACTIVE"}
-                            onChange={(e) => handleChecked(e, res?._id)}
-                          />
-                          <span className="slider" />
-                        </label>
-                        <a
-                          className="Red"
-                          onClick={() => handleDelete(res?._id)}
-                        >
-                          <i className="fa fa-trash" aria-hidden="true" />
-                        </a>
-                      </div>
-                    </td>
+                    {canPerformAction("Driver Management") && (
+                      <td>
+                        {" "}
+                        <div className="Actions">
+                          <label className="Switch">
+                            <input
+                              type="checkbox"
+                              name="status"
+                              checked={res?.userStatus == "ACTIVE"}
+                              onChange={(e) => handleChecked(e, res?._id)}
+                            />
+                            <span className="slider" />
+                          </label>
+                          <a
+                            className="Red"
+                            onClick={() => handleDelete(res?._id)}
+                          >
+                            <i className="fa fa-trash" aria-hidden="true" />
+                          </a>
+                        </div>
+                      </td>
+                    )}
                     <td>
                       <div className="Actions">
                         <Link

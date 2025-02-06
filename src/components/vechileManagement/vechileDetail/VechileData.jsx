@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { actionToService } from "../../../features/slices/vechileManagement/vechileManagement";
 import { toastService } from "../../../utils/toastify";
+import { canPerformAction } from "../../../utils/deniedAccess";
 const initialState = {
   id: "",
   is_local_admin: false,
@@ -13,10 +14,18 @@ const initialState = {
   is_express: false,
 };
 const VechileData = ({ state }) => {
-  const [iState,setUpdateState]=useState(initialState)
-  const {id,is_local_admin,is_outstation_admin,is_express_admin,is_local,is_outstation,is_express}=iState;
+  const [iState, setUpdateState] = useState(initialState);
+  const {
+    id,
+    is_local_admin,
+    is_outstation_admin,
+    is_express_admin,
+    is_local,
+    is_outstation,
+    is_express,
+  } = iState;
   console.log({ state });
-  useEffect(()=>{
+  useEffect(() => {
     setUpdateState((prev) => ({
       ...prev,
       is_local_admin: state?.is_local_admin,
@@ -26,39 +35,39 @@ const VechileData = ({ state }) => {
       is_outstation: state?.is_outstation,
       is_express: state?.is_express,
     }));
-  },[state])
-  const dispatch=useDispatch()
-   const handleChecked = (e, id,type) => {
-        const { name, checked } = e?.target;
-        const data = {
-          id,
-          is_local_admin: is_local,
-          is_outstation_admin: is_outstation,
-          is_express_admin: is_express,
-          is_local: is_local,
-          is_outstation: is_outstation,
-          is_express: is_express,
-          [type]: checked,
-          [name]: checked,
-        };
-        dispatch(actionToService(data)).then((res) => {
-          console.log("status update api", res);
-          if (res?.payload?.code == 200) {
-             setUpdateState((prev) => ({
-               ...prev,
-               is_local_admin: res?.payload?.editCategory?.is_local_admin,
-               is_outstation_admin: res?.payload?.editCategory?.is_outstation_admin,
-               is_express_admin: res?.payload?.editCategory?.is_express_admin,
-               is_local: res?.payload?.editCategory?.is_local,
-               is_outstation: res?.payload?.editCategory?.is_outstation,
-               is_express: res?.payload?.editCategory?.is_express,
-             }));
-            toastService.success("Status updated successfully");
-          } else {
-            toastService.error("status update failed");
-          }
-        });
-      };
+  }, [state]);
+  const dispatch = useDispatch();
+  const handleChecked = (e, id, type) => {
+    const { name, checked } = e?.target;
+    const data = {
+      id,
+      is_local_admin: is_local,
+      is_outstation_admin: is_outstation,
+      is_express_admin: is_express,
+      is_local: is_local,
+      is_outstation: is_outstation,
+      is_express: is_express,
+      [type]: checked,
+      [name]: checked,
+    };
+    dispatch(actionToService(data)).then((res) => {
+      console.log("status update api", res);
+      if (res?.payload?.code == 200) {
+        setUpdateState((prev) => ({
+          ...prev,
+          is_local_admin: res?.payload?.editCategory?.is_local_admin,
+          is_outstation_admin: res?.payload?.editCategory?.is_outstation_admin,
+          is_express_admin: res?.payload?.editCategory?.is_express_admin,
+          is_local: res?.payload?.editCategory?.is_local,
+          is_outstation: res?.payload?.editCategory?.is_outstation,
+          is_express: res?.payload?.editCategory?.is_express,
+        }));
+        toastService.success("Status updated successfully");
+      } else {
+        toastService.error("status update failed");
+      }
+    });
+  };
 
   return (
     <div className="tab-pane active" id="VehicleDetails">
@@ -91,10 +100,10 @@ const VechileData = ({ state }) => {
                     <strong>Vehicle Manufacturer </strong>
                     <span>{state?.vehicleManufacturer}</span>
                   </p>
-                  <p>
-                    <strong>Load Capacity </strong>
-                    <span>-</span>
-                  </p>
+                  // <p>
+                  //   <strong>Load Capacity </strong>
+                  //   <span>-</span>
+                  // </p>
                   <p>
                     <strong>Vehicle Plate Number</strong>
                     <span>{state?.vehicleNumberPlate}</span>
@@ -111,84 +120,86 @@ const VechileData = ({ state }) => {
                   </p>
                   <p>
                     <strong>Total Booking Received</strong>
-                    <span>-</span>
+                    <span>{state?.totalBooking}</span>
                   </p>
                   <p>
                     <strong>Total Completed Booking </strong>
-                    <span>-</span>
+                    <span>{state?.totalCompletedBooking}</span>
                   </p>
                   <p>
                     <strong>Total Upcoming Booking </strong>
-                    <span>-</span>
+                    <span>{state?.totalUpcomingBooking}</span>
                   </p>
                   <p>
                     <strong>Total Cancelled Booking </strong>
-                    <span>-</span>
+                    <span>{state?.totalCancelledBooking}</span>
                   </p>
                   <p>
                     <strong>Total Ongoing Bookings </strong>
-                    <span>-</span>
+                    <span>{state?.totalOngoingBooking}</span>
                   </p>
                   <p>
                     <strong>Approved By </strong>
-                    <span>-</span>
+                    <span>{state?.assignBy}</span>
                   </p>
                 </aside>
               </article>
             </div>
           </div>
         </div>
-        <div className="InformationBox">
-          <h3>Vehicle Status</h3>
-          <div className="Informations">
-            <div className="VehicleStatus">
-              <ul>
-                <li>
-                  <label>Local</label>
-                  <label className="Switch">
-                    <input
-                      type="checkbox"
-                      name="is_local"
-                      checked={is_local}
-                      onChange={(e) =>
-                        handleChecked(e, state?._id, "is_local_admin")
-                      }
-                    />
-                    <span className="slider" />
-                  </label>
-                </li>
-                <li>
-                  <label>Express</label>
-                  <label className="Switch">
-                    <input
-                      type="checkbox"
-                      name="is_express"
-                      checked={is_express}
-                      onChange={(e) =>
-                        handleChecked(e, state?._id, "is_express_admin")
-                      }
-                    />
-                    <span className="slider" />
-                  </label>
-                </li>
-                <li>
-                  <label>Out Station</label>
-                  <label className="Switch">
-                    <input
-                      type="checkbox"
-                      name="is_outstation"
-                      checked={is_outstation}
-                      onChange={(e) =>
-                        handleChecked(e, state?._id, "is_outstation_admin")
-                      }
-                    />
-                    <span className="slider" />
-                  </label>
-                </li>
-              </ul>
+        {canPerformAction("Vehicle Management") && (
+          <div className="InformationBox">
+            <h3>Vehicle Status</h3>
+            <div className="Informations">
+              <div className="VehicleStatus">
+                <ul>
+                  <li>
+                    <label>Local</label>
+                    <label className="Switch">
+                      <input
+                        type="checkbox"
+                        name="is_local"
+                        checked={is_local}
+                        onChange={(e) =>
+                          handleChecked(e, state?._id, "is_local_admin")
+                        }
+                      />
+                      <span className="slider" />
+                    </label>
+                  </li>
+                  <li>
+                    <label>Express</label>
+                    <label className="Switch">
+                      <input
+                        type="checkbox"
+                        name="is_express"
+                        checked={is_express}
+                        onChange={(e) =>
+                          handleChecked(e, state?._id, "is_express_admin")
+                        }
+                      />
+                      <span className="slider" />
+                    </label>
+                  </li>
+                  <li>
+                    <label>Out Station</label>
+                    <label className="Switch">
+                      <input
+                        type="checkbox"
+                        name="is_outstation"
+                        checked={is_outstation}
+                        onChange={(e) =>
+                          handleChecked(e, state?._id, "is_outstation_admin")
+                        }
+                      />
+                      <span className="slider" />
+                    </label>
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
-        </div>
+        )}
         <div className="InformationBox">
           <h3>Vehicle Photos </h3>
           <div className="Informations">
@@ -218,7 +229,7 @@ const VechileData = ({ state }) => {
         </div>
         <div className="row">
           <div className="col-sm-6">
-            <div className="InformationBox">
+            {/* <div className="InformationBox">
               <h3>Owner Details</h3>
               <div className="VehicleDocument">
                 <aside>
@@ -232,7 +243,7 @@ const VechileData = ({ state }) => {
                   </p>
                 </aside>
               </div>
-            </div>
+            </div> */}
           </div>
           <div className="col-sm-6">
             <div className="InformationBox">
@@ -240,12 +251,12 @@ const VechileData = ({ state }) => {
               <div className="VehicleDocument">
                 <aside>
                   <p>
-                    <strong>Owner Name</strong>
-                    <span>-</span>
+                    <strong>Driver Name</strong>
+                    <span>{state?.driverData?.[0]?.fullName}</span>
                   </p>
                   <p>
-                    <strong>Owner Number </strong>
-                    <span>-</span>
+                    <strong>Driver Number </strong>
+                    <span>{state?.driverData?.[0]?.phoneNumber}</span>
                   </p>
                 </aside>
               </div>
@@ -300,10 +311,10 @@ const VechileData = ({ state }) => {
               <h3>Insurance Details</h3>
               <div className="VehicleDocument">
                 <aside>
-                  <p>
+                  {/* <p>
                     <strong>Registration Certificate Number</strong>
                     <span>-</span>
-                  </p>
+                  </p> */}
                   <p>
                     <strong>Expiry</strong>
                     <span>

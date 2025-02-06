@@ -10,6 +10,7 @@ import moment from "moment";
 import CommonPagination from "../../components/CommonPagination";
 import { toastService } from "../../utils/toastify";
 import ExportToExcel from "../../components/ExportToExcel";
+import { canPerformAction } from "../../utils/deniedAccess";
 const initialState = {
   page: 1,
   search: "",
@@ -19,28 +20,28 @@ const initialState = {
 };
 const UserManagement = () => {
   const [iState, setUpdateState] = useState(initialState);
-    const [allData, setAllData] = useState([]);
   const { page, search, fromDate, toDate, timeframe } = iState;
   const dispatch = useDispatch();
-  const userRef = useRef();
   const { users } = useSelector((state) => {
     return state?.userManagement;
   });
-   useEffect(() => {
-     const data = {
-       search,
-       fromDate,
-       toDate,
-       timeframe,
-       limit: 999999,
-     };
-     dispatch(getAllUserList(data)).then((res) => {
-       if (res?.payload?.code == 200) {
-         console.log({ res });
-         setAllData(res?.payload);
-       }
-     });
-   }, [timeframe, page, toDate,search, fromDate]);
+  const userRef = useRef();
+  const [allData, setAllData] = useState([]);
+  useEffect(() => {
+    const data = {
+      search,
+      fromDate,
+      toDate,
+      timeframe,
+      limit: 999999,
+    };
+    dispatch(getAllUserList(data)).then((res) => {
+      if (res?.payload?.code == 200) {
+        console.log({ res });
+        setAllData(res?.payload);
+      }
+    });
+  }, [timeframe, page, toDate, search, fromDate]);
   useEffect(() => {
     dispatch(userList({ page, timeframe }));
   }, [timeframe, page]);
@@ -48,14 +49,14 @@ const UserManagement = () => {
     const delayDebounceFunc = setTimeout(() => {
       dispatch(
         userList({
-          search: search.trim(), 
+          search: search.trim(),
           timeframe,
         })
       );
     }, 1000);
 
     return () => clearTimeout(delayDebounceFunc);
-  }, [search, timeframe, dispatch]); 
+  }, [search, timeframe, dispatch]);
 
   const handlePageChange = (page) => {
     setUpdateState({ ...iState, page });
@@ -191,7 +192,7 @@ const UserManagement = () => {
               <tbody>
                 {allData?.result?.[0]?.paginationData?.map((res, i) => {
                   return (
-                    <tr>
+                    <tr key={i}>
                       <td>{i + 1 + (page - 1) * 10}</td>
                       <td>
                         <Link to={"userManagementDetail"} state={res}>
@@ -243,7 +244,7 @@ const UserManagement = () => {
                   <th>Current Status </th>
                   <th>Language Preference</th>
                   <th>GST Number </th>
-                  <th>Action</th>
+                  {canPerformAction("User Management") && <th>Action</th>}
                 </tr>
               </thead>
               <tbody>
@@ -270,19 +271,22 @@ const UserManagement = () => {
                       </td>
                       <td>{res?.language}</td>
                       <td>{res?.gstNumber}</td>
-                      <td>
-                        <div className="Actions">
-                          <label className="Switch">
-                            <input
-                              type="checkbox"
-                              name="status"
-                              checked={res?.userStatus == "ACTIVE"}
-                              onChange={(e) => handleChecked(e, res?._id)}
-                            />
-                            <span className="slider" />
-                          </label>
-                        </div>
-                      </td>
+                      {canPerformAction("User Management") && (
+                        <td>
+                          <div className="Actions">
+                            <label className="Switch">
+                              <input
+                                type="checkbox"
+                                name="status"
+                                checked={res?.userStatus == "ACTIVE"}
+                                onChange={(e) => handleChecked(e, res?._id)}
+                                disabled={!canPerformAction("User Management")}
+                              />
+                              <span className="slider" />
+                            </label>
+                          </div>
+                        </td>
+                      )}
                     </tr>
                   );
                 })}

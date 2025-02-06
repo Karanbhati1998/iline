@@ -5,6 +5,7 @@ import { toastService } from '../../utils/toastify';
 import moment from 'moment';
 import CommonPagination from '../../components/CommonPagination';
 import { Link } from 'react-router-dom';
+import { canPerformAction } from '../../utils/deniedAccess';
 const initialState = {
   page: 1,
   search: "",
@@ -76,9 +77,12 @@ const BlogManagement = () => {
       <div className="WrapperBox">
         <div className="TitleBox">
           <h4 className="Title">Blog Management</h4>
+          {
+            canPerformAction("Blog") &&
           <Link className="TitleLink" to="addblog">
             Publish New Blog
           </Link>
+          }
         </div>
         <div className="Small-Wrapper">
           <div className="FilterArea">

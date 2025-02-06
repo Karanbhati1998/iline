@@ -5,6 +5,7 @@ import TotalRevenuefromP2pDriverTab from "./TotalRevenuefromP2pDriverTab";
 import TotalPaymentfromP2pDriverTab from "./TotalPaymentfromP2pDriverTab";
 import CommisionModal from "../../components/payment/CommisionModal";
 import { useLocation } from "react-router-dom";
+import { canPerformAction } from "../../utils/deniedAccess";
 
 const PaymentAndRevenue = () => {
   const [showState, setShowState] = useState({
@@ -21,7 +22,7 @@ const PaymentAndRevenue = () => {
     totalPaymentfromP2pDriver,
     setCommision,
   } = showState;
-   const { state } = useLocation();
+  const { state } = useLocation();
   const handleClick = (name) => {
     setShowState((prev) => ({
       totalRevenue: false,
@@ -31,29 +32,31 @@ const PaymentAndRevenue = () => {
       [name]: true,
     }));
   };
-  const handleClose=()=>{
+  const handleClose = () => {
     setShowState((prev) => ({
       ...prev,
       setCommision: false,
     }));
-  }
+  };
   return (
     <>
       <div className="WrapperArea">
         <div className="WrapperBox">
           <div className="TitleBox">
             <h4 className="Title">Payment Management</h4>
-            <a
-              className="TitleLink"
-              onClick={() => {
-                setShowState((prev) => ({
-                  ...prev,
-                  setCommision: true,
-                }));
-              }}
-            >
-              Set Commission{" "}
-            </a>
+            {canPerformAction("Payment & Revenue Management") && (
+              <a
+                className="TitleLink"
+                onClick={() => {
+                  setShowState((prev) => ({
+                    ...prev,
+                    setCommision: true,
+                  }));
+                }}
+              >
+                Set Commission{" "}
+              </a>
+            )}
           </div>
           <div className="SettingsTabs mt-4">
             <ul className="nav nav-tabs">
@@ -102,12 +105,16 @@ const PaymentAndRevenue = () => {
               </li>
             </ul>
             <div className="tab-content">
-              {totalRevenue && <TotalRevenueTab categoryId={state}/>}
+              {totalRevenue && <TotalRevenueTab categoryId={state} />}
               {totalRevenuefromILineDriver && (
-                <TotalRevenuefromILineDriverTab categoryId={state}/>
+                <TotalRevenuefromILineDriverTab categoryId={state} />
               )}
-              {totalRevenuefromP2pDriver && <TotalRevenuefromP2pDriverTab categoryId={state}/>}
-              {totalPaymentfromP2pDriver && <TotalPaymentfromP2pDriverTab categoryId={state}/>}
+              {totalRevenuefromP2pDriver && (
+                <TotalRevenuefromP2pDriverTab categoryId={state} />
+              )}
+              {totalPaymentfromP2pDriver && (
+                <TotalPaymentfromP2pDriverTab categoryId={state} />
+              )}
             </div>
           </div>
         </div>

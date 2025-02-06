@@ -10,7 +10,7 @@ import vechileCategory from "./slices/vechileManagement/vechileCategory";
 import bannerSlice from "./slices/bannerSlice";
 import blogSlice from "./slices/blogSlice";
 import subAdminSlice from "./slices/subAdmin";
-import  dashboardSlice from "./slices/Dashboard";
+import dashboardSlice from "./slices/Dashboard";
 import bookingManagementSlice from "./slices/bookingManagementSlice";
 import vechileSlice from "./slices/vechileManagement/vechileManagement";
 import notificationSlice from "./slices/notification";

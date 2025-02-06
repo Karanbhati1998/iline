@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { getTotalRevenueList } from '../../features/slices/payment';
-import { useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import CommonPagination from '../CommonPagination';
 const initialState = {
   page: 1,
@@ -204,15 +204,16 @@ const TotalRevenueTab = ({ categoryId }) => {
                         <td>{res?.paymentType}</td>
                         <td>
                           <div className="Actions">
-                            <a
+                            <Link
                               className="Blue"
-                              href="booking-management-outgoing-booking-details.html"
+                              to="paymentDetail"
+                              state={res}
                             >
                               <i
                                 className="fa fa-info-circle"
                                 aria-hidden="true"
                               />
-                            </a>
+                            </Link>
                             <span className="Orange">
                               <a href="" download="">
                                 Download Receipt

@@ -6,14 +6,15 @@ import {
 } from "../../../features/slices/userManagementReducer";
 import { toastService } from "../../../utils/toastify";
 import { useDispatch } from "react-redux";
+import { canPerformAction } from "../../../utils/deniedAccess";
 
 const PersonalDetail = ({ state }) => {
-  const [status,setStatus]=useState()
+  const [status, setStatus] = useState();
   const dispatch = useDispatch();
   console.log({ state });
-  useEffect(()=>{
+  useEffect(() => {
     setStatus(state?.userStatus);
-  },[state])
+  }, [state]);
   const handleChecked = (e, id) => {
     const { name, checked } = e?.target;
     const status = checked ? "ACTIVE" : "INACTIVE";
@@ -21,7 +22,7 @@ const PersonalDetail = ({ state }) => {
     dispatch(userStatus(data)).then((res) => {
       if (res?.payload?.code == 200) {
         toastService.success("Status updated successfully");
-         setStatus(checked);
+        setStatus(checked);
         dispatch(userList());
       } else {
         toastService.error("status update failed");
@@ -60,19 +61,21 @@ const PersonalDetail = ({ state }) => {
                       </h3>
                       <h4>User ID : #{state?.user_number}</h4>
                     </div>
-                    <div className="Actions">
-                      <label className="Switch">
-                        <input
-                          type="checkbox"
-                          checked={status}
-                          onChange={(e) => handleChecked(e, state?._id)}
-                        />
-                        <span className="slider" />
-                      </label>
-                      {/* <a className="Green" href="#">
+                    {canPerformAction("User Management") && (
+                      <div className="Actions">
+                        <label className="Switch">
+                          <input
+                            type="checkbox"
+                            checked={status}
+                            onChange={(e) => handleChecked(e, state?._id)}
+                          />
+                          <span className="slider" />
+                        </label>
+                        {/* <a className="Green" href="#">
                         <i className="fa fa-pencil" />
                       </a> */}
-                    </div>
+                      </div>
+                    )}
                   </figcaption>
                 </div>
                 <br />
@@ -85,9 +88,9 @@ const PersonalDetail = ({ state }) => {
                       <label>City &amp; State</label>{" "}
                       <span> {state?.address ? state?.address : "-"}</span>
                     </p>
-                    <p>
+                    {/* <p>
                       <label>Gender </label> <span> -</span>
-                    </p>
+                    </p> */}
                     <p>
                       <label>Registered on </label>{" "}
                       <span>
@@ -113,20 +116,22 @@ const PersonalDetail = ({ state }) => {
                     </p>
                     <p>
                       <label>Total Number of Bookings till today </label>{" "}
-                      <span> -</span>
+                      <span> {state?.rideCount}</span>
                     </p>
                     <p>
-                      <label>Total Spent Amount </label> <span> -</span>
+                      <label>Total Spent Amount </label>{" "}
+                      <span> {state?.totalTripAmount}</span>
                     </p>
                     <p>
-                      <label>Total Rides </label> <span>-</span>
+                      <label>Total Rides </label>{" "}
+                      <span>{state?.rideCount}</span>
                     </p>
-                    <p>
+                    {/* <p>
                       <label>Total Fleets Booked</label> <span>-</span>
                     </p>
                     <p>
                       <label>Upcoming Booking</label> <span>-</span>
-                    </p>
+                    </p> */}
                   </aside>
                 </div>
               </div>

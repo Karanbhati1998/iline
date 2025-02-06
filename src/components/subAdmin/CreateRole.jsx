@@ -97,6 +97,11 @@ const initialState = {
       read: false,
       fullAccess: false,
     },
+    {
+      name: "Blog",
+      read: false,
+      fullAccess: false,
+    },
   ],
 };
 const CreateRole = () => {

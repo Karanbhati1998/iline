@@ -199,16 +199,15 @@ const BookingManagementDetail = () => {
                         </p>
                         <p>
                           <strong> Loading Time</strong>
-                          <span> -</span>
+                          <span>{state?.loadingTime}</span>
                         </p>
                         <p>
                           <strong> Unloading Time</strong>
-                          <span> -</span>
+                          <span>{state?.unloadingTime}</span>
                         </p>
                         <p>
                           <strong>
-                            {" "}
-                            -
+                            Has the purchased trip insurance for a safe journey?
                           </strong>{" "}
                           -
                         </p>
@@ -240,13 +239,10 @@ const BookingManagementDetail = () => {
                     <aside>
                       {" "}
                       <p>
-                        <strong>SGST (5%)</strong>
+                        <strong>GST (5%)</strong>
                         <span> Rs -</span>
                       </p>
-                      <p>
-                        <strong>CGST (5%)</strong>
-                        <span> Rs -</span>
-                      </p>
+                    
                       <p>
                         <strong>Coupon Discount</strong>
                         <span> -Rs -</span>
@@ -314,64 +310,7 @@ const BookingManagementDetail = () => {
                 </div>
               </div>
             </div>
-            <div className="row mt-4">
-              <div className="col-sm-6">
-                <div className="form-group">
-                  <label>Incorrect Load Reported</label>
-                  <div className="Avaialable">
-                    <ul>
-                      <li>
-                        <label className="CheckBox">
-                          Yes
-                          <input type="checkbox" />
-                          <span className="checkmark" />
-                        </label>
-                      </li>
-                      <li>
-                        <label className="CheckBox">
-                          No
-                          <input type="checkbox" />
-                          <span className="checkmark" />
-                        </label>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-              <div className="col-sm-6">
-                <div className="form-group">
-                  <label>Revised Load Capacity</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    defaultValue="450 Kg"
-                    disabled=""
-                  />
-                </div>
-              </div>
-              <div className="col-sm-6">
-                <div className="form-group">
-                  <label>Penalty</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    defaultValue="Rs 1000"
-                    disabled=""
-                  />
-                </div>
-              </div>
-              <div className="col-sm-6">
-                <div className="form-group">
-                  <label>Revised Amount to Pay</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    defaultValue="Rs 3000"
-                    disabled=""
-                  />
-                </div>
-              </div>
-            </div>
+           
           </div>
         </div>
 

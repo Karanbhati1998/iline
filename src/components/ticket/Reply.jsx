@@ -6,6 +6,7 @@ import { previousChat } from "../../features/slices/supportTicketManagement";
 import { getToken } from "../../utils/getToken";
 import moment from "moment/moment";
 import { useSocket } from "../../context/SocketContext";
+import { canPerformAction } from "../../utils/deniedAccess";
 const initialState = {
   userId: "",
   roomId: "",
@@ -210,6 +211,8 @@ const Reply = () => {
               </div>
             ))}
           </div> */}
+          {
+            canPerformAction("Support Ticket Management") &&
           <div className="input-container">
             <input
               type="text"
@@ -220,6 +223,7 @@ const Reply = () => {
             />
             <button onClick={sendMessage}>➤</button>
           </div>
+          }
         </div>
       </div>
     </div>

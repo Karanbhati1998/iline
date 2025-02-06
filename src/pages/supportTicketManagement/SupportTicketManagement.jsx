@@ -166,7 +166,7 @@ const SupportTicketManagement = () => {
                   <tr>
                     <th>S.No.</th>
                     <th>Ticket ID</th>
-                    <th>Booking ID</th>
+                    {/* <th>Booking ID</th> */}
                     <th>User Name</th>
                     <th>Number</th>
                     <th>User Type</th>
@@ -183,10 +183,10 @@ const SupportTicketManagement = () => {
                         <tr key={res?._id}>
                           <td>{i + 1 + (page - 1) * 10}</td>
                           <td>{res?.ticket_number}</td>
-                          <td>-</td>
+                          {/* <td>-</td> */}
                           <td>{res?.userData?.fullName}</td>
                           <td>{res?.userData?.phoneNumber}</td>
-                          <td>-</td>
+                          <td>{res?.userType ||"-"}</td>
                           <td>{moment(res?.createdAt).format("DD-MM-YYYY")}</td>
                           <td>L{res?.description}</td>
                           <td>

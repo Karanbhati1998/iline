@@ -1,12 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getIlineOrP2pVechileList, getServiceBasedVehicleList, vehicleStatus } from "../../../features/slices/vechileManagement/vechileManagement";
+import {
+  getIlineOrP2pVechileList,
+  getServiceBasedVehicleList,
+  vehicleStatus,
+} from "../../../features/slices/vechileManagement/vechileManagement";
 import { Link, useLocation } from "react-router-dom";
 import BackButton from "../../BackButton";
 import { toastService } from "../../../utils/toastify";
 import CommonPagination from "../../CommonPagination";
 import moment from "moment";
 import DeleteModal from "../../DeleteModal";
+import { canPerformAction } from "../../../utils/deniedAccess";
 const initialState = {
   page: 1,
   search: "",
@@ -18,16 +23,15 @@ const initialState = {
   id: "",
 };
 const DeliverTable = () => {
-   const [iState, setUpdateState] = useState(initialState);
-    const { page, search, fromDate, toDate, timeframe, deleteModal, id } =
-      iState;
+  const [iState, setUpdateState] = useState(initialState);
+  const { page, search, fromDate, toDate, timeframe, deleteModal, id } = iState;
   const dispatch = useDispatch();
-  const {state}=useLocation()
-  const {serviceBasedVehicleList}=useSelector(state=>{
+  const { state } = useLocation();
+  const { serviceBasedVehicleList } = useSelector((state) => {
     return state?.vechile;
-  })
+  });
   console.log({ serviceBasedVehicleList });
-  
+
   useEffect(() => {
     if (state) {
       dispatch(
@@ -35,69 +39,69 @@ const DeliverTable = () => {
       );
     }
   }, [state, page, timeframe]);
-   useEffect(() => {
-      const delayDebounceFunc = setTimeout(() => {
-        dispatch(
-          getServiceBasedVehicleList({
-            search: search.trim(),
-            timeframe,
-            serviceType: state,
-          })
-        );
-      }, 1000);
-  
-      return () => clearTimeout(delayDebounceFunc);
-    }, [search, timeframe, dispatch]);
-  
-    const handlePageChange = (page) => {
-      setUpdateState({ ...iState, page });
-      dispatch(getServiceBasedVehicleList({ serviceType: state, page }));
+  useEffect(() => {
+    const delayDebounceFunc = setTimeout(() => {
+      dispatch(
+        getServiceBasedVehicleList({
+          search: search.trim(),
+          timeframe,
+          serviceType: state,
+        })
+      );
+    }, 1000);
+
+    return () => clearTimeout(delayDebounceFunc);
+  }, [search, timeframe, dispatch]);
+
+  const handlePageChange = (page) => {
+    setUpdateState({ ...iState, page });
+    dispatch(getServiceBasedVehicleList({ serviceType: state, page }));
+  };
+  const handleChecked = (e, id) => {
+    const { name, checked } = e?.target;
+    const status = checked ? "ACTIVE" : "INACTIVE";
+    const data = { id, status };
+    dispatch(vehicleStatus(data)).then((res) => {
+      console.log("status update api", res);
+      if (res?.payload?.code == 200) {
+        toastService.success("Status updated successfully");
+        dispatch(getServiceBasedVehicleList({ serviceType: state, page }));
+      } else {
+        toastService.error("status update failed");
+      }
+    });
+  };
+  const handleChange = (e) => {
+    setUpdateState({ ...iState, [e.target.name]: e.target.value });
+  };
+  const handleReset = () => {
+    setUpdateState(initialState);
+    dispatch(getServiceBasedVehicleList({ serviceType: state, page: 1 }));
+  };
+  const handleApply = () => {
+    const data = {
+      search,
+      fromDate,
+      toDate,
+      page,
+      serviceType: state,
     };
-    const handleChecked = (e, id) => {
-      const { name, checked } = e?.target;
-      const status = checked ? "ACTIVE" : "INACTIVE";
-      const data = { id, status };
-      dispatch(vehicleStatus(data)).then((res) => {
-        console.log("status update api", res);
-        if (res?.payload?.code == 200) {
-          toastService.success("Status updated successfully");
-          dispatch(getServiceBasedVehicleList({ serviceType: state, page }));
-        } else {
-          toastService.error("status update failed");
-        }
-      });
-    };
-    const handleChange = (e) => {
-      setUpdateState({ ...iState, [e.target.name]: e.target.value });
-    };
-    const handleReset = () => {
-      setUpdateState(initialState);
-      dispatch(getServiceBasedVehicleList({ serviceType: state, page: 1 }));
-    };
-    const handleApply = () => {
-      const data = {
-        search,
-        fromDate,
-        toDate,
-        page,
-        serviceType: state,
-      };
-      dispatch(getServiceBasedVehicleList(data));
-    };
-     const handleClose = () => {
-       setUpdateState({ ...iState, deleteModal: false, id: "" });
-     };
-     const handleDelete = () => {
-       dispatch(vehicleStatus({ id, status: "DELETED" })).then((res) => {
-         if (res?.payload?.code == 200) {
-           toastService.success("Delete successfully");
-           setUpdateState({ ...iState, deleteModal: false, id: "" });
-           dispatch(getServiceBasedVehicleList({ serviceType: state,page }));
-         } else {
-           toastService.error("Delete failed");
-         }
-       });
-     };
+    dispatch(getServiceBasedVehicleList(data));
+  };
+  const handleClose = () => {
+    setUpdateState({ ...iState, deleteModal: false, id: "" });
+  };
+  const handleDelete = () => {
+    dispatch(vehicleStatus({ id, status: "DELETED" })).then((res) => {
+      if (res?.payload?.code == 200) {
+        toastService.success("Delete successfully");
+        setUpdateState({ ...iState, deleteModal: false, id: "" });
+        dispatch(getServiceBasedVehicleList({ serviceType: state, page }));
+      } else {
+        toastService.error("Delete failed");
+      }
+    });
+  };
   return (
     <>
       <div className="WrapperArea">
@@ -209,7 +213,9 @@ const DeliverTable = () => {
                         <th>Assigned On</th>
                         <th>Assigned By</th>
                         <th>Status</th>
-                        <th>Action</th>
+                        {canPerformAction("Vehicle Management") && (
+                          <th>Action</th>
+                        )}
                       </tr>
                     </thead>
                     <tbody>
@@ -252,43 +258,45 @@ const DeliverTable = () => {
                                     : "Disabled"}
                                 </span>
                               </td>
-                              <td>
-                                <div className="Actions">
-                                  <label className="Switch">
-                                    <input
-                                      type="checkbox"
-                                      name="status"
-                                      checked={res?.status == "ACTIVE"}
-                                      onChange={(e) =>
-                                        handleChecked(e, res?._id)
-                                      }
-                                    />
-                                    <span className="slider" />
-                                  </label>
-                                  <a
-                                    className="Red"
-                                    onClick={() => {
-                                      setUpdateState({
-                                        ...iState,
-                                        deleteModal: true,
-                                        id: res?._id,
-                                      });
-                                    }}
-                                  >
-                                    <i className="fa fa-trash" />
-                                  </a>
-                                  <Link
-                                    to="/vehicleManagement/details"
-                                    className="Blue"
-                                    state={res}
-                                  >
-                                    <i
-                                      className="fa fa-info-circle"
-                                      aria-hidden="true"
-                                    />
-                                  </Link>
-                                </div>
-                              </td>
+                              {canPerformAction("Vehicle Management") && (
+                                <td>
+                                  <div className="Actions">
+                                    <label className="Switch">
+                                      <input
+                                        type="checkbox"
+                                        name="status"
+                                        checked={res?.status == "ACTIVE"}
+                                        onChange={(e) =>
+                                          handleChecked(e, res?._id)
+                                        }
+                                      />
+                                      <span className="slider" />
+                                    </label>
+                                    <a
+                                      className="Red"
+                                      onClick={() => {
+                                        setUpdateState({
+                                          ...iState,
+                                          deleteModal: true,
+                                          id: res?._id,
+                                        });
+                                      }}
+                                    >
+                                      <i className="fa fa-trash" />
+                                    </a>
+                                    <Link
+                                      to="/vehicleManagement/details"
+                                      className="Blue"
+                                      state={res}
+                                    >
+                                      <i
+                                        className="fa fa-info-circle"
+                                        aria-hidden="true"
+                                      />
+                                    </Link>
+                                  </div>
+                                </td>
+                              )}
                             </tr>
                           );
                         }
