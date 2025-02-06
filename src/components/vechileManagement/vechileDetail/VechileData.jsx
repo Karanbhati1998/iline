@@ -100,10 +100,10 @@ const VechileData = ({ state }) => {
                     <strong>Vehicle Manufacturer </strong>
                     <span>{state?.vehicleManufacturer}</span>
                   </p>
-                  // <p>
-                  //   <strong>Load Capacity </strong>
-                  //   <span>-</span>
-                  // </p>
+                  <p>
+                    <strong>Load Capacity </strong>
+                    <span>-</span>
+                  </p>
                   <p>
                     <strong>Vehicle Plate Number</strong>
                     <span>{state?.vehicleNumberPlate}</span>
