@@ -105,21 +105,29 @@ const AddSubAdmin = ({ handleShowAddSubAdminModal }) => {
     let formErrors = {};
     let isValid = true;
 
+    // Name Validation (Only alphabets, no numbers or special characters)
+    const nameRegex = /^[A-Za-z\s]+$/;
     if (!name.trim()) {
       formErrors.name = "Name is required";
       isValid = false;
+    } else if (!nameRegex.test(name)) {
+      formErrors.name = "Name should only contain alphabets";
+      isValid = false;
     }
 
+    // Gender Validation
     if (!gender.trim()) {
       formErrors.gender = "Gender is required";
       isValid = false;
     }
 
+    // Role ID Validation
     if (!roleId.trim()) {
       formErrors.roleId = "Role data is required";
       isValid = false;
     }
 
+    // Email Validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email.trim()) {
       formErrors.email = "Email is required";
@@ -129,25 +137,34 @@ const AddSubAdmin = ({ handleShowAddSubAdminModal }) => {
       isValid = false;
     }
 
+    // Phone Number Validation (Exactly 10 digits, starts with 0-9)
     const phoneRegex = /^[0-9]\d{9}$/;
     if (!phoneNumber.trim()) {
-      formErrors.phoneNumber = "phoneNumber is required";
+      formErrors.phoneNumber = "Phone number is required";
       isValid = false;
     } else if (!phoneRegex.test(phoneNumber)) {
-      formErrors.phoneNumber = "Invalid phoneNumber number";
+      formErrors.phoneNumber = "Invalid phone number format";
       isValid = false;
     }
 
+    // Username Validation
     if (!username.trim()) {
       formErrors.username = "Username is required";
       isValid = false;
     }
 
+    // Password Validation (1 uppercase, 1 lowercase, 1 special character, 8-16 characters)
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{8,16}$/;
     if (!password.trim()) {
       formErrors.password = "Password is required";
       isValid = false;
+    } else if (!passwordRegex.test(password)) {
+      formErrors.password =
+        "Password must be 8-16 characters, include at least 1 uppercase letter, 1 lowercase letter, and 1 special character";
+      isValid = false;
     }
 
+    // Profile Picture Validation
     if (!profilePic.trim()) {
       formErrors.profilePic = "Profile picture is required";
       isValid = false;
@@ -160,6 +177,7 @@ const AddSubAdmin = ({ handleShowAddSubAdminModal }) => {
 
     return isValid;
   };
+
 
   const handleSubmit = () => {
     if (handleValidation()) {

@@ -3,10 +3,25 @@ import axiosInstance from "../axiosInstance";
 
 const initialState = {
   notification: [],
+  sosList: [],
   loading: false,
   error: null,
 };
 
+export const getAllNotificationList = createAsyncThunk(
+  "get/allnotification",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get("/notificationList", {
+        params: payload,
+      });
+      return response.data;
+    } catch (error) {
+      console.log({ error });
+      return rejectWithValue(error); // Return error instead of just rejecting
+    }
+  }
+);
 export const getNotificationList = createAsyncThunk(
   "get/notification",
   async (payload, { rejectWithValue }) => {
@@ -71,7 +86,20 @@ export const deleteNotification = createAsyncThunk(
     }
   }
 );
-
+export const getSosNotificationList = createAsyncThunk(
+  "get/sosnotification",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get("/sosList", {
+        params: payload,
+      });
+      return response.data;
+    } catch (error) {
+      console.log({ error });
+      return rejectWithValue(error); // Return error instead of just rejecting
+    }
+  }
+);
 const notificationSlice = createSlice({
   name: "notification",
   initialState: initialState,
@@ -85,6 +113,17 @@ const notificationSlice = createSlice({
         state.notification = action.payload;
       })
       .addCase(getNotificationList.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || action.error.message; // Access the error message
+      })
+      .addCase(getSosNotificationList.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(getSosNotificationList.fulfilled, (state, action) => {
+        state.loading = false;
+        state.sosList = action.payload;
+      })
+      .addCase(getSosNotificationList.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || action.error.message; // Access the error message
       });

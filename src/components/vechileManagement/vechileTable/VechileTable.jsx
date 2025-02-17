@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  getAllIlineOrP2pVechileList,
   getIlineOrP2pVechileList,
   vehicleStatus,
 } from "../../../features/slices/vechileManagement/vechileManagement";
@@ -10,6 +11,7 @@ import { Link } from "react-router-dom";
 import moment from "moment";
 import DeleteModal from "../../DeleteModal";
 import { canPerformAction } from "../../../utils/deniedAccess";
+import ExportToExcel from "../../ExportToExcel";
 const initialState = {
   page: 1,
   search: "",
@@ -24,6 +26,27 @@ const VechileTable = ({ categoryId, vehicleType }) => {
   const [iState, setUpdateState] = useState(initialState);
   const { page, search, fromDate, toDate, timeframe, deleteModal, id } = iState;
   const dispatch = useDispatch();
+  const vechileRef = useRef();
+  const [allData, setAllData] = useState([]);
+  useEffect(() => {
+    const data = {
+      search,
+      fromDate,
+      toDate,
+      timeframe,
+      limit: 999999,
+      categoryId,
+      vehicleType,
+    };
+    if (categoryId && vehicleType) {
+      dispatch(getAllIlineOrP2pVechileList(data)).then((res) => {
+        if (res?.payload?.code == 200) {
+          console.log({ res });
+          setAllData(res?.payload);
+        }
+      });
+    }
+  }, [timeframe, page, toDate, search, fromDate, categoryId, vehicleType]);
   const { ilineOrP2pVechileList } = useSelector((state) => {
     return state?.vechile;
   });
@@ -181,19 +204,12 @@ const VechileTable = ({ categoryId, vehicleType }) => {
                     <option>Freight-Truck</option>
                   </select>
                 </div>
-                <div className="form-group">
-                  <label>&nbsp;</label>
-                  <a href="#" className="Button" download="">
-                    <span className="download">
-                      <img src="images/download.png" alt="" />
-                    </span>
-                    Download CSV
-                  </a>
-                </div>
+                  <ExportToExcel ref={vechileRef} fileName="vechileTable" />
+              
               </div>
             </div>
-            <div className="TableList mt-4">
-              <table>
+            <div className="TableList mt-4" style={{ display: "none" }}>
+              <table ref={vechileRef}>
                 <thead>
                   <tr>
                     <th>S.No.</th>
@@ -203,15 +219,28 @@ const VechileTable = ({ categoryId, vehicleType }) => {
                     <th>Vehicle Added On</th>
                     <th>Service Type</th>
                     <th>Current Assigned Driver</th>
-                    <th>Assigned On</th>
-                    <th>Assigned By</th>
+                    <th>
+                      {allData?.result?.[0]?.paginationData?.[0]
+                        ?.vehicleType === "ILINE"
+                        ? "Assigned on"
+                        : "Approved on"}
+                    </th>
+                    <th>
+                      {allData?.result?.[0]?.paginationData?.[0]
+                        ?.vehicleType === "ILINE"
+                        ? "Assigned By"
+                        : "Approved By"}
+                    </th>
+
                     <th>Status</th>
                     {canPerformAction("Vehicle Management") && <th>Action</th>}
                   </tr>
                 </thead>
                 <tbody>
-                  {ilineOrP2pVechileList?.result?.[0]?.paginationData?.map(
+                  {allData?.result?.[0]?.paginationData?.map(
                     (res, i) => {
+                      console.log({ res });
+
                       return (
                         <tr key={res?._id}>
                           <td>{i + 1 + (page - 1) * 10}</td>
@@ -232,23 +261,137 @@ const VechileTable = ({ categoryId, vehicleType }) => {
                             })()}
                           </td>
 
+                          <td>{res?.driverData?.[0]?.fullName}</td>
                           <td>
-                            {
-                              ilineOrP2pVechileList?.result?.[0]
-                                ?.paginationData?.[0]?.driverData?.[0]?.fullName
-                            }
+                            {res?.vehicleType == "ILINE"
+                              ? moment(res?.assignOn).format("DD-MM-YYYY")
+                              : moment(res?.driverData?.[0]?.approvedOn).format(
+                                  "DD-MM-YYYY"
+                                )}
                           </td>
                           <td>
-                            {moment(
-                              ilineOrP2pVechileList?.result?.[0]?.paginationData?.[0]
-                                ?.assignOn
-                            ).format("DD-MM-YYYY")}
+                            {res?.vehicleType == "ILINE"
+                              ? res?.assignBy
+                              : res?.driverData?.[0]?.approvedBy}
                           </td>
                           <td>
-                            {
-                              ilineOrP2pVechileList?.result?.[0]
-                                ?.paginationData?.[0]?.assignBy
-                            }
+                            <span
+                              className={
+                                res?.status == "ACTIVE" ? "Green" : "Red"
+                              }
+                            >
+                              {res?.status == "ACTIVE" ? "Enabled" : "Disabled"}
+                            </span>
+                          </td>
+                          {canPerformAction("Vehicle Management") && (
+                            <td>
+                              <div className="Actions">
+                                <label className="Switch">
+                                  <input
+                                    type="checkbox"
+                                    name="status"
+                                    checked={res?.status == "ACTIVE"}
+                                    onChange={(e) => handleChecked(e, res?._id)}
+                                  />
+                                  <span className="slider" />
+                                </label>
+                                <a
+                                  className="Red"
+                                  onClick={() => {
+                                    setUpdateState({
+                                      ...iState,
+                                      deleteModal: true,
+                                      id: res?._id,
+                                    });
+                                  }}
+                                >
+                                  <i className="fa fa-trash" />
+                                </a>
+                                <Link
+                                  to="/vehicleManagement/details"
+                                  state={res}
+                                  className="Blue"
+                                >
+                                  <i
+                                    className="fa fa-info-circle"
+                                    aria-hidden="true"
+                                  />
+                                </Link>
+                              </div>
+                            </td>
+                          )}
+                        </tr>
+                      );
+                    }
+                  )}
+                </tbody>
+              </table>
+            </div>
+            <div className="TableList mt-4">
+              <table>
+                <thead>
+                  <tr>
+                    <th>S.No.</th>
+                    <th>Vehicle ID</th>
+                    <th>Vehicle No.</th>
+                    <th>Vehicle Type</th>
+                    <th>Vehicle Added On</th>
+                    <th>Service Type</th>
+                    <th>Current Assigned Driver</th>
+                    <th>
+                      {ilineOrP2pVechileList?.result?.[0]?.paginationData?.[0]
+                        ?.vehicleType === "ILINE"
+                        ? "Assigned on"
+                        : "Approved on"}
+                    </th>
+                    <th>
+                      {ilineOrP2pVechileList?.result?.[0]?.paginationData?.[0]
+                        ?.vehicleType === "ILINE"
+                        ? "Assigned By"
+                        : "Approved By"}
+                    </th>
+
+                    <th>Status</th>
+                    {canPerformAction("Vehicle Management") && <th>Action</th>}
+                  </tr>
+                </thead>
+                <tbody>
+                  {ilineOrP2pVechileList?.result?.[0]?.paginationData?.map(
+                    (res, i) => {
+                      console.log({ res });
+
+                      return (
+                        <tr key={res?._id}>
+                          <td>{i + 1 + (page - 1) * 10}</td>
+                          <td>{res?.vehicleNumber}</td>
+                          <td>{res?.vehicleNumberPlate}</td>
+
+                          <td>{res?.vehicleType}</td>
+                          <td>{moment(res?.createdAt).format("DD-MM-YYYY")}</td>
+                          <td>
+                            {(() => {
+                              const labels = [];
+                              if (res?.is_local) labels.push("Local");
+                              if (res?.is_express) labels.push("Express");
+                              if (res?.is_outstation) labels.push("Outstation");
+                              return labels.length > 0
+                                ? labels.join(", ")
+                                : "-";
+                            })()}
+                          </td>
+
+                          <td>{res?.driverData?.[0]?.fullName}</td>
+                          <td>
+                            {res?.vehicleType == "ILINE"
+                              ? moment(res?.assignOn).format("DD-MM-YYYY")
+                              : moment(res?.driverData?.[0]?.approvedOn).format(
+                                  "DD-MM-YYYY"
+                                )}
+                          </td>
+                          <td>
+                            {res?.vehicleType == "ILINE"
+                              ? res?.assignBy
+                              : res?.driverData?.[0]?.approvedBy}
                           </td>
                           <td>
                             <span
@@ -338,7 +481,7 @@ const VechileTable = ({ categoryId, vehicleType }) => {
         <DeleteModal
           handleClose={handleClose}
           handleDelete={handleDelete}
-          statement="vechile"
+          statement="vehicle"
         />
       )}
     </>

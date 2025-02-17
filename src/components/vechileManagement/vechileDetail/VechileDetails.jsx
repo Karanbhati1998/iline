@@ -10,6 +10,7 @@ const VechileDetails = () => {
     const handleShowVechileDetail=(data)=>{
         setShowVechileDetail(data)
     }
+    console.log({state});
     
   return (
     <div className="WrapperArea">

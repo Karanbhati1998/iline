@@ -59,7 +59,7 @@ const PersonalDetail = ({ state }) => {
                             : "0.00"}{" "}
                         </span>
                       </h3>
-                      <h4>User ID : #{state?.user_number}</h4>
+                      <h4>User ID : {state?.user_number}</h4>
                     </div>
                     {canPerformAction("User Management") && (
                       <div className="Actions">
@@ -82,7 +82,7 @@ const PersonalDetail = ({ state }) => {
                 <div className="RiderBody">
                   <aside>
                     <p>
-                      <label>User Id</label> <span> #{state?.user_number}</span>
+                      <label>User Id</label> <span> {state?.user_number}</span>
                     </p>
                     <p>
                       <label>City &amp; State</label>{" "}

@@ -4,6 +4,7 @@ const initialState = {
   VechileCategories: [],
   VechileFeatures: [],
   VechileOffers: [],
+  categoryListDropdown:[],
   loading: false,
   error: null,
 };
@@ -12,6 +13,20 @@ export const getVechileCategory = createAsyncThunk(
   async (payload, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get("/categoryList", {
+        params: payload,
+      });
+      return response.data;
+    } catch (error) {
+      console.log({ error });
+      rejectWithValue(error);
+    }
+  }
+);
+export const getCategoryListDropdown = createAsyncThunk(
+  "get/categoryListDropdown",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get("/categoryListDropdown", {
         params: payload,
       });
       return response.data;
@@ -199,6 +214,16 @@ const vechileCategorySlice = createSlice({
       state.VechileOffers = action.payload;
     });
     builder.addCase(getOffersList.rejected, (state, action) => {
+      state.loading = false;
+    });
+    builder.addCase(getCategoryListDropdown.pending, (state, action) => {
+      state.loading = true;
+    });
+    builder.addCase(getCategoryListDropdown.fulfilled, (state, action) => {
+      state.loading = false;
+      state.categoryListDropdown = action.payload;
+    });
+    builder.addCase(getCategoryListDropdown.rejected, (state, action) => {
       state.loading = false;
     });
   },

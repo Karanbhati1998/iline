@@ -7,13 +7,18 @@ import { useDispatch } from "react-redux";
 const initialState = {
   title: "",
   permission: [
+    // {
+    //   name: "Dashboard",
+    //   read: false,
+    //   fullAccess: false,
+    // },
     {
-      name: "Dashboard",
+      name: "User Management",
       read: false,
       fullAccess: false,
     },
     {
-      name: "User Management",
+      name: "Enterprise Management",
       read: false,
       fullAccess: false,
     },
@@ -53,12 +58,27 @@ const initialState = {
       fullAccess: false,
     },
     {
+      name: "Logistics Partner Management",
+      read: false,
+      fullAccess: false,
+    },
+    {
       name: "Banner Management",
       read: false,
       fullAccess: false,
     },
     {
       name: "Ad & Package Management",
+      read: false,
+      fullAccess: false,
+    },
+    {
+      name: "Charging Station",
+      read: false,
+      fullAccess: false,
+    },
+    {
+      name: "Online Booking View",
       read: false,
       fullAccess: false,
     },
@@ -74,6 +94,11 @@ const initialState = {
     },
     {
       name: "Content Management",
+      read: false,
+      fullAccess: false,
+    },
+    {
+      name: "Change Management",
       read: false,
       fullAccess: false,
     },

@@ -198,10 +198,18 @@ const VechileCategory = () => {
                     {VechileCategories?.result?.[0]?.paginationData?.map(
                       (res, i) => {
                         return (
-                          <tr>
+                          <tr key={i}>
                             <td>{i + 1 + (page - 1) * 10}</td>
                             <td>{res?.category_number}</td>
-                            <td>{res?.categoryName}</td>
+                            <td>
+                              <span
+                                style={{ color: "green", fontWeight: "bold" ,display:"inline",padding:"0px"}}
+                              >
+                                {res?.categoryName?.slice(0, 2)}
+                              </span>
+                              {res?.categoryName?.slice(2)}
+                            </td>
+
                             <td>
                               <img
                                 src={res?.uploadIcon}

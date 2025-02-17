@@ -28,7 +28,7 @@ const Detail_ride = () => {
               <li>
                 <h2>
                   Driver Details{" "}
-                  <span> #{state?.driverData?.driver_number}</span>
+                  <span> {state?.driverData?.driver_number}</span>
                 </h2>
                 <a href="driver-management-all-driver-details.html">
                   <span className="Icon">
@@ -39,13 +39,13 @@ const Detail_ride = () => {
                     <p>{state?.driverData?.phoneNumber}</p>
                   </span>
                   <span className="Count">
-                    ⭐ {state?.driverData?.avgRating}
+                    ⭐ {state?.driverData?.avgRating?.toFixed(2)}
                   </span>
                 </a>
               </li>
               <li>
                 <h2>
-                  Customer Details<span> #21335</span>
+                  Customer Details<span> {state?.userData?.user_number}</span>
                 </h2>
                 <a href="driver-management-all-driver-details.html">
                   <span className="Icon">
@@ -233,7 +233,7 @@ const Detail_ride = () => {
                     <aside>
                       <p>
                         <strong>Trip Charges</strong>
-                        <span> Rs {state?.tripCharge}</span>
+                        <span> Rs {state?.tripCharge?.toFixed(2)}</span>
                       </p>
                       <p>
                         <strong>Loading/Unloading Charges</strong>
@@ -248,7 +248,7 @@ const Detail_ride = () => {
                       {" "}
                       <p>
                         <strong>GST (5%)</strong>
-                        <span> Rs {state?.gstCharge}</span>
+                        <span> Rs {state?.gstCharge?.toFixed(2)}</span>
                       </p>
                       {/* <p>
                         <strong>Coupon Discount</strong>
@@ -258,7 +258,7 @@ const Detail_ride = () => {
                   </article>
                 </div>
               </div>
-              <h3>Total Amount to Pay: Rs {state?.withoutGst}</h3>
+              <h3>Total Amount to Pay: Rs {state?.tripCharge?.toFixed(2)}</h3>
             </div>
             {/* <div className="InformationBox mt-4">
               <h3>Documents</h3>

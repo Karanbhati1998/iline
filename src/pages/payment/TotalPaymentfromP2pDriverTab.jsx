@@ -1,4 +1,4 @@
-import React from 'react'
+import React from "react";
 
 const TotalPaymentfromP2pDriverTab = () => {
   return (
@@ -87,15 +87,15 @@ const TotalPaymentfromP2pDriverTab = () => {
                     </a>
                   </td>
                   <td>
-                    <a href="">D-101</a>
+                    <a>D-101</a>
                   </td>
                   <td>Kanha </td>
                   <td>
-                    <a href="">202</a>
+                    <a>202</a>
                   </td>
                   <td>Kanha</td>
                   <td>
-                    <a href="">v-1</a>
+                    <a>v-1</a>
                   </td>
                   <td>Delhi</td>
                   <td>Noida</td>
@@ -293,6 +293,6 @@ const TotalPaymentfromP2pDriverTab = () => {
       </div>
     </>
   );
-}
+};
 
-export default TotalPaymentfromP2pDriverTab
+export default TotalPaymentfromP2pDriverTab;

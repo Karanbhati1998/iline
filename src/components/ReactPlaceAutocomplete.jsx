@@ -9,31 +9,34 @@ const ReactPlaceAutocomplete = ({ setUpdateState, address }) => {
   const handleChangeAddress = (newAddress) => {
     setUpdateState((prev) => ({
       ...prev,
-      location: newAddress,
+      location: {
+        ...prev.location,
+        address: newAddress,
+      },
     }));
   };
- const handleSelectAddress = (newAddress) => {
-   geocodeByAddress(newAddress)
-     .then((results) => getLatLng(results[0])) // Extract lat/lng
-     .then((latLng) => {
-       console.log("Success", latLng); // Debugging purpose
 
-       // Update state with address and coordinates
-       setUpdateState((prev) => ({
-         ...prev,
-         location: {
-           address: newAddress,
-           lat: latLng.lat,
-           long: latLng.lng,
-         },
-       }));
-     })
-     .catch((error) => console.error("Error", error));
- };
- 
+  const handleSelectAddress = (newAddress) => {
+    geocodeByAddress(newAddress)
+      .then((results) => getLatLng(results[0])) 
+      .then((latLng) => {
+        console.log("Success", latLng); 
+
+        setUpdateState((prev) => ({
+          ...prev,
+          location: {
+            address: newAddress,
+            lat: latLng.lat,
+            long: latLng.lng,
+          },
+        }));
+      })
+      .catch((error) => console.error("Error", error));
+  };
+
   return (
     <PlacesAutocomplete
-      value={address}
+      value={address || ""}
       onChange={handleChangeAddress}
       onSelect={handleSelectAddress}
     >

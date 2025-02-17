@@ -8,8 +8,11 @@ import {
   pendingVehicleStatus,
 } from "../../../features/slices/vechileManagement/vechileManagement";
 import DisApprovedModal from "./DisApprovedModal";
+import ZoomEffect from "../../ZoomEffect";
 
-const PendingForApproval = ({ handleClose, data }) => {
+const PendingForApproval = ({ handleClose, data, handleViewImageFunc }) => {
+  const [imageModal, setImageModal] = useState(false);
+  const [image, setImage] = useState("");
   const [approvalState, setApprovalState] = useState({
     approveRcCheck: false,
     disApproveRcCheck: false,
@@ -46,7 +49,7 @@ const PendingForApproval = ({ handleClose, data }) => {
       !approvalState.approveInsuranceCheck &&
       !approvalState.disApproveInsuranceCheck
     ) {
-      isValid = false; // Mark as invalid if the condition is not met.
+      isValid = false; 
       errorObj.insurenceError =
         "Please select one of the Insurance check options.";
     }
@@ -55,38 +58,43 @@ const PendingForApproval = ({ handleClose, data }) => {
     return isValid;
   };
 
-  const handleCheckboxChange = (e, type) => {
+  const handleCheckboxChange = (e, oppositeType) => {
     const { name, checked } = e.target;
-    console.log("name:", name, checked);
-
     setApprovalState((prevState) => ({
       ...prevState,
       [name]: checked,
+      [oppositeType]: false, 
     }));
-    if (checked) {
-      setApprovalState((prevState) => ({
-        ...prevState,
-        [type]: !checked,
-      }));
-    }
   };
-  useEffect(() => {
-    if (approveRcCheck && approveInsuranceCheck) {
-      setDisableBtn({
-        isApproveButtonDisabled: false,
-        isDisapproveButtonDisabled: true,
-      });
-    } else if (disApproveRcCheck && disApproveInsuranceCheck) {
-      setDisableBtn({
-        isApproveButtonDisabled: true,
-        isDisapproveButtonDisabled: false,
-      });
-    }
-  }, []);
+
+ useEffect(() => {
+   if (approveRcCheck && approveInsuranceCheck) {
+     setDisableBtn({
+       isApproveButtonDisabled: false,
+       isDisapproveButtonDisabled: true,
+     });
+   } else if (disApproveRcCheck && disApproveInsuranceCheck) {
+     setDisableBtn({
+       isApproveButtonDisabled: true,
+       isDisapproveButtonDisabled: false,
+     });
+   } else {
+     setDisableBtn({
+       isApproveButtonDisabled: true,
+       isDisapproveButtonDisabled: false,
+     });
+   }
+ }, [
+   approveRcCheck,
+   approveInsuranceCheck,
+   disApproveRcCheck,
+   disApproveInsuranceCheck,
+ ]);
+
 
   const handleApprove = () => {
     if (handleValidation()) {
-      console.log("Appro ruen");
+      console.log("Appro rue");
       dispatch(
         pendingVehicleStatus({
           id: data?._id,
@@ -112,6 +120,13 @@ const PendingForApproval = ({ handleClose, data }) => {
   const handleDisapproveModalClose = () => {
     setShowModal(false);
   };
+  const handleViewImage = (image) => {
+    handleViewImageFunc(image);
+  };
+  // const handleCloseImageModal = () => {
+  //   setImageModal(false);
+  //   setImage("");
+  // };
   return (
     <>
       <div className="modal-open">
@@ -142,12 +157,8 @@ const PendingForApproval = ({ handleClose, data }) => {
                     <div className="RequestBox">
                       <div className="form-group">
                         <p>
-                          <strong>Request ID </strong>
-                          <span> #-</span>
-                        </p>
-                        <p>
                           <strong>Driver ID </strong>
-                          <span>#{data?.driverData?.driver_number}</span>
+                          <span>{data?.driverData?.driver_number}</span>
                         </p>
                         <p>
                           <strong>Driver Name </strong>
@@ -163,7 +174,7 @@ const PendingForApproval = ({ handleClose, data }) => {
                         </p>
                         <p>
                           <strong>Created By </strong>
-                          <span>- </span>
+                          <span>{data?.driverData?.fullName} </span>
                         </p>
                       </div>
                       <div className="form-group">
@@ -200,10 +211,25 @@ const PendingForApproval = ({ handleClose, data }) => {
                                     <ul>
                                       <li>
                                         <span>Document</span>
-                                        <figure className="mb-3">
+                                        <figure
+                                          className="mb-3"
+                                          style={{
+                                            cursor: "pointer",
+                                          }}
+                                          onClick={() =>
+                                            handleViewImage(data?.rcFront)
+                                          }
+                                        >
                                           <img src={data?.rcFront} />
                                         </figure>
-                                        <figure>
+                                        <figure
+                                          style={{
+                                            cursor: "pointer",
+                                          }}
+                                          onClick={() =>
+                                            handleViewImage(data?.rcBack)
+                                          }
+                                        >
                                           <img src={data?.rcBack} />
                                         </figure>
                                       </li>
@@ -273,10 +299,28 @@ const PendingForApproval = ({ handleClose, data }) => {
                                     <ul>
                                       <li>
                                         <span>Document</span>
-                                        <figure className="mb-3">
+                                        <figure
+                                          className="mb-3"
+                                          style={{
+                                            cursor: "pointer",
+                                          }}
+                                          onClick={() =>
+                                            handleViewImage(
+                                              data?.insurenceFront
+                                            )
+                                          }
+                                        >
                                           <img src={data?.insurenceFront} />
                                         </figure>
-                                        <figure className="mb-3">
+                                        <figure
+                                          className="mb-3"
+                                          style={{
+                                            cursor: "pointer",
+                                          }}
+                                          onClick={() =>
+                                            handleViewImage(data?.insurenceBack)
+                                          }
+                                        >
                                           <img src={data?.insurenceBack} />
                                         </figure>
                                       </li>
@@ -360,6 +404,9 @@ const PendingForApproval = ({ handleClose, data }) => {
           handleMainModalClose={handleClose}
         />
       )}
+      {/* {imageModal && (
+        <ZoomEffect image={image} handleClose={handleCloseImageModal} />
+      )} */}
     </>
   );
 };

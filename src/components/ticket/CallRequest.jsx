@@ -186,7 +186,7 @@ const CallRequest = () => {
                           <td>{i + 1 + (page - 1) * 10}</td>
                           <td>{res?.request_number}</td>
                           <td>{res?.userId}</td>
-                          <td>-</td>
+                          <td>{res?.userType}</td>
                           <td>{res?.userData?.fullName}</td>
                           <td>{res?.phoneNumber}</td>
                           <td>{moment(res?.createdAt).format("DD-MM-YYYY")}</td>

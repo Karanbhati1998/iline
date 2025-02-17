@@ -5,6 +5,8 @@ import { useLocation } from "react-router-dom";
 import BackButton from "../../../../BackButton";
 import moment from "moment";
 import CommonPagination from "../../../../CommonPagination";
+import { deleteVehicleHistory } from "../../../../../features/slices/vechileManagement/vechileManagement";
+import { toastService } from "../../../../../utils/toastify";
 const initialState = {
   page: 1,
   search: "",
@@ -98,6 +100,21 @@ const AssignedVichelHistory = () => {
       driverId: state?._id,
     };
     dispatch(fetchDriverVehicleHistory(data));
+  };
+  const deleteVechileHistory = (id) => {
+    dispatch(deleteVehicleHistory(id)).then((res) => {
+      if (res?.payload?.code === 200) {
+        toastService.success("Vehicle History deleted successfully");
+        dispatch(
+          fetchDriverVehicleHistory({
+            page,
+            driverId: state?._id,
+          })
+        );
+      } else {
+        toastService.error("Failed to delete Vehicle History");
+      }
+    });
   };
   return (
     <div className="WrapperArea">
@@ -200,9 +217,9 @@ const AssignedVichelHistory = () => {
                     <th>Total Bookings</th>
                     <th>Assigned On</th>
                     <th>Local Delivery</th>
-                    <th>Out Station</th>
+                    {/* <th>Out Station</th>
                     <th>Express Delivery</th>
-                    <th>Action</th>
+                    <th>Action</th> */}
                     <th>Assigned By</th>
                   </tr>
                 </thead>
@@ -223,13 +240,16 @@ const AssignedVichelHistory = () => {
                               "DD-MM-YYYY"
                             )}
                           </td>
+                          {/* <td>-</td>
                           <td>-</td>
-                          <td>-</td>
-                          <td>-</td>
+                          <td>-</td> */}
                           <td>
                             {" "}
                             <div className="Actions">
-                              <a className="Red" href="">
+                              <a
+                                className="Red"
+                                onClick={() => deleteVechileHistory(res?._id)}
+                              >
                                 <i className="fa fa-trash" aria-hidden="true" />
                               </a>
                             </div>
@@ -250,7 +270,6 @@ const AssignedVichelHistory = () => {
                       );
                     }
                   )}
-                
                 </tbody>
               </table>
             </div>

@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  getAllPendingVehicleList,
   getIlineOrP2pVechileList,
   getPendingVehicleList,
   pendingVehicleStatus,
@@ -14,6 +15,8 @@ import DisApprovedModal from "./DisApprovedModal";
 import PendingForApproval from "./PendingForApproval";
 import { Link } from "react-router-dom";
 import { canPerformAction } from "../../../utils/deniedAccess";
+import ZoomEffect from "../../ZoomEffect";
+import ExportToExcel from "../../ExportToExcel";
 const initialState = {
   page: 1,
   search: "",
@@ -26,8 +29,10 @@ const initialState = {
   DISAPPROVED: false,
   data: {},
 };
-const PendingVechileTable = () => {
+const PendingVechileTable = ({ categoryId }) => {
   const [iState, setUpdateState] = useState(initialState);
+    const [imageModal, setImageModal] = useState(false);
+    const [image, setImage] = useState("");
   const {
     page,
     search,
@@ -41,12 +46,32 @@ const PendingVechileTable = () => {
     data,
   } = iState;
   const dispatch = useDispatch();
+   const pendingRef = useRef();
+    const [allData, setAllData] = useState([]);
+      useEffect(() => {
+        const data = {
+          search,
+          fromDate,
+          toDate,
+          timeframe,
+          limit: 999999,
+          categoryId,
+        };
+        dispatch(getAllPendingVehicleList(data)).then((res) => {
+          if (res?.payload?.code == 200) {
+            console.log({ res });
+            setAllData(res?.payload);
+          }
+        });
+      }, [timeframe, page, toDate, search, fromDate]);
+   
   const { PendingVechileList } = useSelector((state) => {
     return state?.vechile;
   });
   useEffect(() => {
     dispatch(
       getPendingVehicleList({
+        categoryId,
         page,
         timeframe,
       })
@@ -56,6 +81,7 @@ const PendingVechileTable = () => {
     const delayDebounceFunc = setTimeout(() => {
       dispatch(
         getPendingVehicleList({
+          categoryId,
           search: search.trim(),
           timeframe,
         })
@@ -67,7 +93,7 @@ const PendingVechileTable = () => {
 
   const handlePageChange = (page) => {
     setUpdateState({ ...iState, page });
-    dispatch(getPendingVehicleList({ page }));
+    dispatch(getPendingVehicleList({ page, categoryId }));
   };
   const handleChecked = (e, id) => {
     const { name, checked } = e?.target;
@@ -77,7 +103,7 @@ const PendingVechileTable = () => {
       console.log("status update api", res);
       if (res?.payload?.code == 200) {
         toastService.success("Status updated successfully");
-        dispatch(getPendingVehicleList({ page }));
+        dispatch(getPendingVehicleList({ page, categoryId }));
       } else {
         toastService.error("status update failed");
       }
@@ -88,13 +114,14 @@ const PendingVechileTable = () => {
   };
   const handleReset = () => {
     setUpdateState(initialState);
-    dispatch(getPendingVehicleList({ page: 1 }));
+    dispatch(getPendingVehicleList({ page: 1, categoryId }));
   };
   const handleApply = () => {
     const data = {
       search,
       fromDate,
       toDate,
+      categoryId,
       page,
     };
     dispatch(getPendingVehicleList(data));
@@ -108,6 +135,7 @@ const PendingVechileTable = () => {
       DISAPPROVED: false,
     }));
   };
+
   const handleShowModal = (val, res) => {
     setUpdateState((prev) => ({
       ...prev,
@@ -122,13 +150,25 @@ const PendingVechileTable = () => {
       if (res?.payload?.code == 200) {
         toastService.success("Delete successfully");
         setUpdateState({ ...iState, deleteModal: false, id: "" });
-        dispatch(getPendingVehicleList());
+        dispatch(getPendingVehicleList({ page, categoryId }));
       } else {
         toastService.error("Delete failed");
       }
     });
   };
-
+const handleViewImage = (image) => {
+  setImage(image);
+  setImageModal(true);
+  handleClose()
+};
+const handleCloseImageModal = () => {
+  setImageModal(false);
+  setImage("");
+   setUpdateState((prev) => ({
+     ...prev,
+     PENDING: true,
+   }));
+};
   return (
     <>
       <div className="tab-pane fade active show">
@@ -204,16 +244,113 @@ const PendingVechileTable = () => {
                   <option>Freight-Truck</option>
                 </select>
               </div>
-              <div className="form-group">
-                <label>&nbsp;</label>
-                <a href="#" className="Button" download="">
-                  <span className="download">
-                    <img src="images/download.png" alt="" />
-                  </span>
-                  Download CSV
-                </a>
-              </div>
+              <ExportToExcel ref={pendingRef} fileName="pendingVechile" />
             </div>
+          </div>
+          <div className="TableList mt-4" style={{ display: "none" }}>
+            <table ref={pendingRef}>
+              <thead>
+                <tr>
+                  <th>S.No.</th>
+                  <th>Vehicle ID</th>
+                  <th>Vehicle No. </th>
+                  <th>Vehicle Type</th>
+                  <th>Vehicle Added On</th>
+                  <th>Service Type</th>
+                  <th>Driver Name</th>
+                  <th>Driver Approval Status</th>
+                  <th>View Vehicle Details</th>
+                  {canPerformAction("Vehicle Management") && <th>Action</th>}
+                </tr>
+              </thead>
+              <tbody>
+                {allData?.result?.[0]?.paginationData?.map((res, i) => {
+                  return (
+                    <tr>
+                      <td>{i + 1 + (page - 1) * 10}</td>
+                      <td>{res?.vehicleNumber}</td>
+                      <td>{res?.vehicleNumberPlate}</td>
+
+                      <td>{res?.vehicleType}</td>
+                      <td>{moment(res?.createdAt).format("DD-MM-YYYY")}</td>
+                      <td>
+                        {(() => {
+                          const labels = [];
+                          if (res?.is_local) labels.push("Local");
+                          if (res?.is_express) labels.push("Express");
+                          if (res?.is_outstation) labels.push("Outstation");
+                          return labels.length > 0 ? labels.join(", ") : "-";
+                        })()}
+                      </td>
+                      <td>{res?.driverData?.fullName}</td>
+                      <td>
+                        <span
+                          className={
+                            res?.approvedStatus == "PENDING"
+                              ? "Red"
+                              : res?.approvedStatus !== "Disapproved"
+                              ? "Green"
+                              : "Blue"
+                          }
+                          // onClick={() =>
+                          //   handleShowModal(res?.approvedStatus, res)
+                          // }
+                          // disabled={res?.approvedStatus == "APPROVED"}
+                        >
+                          {res?.approvedStatus}
+                        </span>{" "}
+                      </td>
+                      <td>
+                        <div className="Actions">
+                          <Link
+                            to="/vehicleManagement/details"
+                            state={res}
+                            className="Blue"
+                          >
+                            <i
+                              className="fa fa-info-circle"
+                              aria-hidden="true"
+                            />
+                          </Link>
+                        </div>
+                      </td>
+                      {canPerformAction("Vehicle Management") && (
+                        <td>
+                          <div className="Actions">
+                            <a
+                              className="Red"
+                              onClick={() =>
+                                setUpdateState((prev) => ({
+                                  ...prev,
+                                  id: res?._id,
+                                  deleteModal: true,
+                                }))
+                              }
+                            >
+                              <i
+                                className="fa fa-times-circle"
+                                aria-hidden="true"
+                              />
+                            </a>
+                            <a
+                              className="Green"
+                              onClick={() =>
+                                handleShowModal(res?.approvedStatus, res)
+                              }
+                            >
+                              <i
+                                className="fa fa-check-circle"
+                                aria-hidden="true"
+                              />
+                            </a>
+                          </div>
+                        </td>
+                      )}
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
           <div className="TableList mt-4">
             <table>
@@ -283,39 +420,38 @@ const PendingVechileTable = () => {
                             </Link>
                           </div>
                         </td>
-                        {
-                          canPerformAction("Vehicle Management") &&
-                        <td>
-                          <div className="Actions">
-                            <a
-                              className="Red"
-                              onClick={() =>
-                                setUpdateState((prev) => ({
-                                  ...prev,
-                                  id: res?._id,
-                                  deleteModal: true,
-                                }))
-                              }
-                            >
-                              <i
-                                className="fa fa-times-circle"
-                                aria-hidden="true"
-                              />
-                            </a>
-                            <a
-                              className="Green"
-                              onClick={() =>
-                                handleShowModal(res?.approvedStatus, res)
-                              }
-                            >
-                              <i
-                                className="fa fa-check-circle"
-                                aria-hidden="true"
-                              />
-                            </a>
-                          </div>
-                        </td>
-                        }
+                        {canPerformAction("Vehicle Management") && (
+                          <td>
+                            <div className="Actions">
+                              <a
+                                className="Red"
+                                onClick={() =>
+                                  setUpdateState((prev) => ({
+                                    ...prev,
+                                    id: res?._id,
+                                    deleteModal: true,
+                                  }))
+                                }
+                              >
+                                <i
+                                  className="fa fa-times-circle"
+                                  aria-hidden="true"
+                                />
+                              </a>
+                              <a
+                                className="Green"
+                                onClick={() =>
+                                  handleShowModal(res?.approvedStatus, res)
+                                }
+                              >
+                                <i
+                                  className="fa fa-check-circle"
+                                  aria-hidden="true"
+                                />
+                              </a>
+                            </div>
+                          </td>
+                        )}
                       </tr>
                     );
                   }
@@ -355,11 +491,20 @@ const PendingVechileTable = () => {
         <DeleteModal
           handleClose={handleClose}
           handleDelete={handleDelete}
-          statement="vechile"
+          statement="vehicle"
         />
       )}
       {DISAPPROVED && <DisApprovedModal handleClose={handleClose} id={id} />}
-      {PENDING && <PendingForApproval handleClose={handleClose} data={data} />}
+      {PENDING && (
+        <PendingForApproval
+          handleClose={handleClose}
+          data={data}
+          handleViewImageFunc={handleViewImage}
+        />
+      )}
+      {imageModal && (
+        <ZoomEffect image={image} handleClose={handleCloseImageModal} />
+      )}
     </>
   );
 };

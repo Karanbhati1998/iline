@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import BookingManagementComponent from "../BookingManagementComponent";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -7,6 +7,7 @@ import {
 } from "../../../features/slices/bookingManagementSlice";
 import { Link, useLocation } from "react-router-dom";
 import CommonPagination from "../../CommonPagination";
+import ExportToExcel from "../../ExportToExcel";
 const initialState = {
   page: 1,
   search: "",
@@ -25,6 +26,7 @@ const Completed = ({ categoryId }) => {
   const { completedBookingList } = useSelector((state) => {
     return state.bookingManagement;
   });
+     const userRef = useRef();
   const [allData, setAllData] = useState([]);
   useEffect(() => {
     const data = {
@@ -33,6 +35,7 @@ const Completed = ({ categoryId }) => {
       toDate,
       timeframe,
       limit: 999999,
+      categoryId: state,
     };
     dispatch(getAllCompletedBookingList(data)).then((res) => {
       if (res?.payload?.code == 200) {
@@ -40,7 +43,7 @@ const Completed = ({ categoryId }) => {
         setAllData(res?.payload);
       }
     });
-  }, [timeframe, page, toDate, search, fromDate]);
+  }, [timeframe, page, toDate, search, fromDate, categoryId]);
 
   useEffect(() => {
     if (categoryId) {
@@ -153,16 +156,72 @@ const Completed = ({ categoryId }) => {
           </div>
         </div>
         <div className="FilterRight">
-          <div className="form-group">
-            <label>&nbsp;</label>
-            <a href="#" className="Button" download="">
-              <span className="download">
-                <img src="images/download.png" alt="" />
-              </span>
-              Download CSV
-            </a>
-          </div>
+          <ExportToExcel ref={userRef} fileName="completeBooking" />
         </div>
+      </div>
+      <div className="TableList mt-4" style={{ display: "none" }}>
+        <table style={{ width: "150%" }} ref={userRef}>
+          <thead>
+            <tr>
+              <th>S.No.</th>
+              <th>Booking ID</th>
+              <th>Driver ID </th>
+              <th>Driver Name</th>
+              <th>Customer ID</th>
+              <th>Customer Name</th>
+              <th>Vehicle ID</th>
+              <th>Pickup Location</th>
+              <th>Drop off Location</th>
+              <th>Total fare (in Rs)</th>
+              <th>Service Type</th>
+              <th>Booking Date &amp; Time</th>
+              <th>Payment Mode</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {allData?.result?.[0]?.paginationData?.map((res, i) => {
+              return (
+                <tr key={i}>
+                  <td>{i + 1 + (page - 1) * 10}</td>
+                  <td>
+                    <a className="Blue">{res?.trip_number}</a>
+                  </td>
+                  <td>
+                    <a>{res?.driverData?.driver_number}</a>
+                  </td>
+                  <td>{res?.driverData?.fullName} </td>
+                  <td>
+                    <a>{res?.userData?.user_number}</a>
+                  </td>
+                  <td>{res?.userData?.fullName}</td>
+                  <td>
+                    <a>{res?.vehicleData?.vehicleNumber}</a>
+                  </td>
+                  <td>{res?.pickUpLocationName}</td>
+                  <td>{res?.dropOffLocationName}</td>
+                  <td>{res?.tripCharge}</td>
+                  <td>{res?.rideType}</td>
+                  <td>
+                    {res?.scheduledDate} &amp; {res?.scheduledTime}{" "}
+                  </td>
+                  <td>{res?.paymentMode}</td>
+
+                  <td>
+                    <div className="Actions">
+                      <Link to="completedetail" className="Blue" state={res}>
+                        <i className="fa fa-info-circle" aria-hidden="true" />
+                      </Link>
+                      <span className="Orange">
+                        <Link to="track">View Track Status</Link>
+                      </span>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
       </div>
       <div className="TableList mt-4">
         <table style={{ width: "150%" }}>

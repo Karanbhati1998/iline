@@ -9,6 +9,7 @@ import {
   getIlineOrP2pVechileList,
 } from "../../features/slices/vechileManagement/vechileManagement";
 import { useNavigate } from "react-router-dom";
+import BackButton from "../BackButton";
 
 const initialState = {
   categoryId: "",
@@ -75,8 +76,8 @@ const AddVechile = () => {
   } = iState;
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  console.log({navigate});
-  
+  console.log({ navigate });
+
   const { VechileCategories } = useSelector((state) => {
     return state?.vechileCategory;
   });
@@ -106,7 +107,7 @@ const AddVechile = () => {
 
   const uploadImage = (e) => {
     const { name } = e.target;
-    updateImageLoader((prev) => ({...prev, [name]: true }));
+    updateImageLoader((prev) => ({ ...prev, [name]: true }));
     setUpdateState((prev) => ({
       ...prev,
       errors: {
@@ -125,14 +126,14 @@ const AddVechile = () => {
             ...prev,
             [name]: res?.payload?.url,
           }));
-          updateImageLoader((prev) => ({...prev, [name]: false }));
+          updateImageLoader((prev) => ({ ...prev, [name]: false }));
         } else {
           toastService.error("Image upload failed");
           setUpdateState((prev) => ({
             ...prev,
             [name]: "",
           }));
-          updateImageLoader((prev) => ({...prev, [name]: false }));
+          updateImageLoader((prev) => ({ ...prev, [name]: false }));
         }
       });
     } else {
@@ -222,7 +223,6 @@ const AddVechile = () => {
       formErrors.insurenceNumber = "insurence number  is required";
       isValid = false;
     }
-   
 
     setUpdateState((prev) => ({
       ...prev,
@@ -259,7 +259,7 @@ const AddVechile = () => {
         loading: true,
       }));
       console.log("succes submit");
-      
+
       dispatch(addVechile(data)).then((res) => {
         if (res?.payload?.code === 200) {
           toastService.success("Vechile added successfully");
@@ -290,9 +290,8 @@ const AddVechile = () => {
         <div className="TitleBox">
           <h4 className="Title">Add New Vehicle</h4>
           <div className="TitleLink">
-            <a className="TitleLink" href="vehicle-management.html">
-              <i className="fa fa-arrow-left" aria-hidden="true" />
-              Back
+            <a className="TitleLink">
+              <BackButton />
             </a>
           </div>
         </div>
@@ -399,7 +398,6 @@ const AddVechile = () => {
                       <div className="Upload">
                         <i className="fa fa-upload" /> <span>Upload Icon</span>
                         <input
-                          id="inputimage1"
                           type="file"
                           name="vehicleFrontImage"
                           onChange={uploadImage}
@@ -447,6 +445,14 @@ const AddVechile = () => {
                       />
                     </figure>
                   )}
+                  <input
+                    id="inputimage1"
+                    type="file"
+                    name="vehicleFrontImage"
+                    onChange={uploadImage}
+                    accept=".jpg,.png,.jpeg"
+                    style={{ display: "none" }} // Hide input, but keep it accessible for click events
+                  />
                   {errors.vehicleFrontImage && (
                     <p className="d-flex justify-content-start text-danger mt-2 error">
                       {errors.vehicleFrontImage}
@@ -462,7 +468,6 @@ const AddVechile = () => {
                       <div className="Upload">
                         <i className="fa fa-upload" /> <span>Upload Icon</span>
                         <input
-                          id="inputimage2"
                           type="file"
                           name="vehicleLeftImage"
                           onChange={uploadImage}
@@ -510,6 +515,14 @@ const AddVechile = () => {
                       />
                     </figure>
                   )}
+                  <input
+                    id="inputimage2"
+                    type="file"
+                    name="vehicleLeftImage"
+                    onChange={uploadImage}
+                    accept=".jpg,.png,.jpeg"
+                    style={{ display: "none" }} // Hide input, but keep it accessible for click events
+                  />
                   {errors.vehicleLeftImage && (
                     <p className="d-flex justify-content-start text-danger mt-2 error">
                       {errors.vehicleLeftImage}
@@ -525,7 +538,6 @@ const AddVechile = () => {
                       <div className="Upload">
                         <i className="fa fa-upload" /> <span>Upload Icon</span>
                         <input
-                          id="inputimage3"
                           type="file"
                           name="vehicleInsideImage"
                           onChange={uploadImage}
@@ -573,6 +585,14 @@ const AddVechile = () => {
                       />
                     </figure>
                   )}
+                  <input
+                    id="inputimage3"
+                    type="file"
+                    name="vehicleInsideImage"
+                    onChange={uploadImage}
+                    accept=".jpg,.png,.jpeg"
+                    style={{ display: "none" }} // Hide input, but keep it accessible for click events
+                  />
                   {errors.vehicleInsideImage && (
                     <p className="d-flex justify-content-start text-danger mt-2 error">
                       {errors.vehicleInsideImage}
@@ -642,7 +662,6 @@ const AddVechile = () => {
                       <div className="Upload">
                         <i className="fa fa-upload" /> <span>Upload Icon</span>
                         <input
-                          id="inputimage4"
                           type="file"
                           name="vehicleBackImage"
                           onChange={uploadImage}
@@ -690,6 +709,14 @@ const AddVechile = () => {
                       />
                     </figure>
                   )}
+                  <input
+                    id="inputimage4"
+                    type="file"
+                    name="vehicleBackImage"
+                    onChange={uploadImage}
+                    accept=".jpg,.png,.jpeg"
+                    style={{ display: "none" }} // Hide input, but keep it accessible for click events
+                  />
                   {errors.vehicleBackImage && (
                     <p className="d-flex justify-content-start text-danger mt-2 error">
                       {errors.vehicleBackImage}
@@ -706,7 +733,6 @@ const AddVechile = () => {
                       <div className="Upload">
                         <i className="fa fa-upload" /> <span>Upload Icon</span>
                         <input
-                          id="inputimage5"
                           type="file"
                           name="vehicleRightImage"
                           onChange={uploadImage}
@@ -754,6 +780,14 @@ const AddVechile = () => {
                       />
                     </figure>
                   )}
+                  <input
+                    id="inputimage5"
+                    type="file"
+                    name="vehicleRightImage"
+                    onChange={uploadImage}
+                    accept=".jpg,.png,.jpeg"
+                    style={{ display: "none" }} // Hide input, but keep it accessible for click events
+                  />
                   {errors.vehicleRightImage && (
                     <p className="d-flex justify-content-start text-danger mt-2 error">
                       {errors.vehicleRightImage}
@@ -769,7 +803,6 @@ const AddVechile = () => {
                       <div className="Upload">
                         <i className="fa fa-upload" /> <span>Upload Icon</span>
                         <input
-                          id="inputimage6"
                           type="file"
                           name="vehicleOverallImage"
                           onChange={uploadImage}
@@ -817,6 +850,14 @@ const AddVechile = () => {
                       />
                     </figure>
                   )}
+                  <input
+                    id="inputimage6"
+                    type="file"
+                    name="vehicleOverallImage"
+                    onChange={uploadImage}
+                    accept=".jpg,.png,.jpeg"
+                    style={{ display: "none" }} // Hide input, but keep it accessible for click events
+                  />
                   {errors.vehicleOverallImage && (
                     <p className="d-flex justify-content-start text-danger mt-2 error">
                       {errors.vehicleOverallImage}
@@ -883,7 +924,6 @@ const AddVechile = () => {
                                   <i className="fa fa-upload" />{" "}
                                   <span>Upload Icon</span>
                                   <input
-                                    id="inputimage7"
                                     type="file"
                                     name="rcFront"
                                     onChange={uploadImage}
@@ -931,6 +971,14 @@ const AddVechile = () => {
                                 />
                               </figure>
                             )}
+                            <input
+                              id="inputimage7"
+                              type="file"
+                              name="rcFront"
+                              onChange={uploadImage}
+                              accept=".jpg,.png,.jpeg"
+                              style={{ display: "none" }} // Hide input, but keep it accessible for click events
+                            />
                             {errors.rcFront && (
                               <p className="d-flex justify-content-start text-danger mt-2 error">
                                 {errors.rcFront}
@@ -949,7 +997,6 @@ const AddVechile = () => {
                                   <i className="fa fa-upload" />{" "}
                                   <span>Upload Icon</span>
                                   <input
-                                    id="inputimage8"
                                     type="file"
                                     name="rcBack"
                                     onChange={uploadImage}
@@ -997,6 +1044,14 @@ const AddVechile = () => {
                                 />
                               </figure>
                             )}
+                            <input
+                              id="inputimage8"
+                              type="file"
+                              name="rcBack"
+                              onChange={uploadImage}
+                              accept=".jpg,.png,.jpeg"
+                              style={{ display: "none" }}
+                            />
                             {errors.rcBack && (
                               <p className="d-flex justify-content-start text-danger mt-2 error">
                                 {errors.rcBack}
@@ -1061,7 +1116,6 @@ const AddVechile = () => {
                                   <i className="fa fa-upload" />{" "}
                                   <span>Upload Icon</span>
                                   <input
-                                    id="inputimage9"
                                     type="file"
                                     name="insurenceFront"
                                     onChange={uploadImage}
@@ -1109,6 +1163,14 @@ const AddVechile = () => {
                                 />
                               </figure>
                             )}
+                            <input
+                              id="inputimage9"
+                              type="file"
+                              name="insurenceFront"
+                              onChange={uploadImage}
+                              accept=".jpg,.png,.jpeg"
+                              style={{ display: "none" }}
+                            />
                             {errors.insurenceFront && (
                               <p className="d-flex justify-content-start text-danger mt-2 error">
                                 {errors.insurenceFront}
@@ -1125,7 +1187,6 @@ const AddVechile = () => {
                                   <i className="fa fa-upload" />{" "}
                                   <span>Upload Icon</span>
                                   <input
-                                    id="inputimage10"
                                     type="file"
                                     name="insurenceBack"
                                     onChange={uploadImage}
@@ -1175,6 +1236,14 @@ const AddVechile = () => {
                                 />
                               </figure>
                             )}
+                            <input
+                              id="inputimage10"
+                              type="file"
+                              name="insurenceBack"
+                              onChange={uploadImage}
+                              accept=".jpg,.png,.jpeg"
+                              style={{ display: "none" }}
+                            />
                             {errors.insurenceBack && (
                               <p className="d-flex justify-content-start text-danger mt-2 error">
                                 {errors.insurenceBack}

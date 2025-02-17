@@ -146,17 +146,7 @@ const DisApprovedList = () => {
                 </button>
               </div>
             </div>
-            <div className="FilterRight">
-              <div className="form-group">
-                <label>&nbsp;</label>
-                <a href="#" className="Button" download="">
-                  <span className="download">
-                    <img src="images/download.png" alt="" />
-                  </span>
-                  Download Receipt
-                </a>
-              </div>
-            </div>
+           
           </div>
         </div>
         <div className="Small-Wrapper">

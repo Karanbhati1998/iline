@@ -95,6 +95,20 @@ export const getCanceledBookingList = createAsyncThunk(
     }
   }
 );
+export const getAllCanceledBookingList = createAsyncThunk(
+  "get/allcanceledBookingList",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get("/cancelledRequestList", {
+        params: payload,
+      });
+      return response.data;
+    } catch (error) {
+      console.log({ error });
+      return rejectWithValue(error);
+    }
+  }
+);
 
 export const ongoingBookingStatus = createAsyncThunk(
   "status/ongoingBooking",

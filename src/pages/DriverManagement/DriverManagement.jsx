@@ -1,8 +1,18 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { canPerformAction } from "../../utils/deniedAccess";
+import { useDispatch, useSelector } from "react-redux";
+import { getDriverCount } from "../../features/slices/DriverManagement/allDriver/allDriverReducer";
 
 const DriverManagement = () => {
+  const dispatch=useDispatch()
+  const { driverCount } = useSelector(
+    (state) => state.driverManagementAllDrivers
+  );
+  useEffect(()=>{
+    dispatch(getDriverCount());
+  },[])
+  console.log({ driverCount });
   return (
     <div className="WrapperArea">
       <div className="WrapperBox">
@@ -19,7 +29,7 @@ const DriverManagement = () => {
                     <img src={require("../../assets/images/Driver.png")} />
                   </span>
                   <span className="Text">All Drivers</span>
-                  <span className="Count">-</span>
+                  <span className="Count">{driverCount?.allDriver}</span>
                 </Link>
               </li>
               {canPerformAction("Driver Management") && (
@@ -39,7 +49,9 @@ const DriverManagement = () => {
                     <img src={require("../../assets/images/Driver.png")} />
                   </span>
                   <span className="Text">Pending for Approval</span>
-                  <span className="Count">-</span>
+                  <span className="Count">
+                    {driverCount?.pendingDriverCount}
+                  </span>
                 </Link>
               </li>
               <li>

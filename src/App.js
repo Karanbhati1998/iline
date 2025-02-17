@@ -74,6 +74,7 @@ import { denieAccess, denyAccess } from "./utils/deniedAccess";
 import PaymentDetail from "./components/payment/PaymentDetail";
 import CommonBookingDetail from "./components/driverManagement/allDriver/driverDetailManagement/bookingSummary/CommonBookingDetail";
 import DisApprovedList from "./pages/DriverManagement/DisApprovedList";
+import SosListComponent from "./components/ticket/SosListComponent";
 function App() {
   const isAuthenticated = getToken("ilineLogin", "token");
   useEffect(() => {
@@ -254,6 +255,10 @@ function App() {
                 <Route
                   path="/supportTicketManagement/callRequest"
                   element={<CallRequest />}
+                />
+                <Route
+                  path="/supportTicketManagement/sosRequest"
+                  element={<SosListComponent />}
                 />
                 <Route
                   path="/supportTicketManagement/reply"

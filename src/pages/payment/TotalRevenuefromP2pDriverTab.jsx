@@ -1,8 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getP2pRevenueList } from "../../features/slices/payment";
+import {
+  getP2pRevenueList,
+  getP2pRevenueListDownload,
+} from "../../features/slices/payment";
 import { Link, useLocation } from "react-router-dom";
 import CommonPagination from "../../components/CommonPagination";
+import ExportToExcel from "../../components/ExportToExcel";
 const initialState = {
   page: 1,
   search: "",
@@ -18,6 +22,27 @@ const TotalRevenuefromP2pDriverTab = ({ categoryId }) => {
   const { page, search, fromDate, toDate, timeframe, id } = iState;
   const dispatch = useDispatch();
   const { state } = useLocation();
+  const totalRevenueP2pRef = useRef();
+  const [allData, setAllData] = useState([]);
+  useEffect(() => {
+    const data = {
+      search,
+      fromDate,
+      toDate,
+      timeframe,
+      limit: 999999,
+      categoryId,
+      revenueType: "ILINE",
+    };
+    if (categoryId) {
+      dispatch(getP2pRevenueListDownload(data)).then((res) => {
+        if (res?.payload?.code == 200) {
+          console.log({ res });
+          setAllData(res?.payload);
+        }
+      });
+    }
+  }, [timeframe, page, toDate, search, fromDate, categoryId]);
   const { p2pRevenueList } = useSelector((state) => {
     return state?.payment;
   });
@@ -140,16 +165,85 @@ const TotalRevenuefromP2pDriverTab = ({ categoryId }) => {
               </div>
             </div>
             <div className="FilterRight">
-              <div className="form-group">
-                <label>&nbsp;</label>
-                <a href="#" className="Button" download="">
-                  <span className="download">
-                    <img src="images/download.png" alt="" />
-                  </span>
-                  Download CSV
-                </a>
-              </div>
+              <ExportToExcel ref={totalRevenueP2pRef} fileName="ilineDriver" />
             </div>
+          </div>
+          <div className="TableList mt-4" style={{ display: "none" }}>
+            <table style={{ width: "150%" }} ref={totalRevenueP2pRef}>
+              <thead>
+                <tr>
+                  <th>S.No.</th>
+                  <th>Booking ID</th>
+                  <th>Driver ID </th>
+                  <th>Driver Name</th>
+                  <th>Customer ID</th>
+                  <th>Customer Name</th>
+                  <th>Vehicle ID</th>
+                  <th>Pickup Location</th>
+                  <th>Drop off Location</th>
+                  <th>Total fare (in Rs)</th>
+                  <th>Service Type</th>
+                  <th>Booking Date &amp; Time</th>
+                  <th>Payment Mode</th>
+                  <th>Incorrect Load Reported?</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {allData?.result?.[0]?.paginationData?.map((res, i) => {
+                  return (
+                    <tr>
+                      <td>{i + 1 + (page - 1) * 10}</td>
+                      <td>
+                        <a
+                          className="Blue"
+                          data-toggle="modal"
+                          data-target="#ApprovalModal"
+                        >
+                          {res?.requestData?.requestId}
+                        </a>
+                      </td>
+                      <td>
+                        <a>{res?.driverData?.driver_number}</a>
+                      </td>
+                      <td>{res?.driverData?.fullName} </td>
+                      <td>
+                        <a>{res?.userData?.user_number}</a>
+                      </td>
+                      <td>{res?.userData?.fullName}</td>
+                      <td>
+                        <a>{res?.vehicleData?.vehicleNumber}</a>
+                      </td>
+                      <td>{res?.requestData?.pickUpLocationName}</td>
+                      <td>{res?.requestData?.dropOffLocationName}</td>
+                      <td>{res?.requestData?.tripCharge}</td>
+                      <td>{res?.requestData?.rideType}</td>
+                      <td>
+                        {res?.requestData?.scheduledDate} &amp;{" "}
+                        {res?.requestData?.scheduledTime}
+                      </td>
+                      <td>{res?.paymentType}</td>
+                      <td>{res?.requestData?.is_report ? "yes" : "No"}</td>
+                      <td>
+                        <div className="Actions">
+                          <Link className="Blue" to="paymentDetail" state={res}>
+                            <i
+                              className="fa fa-info-circle"
+                              aria-hidden="true"
+                            />
+                          </Link>
+                          <span className="Orange">
+                            <a href="booking-management-completed-track-details.html">
+                              View Track Status
+                            </a>
+                          </span>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
           <div className="TableList mt-4">
             <table style={{ width: "150%" }}>
@@ -187,15 +281,15 @@ const TotalRevenuefromP2pDriverTab = ({ categoryId }) => {
                         </a>
                       </td>
                       <td>
-                        <a href="">{res?.driverData?.driver_number}</a>
+                        <a>{res?.driverData?.driver_number}</a>
                       </td>
                       <td>{res?.driverData?.fullName} </td>
                       <td>
-                        <a href="">{res?.userData?.user_number}</a>
+                        <a>{res?.userData?.user_number}</a>
                       </td>
                       <td>{res?.userData?.fullName}</td>
                       <td>
-                        <a href="">{res?.vehicleData?.vehicleNumber}</a>
+                        <a>{res?.vehicleData?.vehicleNumber}</a>
                       </td>
                       <td>{res?.requestData?.pickUpLocationName}</td>
                       <td>{res?.requestData?.dropOffLocationName}</td>
@@ -209,11 +303,7 @@ const TotalRevenuefromP2pDriverTab = ({ categoryId }) => {
                       <td>{res?.requestData?.is_report ? "yes" : "No"}</td>
                       <td>
                         <div className="Actions">
-                          <Link
-                              className="Blue"
-                              to="paymentDetail"
-                              state={res}
-                          >
+                          <Link className="Blue" to="paymentDetail" state={res}>
                             <i
                               className="fa fa-info-circle"
                               aria-hidden="true"
@@ -229,7 +319,6 @@ const TotalRevenuefromP2pDriverTab = ({ categoryId }) => {
                     </tr>
                   );
                 })}
-
               </tbody>
             </table>
           </div>

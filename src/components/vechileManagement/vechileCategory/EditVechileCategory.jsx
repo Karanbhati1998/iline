@@ -224,23 +224,26 @@ const EditVechileCategory = () => {
      formErrors.weightCapicity = "Weight Capacity is required";
      isValid = false;
    }
-  if (!length.trim()) {
+   console.log("val",length?.toString().trim());
+   
+  if (!length?.toString().trim()) {
+
     formErrors.length = "Length is required";
     isValid = false;
   }
-  if (!width.trim()) {
+  if (!width?.toString().trim()) {
     formErrors.width = "Width is required";
     isValid = false;
   }
-  if (!height.trim()) {
+  if (!height?.toString().trim()) {
     formErrors.height = "Height is required";
     isValid = false;
   }
-  if (!loadingTime.trim()) {
+  if (!loadingTime?.toString().trim()) {
     formErrors.loadingTime = "Height is required";
     isValid = false;
   }
-  if (!unloadingTime.trim()) {
+  if (!unloadingTime?.toString().trim()) {
     formErrors.unloadingTime = "unloading Time is required";
     isValid = false;
   }

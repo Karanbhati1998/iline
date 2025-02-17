@@ -28,7 +28,7 @@ const CommonBookingDetail = () => {
                <li>
                  <h2>
                    Driver Details{" "}
-                   <span> #{state?.driverData?.driver_number}</span>
+                   <span> {state?.driverData?.driver_number}</span>
                  </h2>
                  <a href="driver-management-all-driver-details.html">
                    <span className="Icon">
@@ -45,15 +45,15 @@ const CommonBookingDetail = () => {
                      <p>{state?.driverData?.phoneNumber}</p>
                    </span>
                    <span className="Count">
-                     ⭐ {state?.driverData?.avgRating}
+                     ⭐ {state?.driverData?.avgRating?.toFixed(2)}
                    </span>
                  </a>
                </li>
                <li>
                  <h2>
-                   Customer Details<span> #{state?.userData?.user_number}</span>
+                   Customer Details<span> {state?.userData?.user_number}</span>
                  </h2>
-                 <a >
+                 <a>
                    <span className="Icon">
                      <img
                        src={
@@ -67,7 +67,7 @@ const CommonBookingDetail = () => {
                      <p>{state?.userData?.phoneNumber}</p>
                    </span>
                    <span className="Count">
-                     ⭐ {state?.userData?.avgRating}
+                     ⭐ {state?.userData?.avgRating?.toFixed(2)}
                    </span>
                  </a>
                </li>
@@ -109,7 +109,9 @@ const CommonBookingDetail = () => {
                  <h2>Sender Details</h2>
                  <a href="driver-management-all-driver-details.html">
                    <span className="Icon">
-                     <img src={require("../../../../../assets/images/locationIcon.png")} />
+                     <img
+                       src={require("../../../../../assets/images/locationIcon.png")}
+                     />
                    </span>
                    <span className="Text">
                      {state?.pickUpUserName}
@@ -123,7 +125,9 @@ const CommonBookingDetail = () => {
                  <h2>Receiver Details</h2>
                  <a href="driver-management-all-driver-details.html">
                    <span className="Icon">
-                     <img src={require("../../../../../assets/images/locationIcon.png")} />
+                     <img
+                       src={require("../../../../../assets/images/locationIcon.png")}
+                     />
                    </span>
                    <span className="Text">
                      {state?.dropOffUserName}
@@ -243,7 +247,7 @@ const CommonBookingDetail = () => {
                      <aside>
                        <p>
                          <strong>Trip Charges</strong>
-                         <span> Rs {state?.tripCharge}</span>
+                         <span> Rs {state?.tripCharge?.toFixed(2)}</span>
                        </p>
                        <p>
                          <strong>Loading/Unloading Charges</strong>
@@ -258,7 +262,7 @@ const CommonBookingDetail = () => {
                        {" "}
                        <p>
                          <strong>GST (5%)</strong>
-                         <span> Rs {state?.gstCharge}</span>
+                         <span> Rs {state?.gstCharge?.toFixed(2)}</span>
                        </p>
                        {/* <p>
                         <strong>Coupon Discount</strong>
@@ -268,7 +272,7 @@ const CommonBookingDetail = () => {
                    </article>
                  </div>
                </div>
-               <h3>Total Amount to Pay: Rs {state?.withoutGst}</h3>
+               <h3>Total Amount to Pay: Rs {state?.tripCharge?.toFixed(2)}</h3>
              </div>
              {/* <div className="Small-Wrapper">
               <div className="TitleBox">

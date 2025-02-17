@@ -1,16 +1,19 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
 import {
   deleteNotification,
+  getAllNotificationList,
   getNotificationList,
+  getSosNotificationList,
   resendNotification,
 } from "../../features/slices/notification";
 import CommonPagination from "../../components/CommonPagination";
 import moment from "moment";
 import { toastService } from "../../utils/toastify";
-import DeleteModal from "../../components/DeleteModal"
+import DeleteModal from "../../components/DeleteModal";
+import ExportToExcel from "../../components/ExportToExcel";
 const initialState = {
   page: 1,
   search: "",
@@ -26,7 +29,23 @@ const PushNotification = () => {
   const { page, search, fromDate, toDate, timeframe, id, deleteModals } =
     iState;
   const dispatch = useDispatch();
-
+    const notificationRef = useRef();
+    const [allData, setAllData] = useState([]);
+      useEffect(() => {
+        const data = {
+          search,
+          fromDate,
+          toDate,
+          timeframe,
+          limit: 999999,
+        };
+        dispatch(getAllNotificationList(data)).then((res) => {
+          if (res?.payload?.code == 200) {
+            console.log({ res });
+            setAllData(res?.payload);
+          }
+        });
+      }, [timeframe, page, toDate, search, fromDate]);
   const { notification } = useSelector((state) => {
     return state.notification;
   });
@@ -35,6 +54,11 @@ const PushNotification = () => {
   useEffect(() => {
     dispatch(
       getNotificationList({
+        page,
+      })
+    );
+    dispatch(
+      getSosNotificationList({
         page,
       })
     );
@@ -73,43 +97,43 @@ const PushNotification = () => {
     };
     dispatch(getNotificationList(data));
   };
-  const handleResendNotification=(id)=>{
-    dispatch(resendNotification({id})).then(res=>{
-      if(res?.payload?.code==200){
+  const handleResendNotification = (id) => {
+    dispatch(resendNotification({ id })).then((res) => {
+      if (res?.payload?.code == 200) {
         toastService.success("Notification resent successfully");
-      }else{
+      } else {
         toastService.error("Failed to resend notification");
       }
-    })
-  }
-  const handleClose=()=>{
+    });
+  };
+  const handleClose = () => {
     setUpdateState((prev) => ({
       ...prev,
       deleteModals: false,
       id: "",
     }));
-  }
-  const handleOpen=(id)=>{
+  };
+  const handleOpen = (id) => {
     setUpdateState((prev) => ({
       ...prev,
       deleteModals: true,
       id,
     }));
-  }
-  const handleDelete=()=>{
-    dispatch(deleteNotification({id})).then(res=>{
-      if(res?.payload?.code==200){
+  };
+  const handleDelete = () => {
+    dispatch(deleteNotification({ id })).then((res) => {
+      if (res?.payload?.code == 200) {
         toastService.success("Notification deleted successfully");
         setUpdateState((prev) => ({
           ...prev,
           deleteModals: false,
         }));
         dispatch(getNotificationList({ page }));
-      }else{
+      } else {
         toastService.error("Failed to delete notification");
       }
-    })
-  }
+    });
+  };
   return (
     <>
       <div className="WrapperArea">
@@ -195,20 +219,73 @@ const PushNotification = () => {
                       <option>User</option>
                     </select>
                   </div>
-                  <div className="form-group">
-                    <label>&nbsp;</label>
-                    <a href="#" className="Button" download="">
-                      <span className="download">
-                        <img src="images/download.png" alt="" />
-                      </span>
-                      Download CSV
-                    </a>
-                  </div>
+                  <ExportToExcel
+                    ref={notificationRef}
+                    fileName="notificationExcel"
+                  />
                 </div>
               </div>
             </div>
 
             <div className="Small-Wrapper">
+              <div className="TableList" style={{ display: "none" }}>
+                <table ref={notificationRef}>
+                  <thead>
+                    <tr>
+                      <th>S.No.</th>
+                      <th>Notification ID</th>
+                      <th>Notification Title </th>
+                      <th>User Group</th>
+                      <th>Date Sent</th>
+                      <th>Resend</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {allData?.result?.[0]?.paginationData?.map((res, i) => {
+                      return (
+                        <tr key={i}>
+                          <td>{i + 1 + (page - 1) * 10}</td>
+                          <td>
+                            <a>{res?.noti_number}</a>
+                          </td>
+                          <td>{res?.title} </td>
+                          <td>{res?.userType}</td>
+                          <td>{moment(res?.createdAt).format("DD-MM-YYYY")}</td>
+
+                          <td>
+                            <span
+                              className="Red"
+                              onClick={() => handleResendNotification(res?._id)}
+                            >
+                              Resend
+                            </span>
+                          </td>
+                          <td>
+                            <div className="Actions">
+                              <Link to="detail" className="" state={res}>
+                                <i
+                                  className="fa fa-info-circle"
+                                  aria-hidden="true"
+                                />
+                              </Link>
+                              <Link to="edit" className="Green" state={res}>
+                                <i className="fa fa-pencil" />
+                              </Link>
+                              <a
+                                className="Red"
+                                onClick={() => handleOpen(res?._id)}
+                              >
+                                <i className="fa fa-trash" />
+                              </a>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
               <div className="TableList">
                 <table>
                   <thead>

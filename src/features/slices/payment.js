@@ -36,6 +36,20 @@ export const addSetCommision = createAsyncThunk(
     }
   }
 );
+export const getTotalRevenueListDownload= createAsyncThunk(
+  "get/totalRevenueListdownload",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get("/totalRevenueList", {
+        params: payload,
+      });
+      return response.data;
+    } catch (error) {
+      console.log({ error });
+      return rejectWithValue(error); // Return error instead of just rejecting
+    }
+  }
+);
 export const getTotalRevenueList = createAsyncThunk(
   "get/totalRevenueList",
   async (payload, { rejectWithValue }) => {
@@ -50,11 +64,39 @@ export const getTotalRevenueList = createAsyncThunk(
     }
   }
 );
+export const getIlineRevenueListDownload = createAsyncThunk(
+  "get/ilineRevenueListdownload",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get("/ilineRevenueList", {
+        params: payload,
+      });
+      return response.data;
+    } catch (error) {
+      console.log({ error });
+      return rejectWithValue(error); // Return error instead of just rejecting
+    }
+  }
+);
 export const getIlineRevenueList = createAsyncThunk(
   "get/ilineRevenueList",
   async (payload, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get("/ilineRevenueList", {
+        params: payload,
+      });
+      return response.data;
+    } catch (error) {
+      console.log({ error });
+      return rejectWithValue(error); // Return error instead of just rejecting
+    }
+  }
+);
+export const getP2pRevenueListDownload = createAsyncThunk(
+  "get/p2pRevenueListDownload",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get("/p2pRevenueList", {
         params: payload,
       });
       return response.data;

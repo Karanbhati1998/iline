@@ -47,7 +47,8 @@ const Sidebar = () => {
     <>
       <div className="SidenavBar">
         <ul>
-          {denyAccess("Dashboard") && (
+          {/* {denyAccess("Dashboard") && (
+          )} */}
             <li className={url == "dashboard" ? "active" : ""}>
               <Link to="/dashboard">
                 <span>
@@ -56,7 +57,6 @@ const Sidebar = () => {
                 Dashboard
               </Link>
             </li>
-          )}
           {denyAccess("User Management") && (
             <li className={url == "userManagement" ? "active" : ""}>
               <Link to="/userManagement">
@@ -67,7 +67,7 @@ const Sidebar = () => {
               </Link>
             </li>
           )}
-          {
+          {denyAccess("Enterprise Management") && (
             <li>
               <a>
                 <span>
@@ -76,7 +76,7 @@ const Sidebar = () => {
                 Enterprise Management
               </a>
             </li>
-          }
+          )}
           {denyAccess("Booking Management") && (
             <li
               className={
@@ -135,83 +135,94 @@ const Sidebar = () => {
               </Link>
             </li>
           )}
-          <li>
-            <a>
-              <span>
-                <i className="fa fa-user" />
-              </span>{" "}
-              Logistics Partner Management
-            </a>
-          </li>
-
-          <li
-            className={
-              url.includes("paymentAndRevenueManagemnt")
-                ? "active dropdown"
-                : "dropdown"
-            }
-          >
-            <a
-              href="javascript:void(0)"
-              id="navbardrop"
-              className="dropdown-toggle"
-              data-toggle="dropdown"
-              // aria-expanded="false"
+          {denyAccess("Logistics Partner Management") && (
+            <li>
+              <a>
+                <span>
+                  <i className="fa fa-user" />
+                </span>{" "}
+                Logistics Partner Management
+              </a>
+            </li>
+          )}
+          {denyAccess("Payment & Revenue Management") && (
+            <li
+              className={
+                url.includes("paymentAndRevenueManagemnt")
+                  ? "active dropdown"
+                  : "dropdown"
+              }
             >
-              <span>
-                <i className="fa fa-text-width" />
-              </span>{" "}
-              Payment and Revenue Management
-            </a>
-            <ol className="dropdown-menu">
-              {VechileCategories?.result?.[0]?.paginationData?.map((res) => {
-                return (
-                  <li key={res?._id}>
-                    <a
-                      className={catId == res?._id ? "textactive" : ""}
-                      onClick={() => {
-                        handleNavigateToPayment(res?._id);
-                      }}
-                    >
-                      {res?.categoryName}
-                    </a>
-                  </li>
-                );
-              })}
-            </ol>
-          </li>
-          <li className={url == "chargingStation" ? "active" : ""}>
-            <Link to="/chargingStation">
-              <span>
-                <i className="fa fa-money" />
-              </span>{" "}
-              Charging Station
-            </Link>
-          </li>
-          <li className={url == "onlineBookingView" ? "active" : ""}>
-            <Link to="/onlineBookingView">
-              <span>
-                <i className="fa fa-money" />
-              </span>{" "}
-              Online Booking View
-            </Link>
-          </li>
-          <li className={url == "bannerManagement" ? "active" : ""}>
-            <Link to="/bannerManagement">
-              <span>
-                <i className="fa fa-globe" />
-              </span>{" "}
-              Banner Management
-            </Link>
-          </li>
-          <li>
-            <a>
-              <span>
-                <i className="fa fa-bicycle" />
-              </span>{" "}
-              Reports
-            </a>
-          </li>
+              <a
+                href="javascript:void(0)"
+                id="navbardrop"
+                className="dropdown-toggle"
+                data-toggle="dropdown"
+                // aria-expanded="false"
+              >
+                <span>
+                  <i className="fa fa-text-width" />
+                </span>{" "}
+                Payment and Revenue Management
+              </a>
+              <ol className="dropdown-menu">
+                {VechileCategories?.result?.[0]?.paginationData?.map((res) => {
+                  return (
+                    <li key={res?._id}>
+                      <a
+                        className={catId == res?._id ? "textactive" : ""}
+                        onClick={() => {
+                          handleNavigateToPayment(res?._id);
+                        }}
+                      >
+                        {res?.categoryName}
+                      </a>
+                    </li>
+                  );
+                })}
+              </ol>
+            </li>
+          )}
+          {denyAccess("Charging Station") && (
+            <li className={url == "chargingStation" ? "active" : ""}>
+              <Link to="/chargingStation">
+                <span>
+                  <i className="fa fa-money" />
+                </span>{" "}
+                Charging Station
+              </Link>
+            </li>
+          )}
+          {denyAccess("Online Booking View") && (
+            <li className={url == "onlineBookingView" ? "active" : ""}>
+              <Link to="/onlineBookingView">
+                <span>
+                  <i className="fa fa-money" />
+                </span>{" "}
+                Online Booking View
+              </Link>
+            </li>
+          )}
+          {denyAccess("Banner Management") && (
+            <li className={url == "bannerManagement" ? "active" : ""}>
+              <Link to="/bannerManagement">
+                <span>
+                  <i className="fa fa-globe" />
+                </span>{" "}
+                Banner Management
+              </Link>
+            </li>
+          )}
+          {denyAccess("Reports") && (
+            <li>
+              <a>
+                <span>
+                  <i className="fa fa-bicycle" />
+                </span>{" "}
+                Reports
+              </a>
+            </li>
+          )}
           {denyAccess("Content Management") && (
             <li className={url == "contentManagement" ? "active" : ""}>
               <Link to="/contentManagement">
@@ -252,25 +263,26 @@ const Sidebar = () => {
               </Link>
             </li>
           )}
-          <li className={url == "changeManagement" ? "active" : ""}>
-            <Link to="/changeManagement">
-              <span>
-                <i className="fa fa-eercast" />
-              </span>{" "}
-              Change Management
-            </Link>
-          </li>
-          {
-            denyAccess("Blog") &&
-          <li className={url == "blogManagement" ? "active" : ""}>
-            <Link to="/blogManagement">
-              <span>
-                <i className="fa fa-eercast" />
-              </span>{" "}
-              Blog
-            </Link>
-          </li>
-          }
+          {denyAccess("Change Management") && (
+            <li className={url == "changeManagement" ? "active" : ""}>
+              <Link to="/changeManagement">
+                <span>
+                  <i className="fa fa-eercast" />
+                </span>{" "}
+                Change Management
+              </Link>
+            </li>
+          )}
+          {denyAccess("Blog") && (
+            <li className={url == "blogManagement" ? "active" : ""}>
+              <Link to="/blogManagement">
+                <span>
+                  <i className="fa fa-eercast" />
+                </span>{" "}
+                Blog
+              </Link>
+            </li>
+          )}
           <li>
             <a
               onClick={() => {

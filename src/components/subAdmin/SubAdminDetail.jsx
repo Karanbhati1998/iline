@@ -29,7 +29,7 @@ const SubAdminDetail = () => {
               </p>
               <p>
                 <strong>Sub Admin ID</strong>
-                <span>-</span>
+                <span>{state?.subadmin_number}</span>
               </p>
               <p>
                 <strong>Created On</strong>
@@ -51,10 +51,10 @@ const SubAdminDetail = () => {
                 <strong> User Name</strong>
                 <span>{state?.userName}</span>
               </p>
-              <p>
+              {/* <p>
                 <strong>Password</strong>
                 <span>Kim123</span>
-              </p>
+              </p> */}
             </figcaption>
           </div>
           <div className="AdminAccess">

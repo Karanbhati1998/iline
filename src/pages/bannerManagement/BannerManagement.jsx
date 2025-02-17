@@ -7,6 +7,7 @@ import ExportToExcel from "../../components/ExportToExcel";
 import { toastService } from "../../utils/toastify";
 import moment from "moment";
 import { canPerformAction } from "../../utils/deniedAccess";
+import CommonPagination from "../../components/CommonPagination";
 const initialState = {
   page: 1,
   search: "",
@@ -31,6 +32,23 @@ const BannerManagement = () => {
   } = iState;
   const dispatch = useDispatch();
   const bannerRef = useRef();
+  const [allData, setAllData] = useState([]);
+  useEffect(() => {
+    const data = {
+      search,
+      fromDate,
+      toDate,
+      timeframe,
+      limit: 999999,
+    };
+
+    dispatch(getBannerList(data)).then((res) => {
+      if (res?.payload?.code == 200) {
+        console.log({ res });
+        setAllData(res?.payload);
+      }
+    });
+  }, [timeframe, page, toDate, search, fromDate]);
   const { bannerList } = useSelector((state) => {
     return state?.banner;
   });
@@ -101,6 +119,10 @@ const BannerManagement = () => {
       id: id,
     }));
   };
+   const handlePageChange = (page) => {
+      setUpdateState({ ...iState, page });
+      dispatch(getBannerList({  page }));
+    };
   return (
     <>
       <div className="WrapperArea">
@@ -188,8 +210,87 @@ const BannerManagement = () => {
             </div>
           </div>
           <div className="Small-Wrapper">
-            <div className="TableList">
+            <div className="TableList" style={{ display: "none" }}>
               <table ref={bannerRef}>
+                <thead>
+                  <tr>
+                    <th>S.No.</th>
+                    <th>Banner Name</th>
+                    <th>Banner ID</th>
+                    <th>Banner Image</th>
+                    <th>Uploaded On</th>
+                    <th>Status</th>
+                    {canPerformAction("Banner Management") && <th>Action</th>}
+                  </tr>
+                </thead>
+                <tbody>
+                  {allData?.result?.[0]?.paginationData?.map((res, i) => {
+                    return (
+                      <tr>
+                        <td>{i + 1 + (page - 1) * 10}</td>
+                        <td>{res?.name}</td>
+                        <td>
+                          <a
+                            className="Blue"
+                            data-toggle="modal"
+                            data-target="#ApprovalModal"
+                          >
+                            {res?.banner_number}
+                          </a>
+                        </td>
+                        <td>
+                          <img
+                            src={res?.imageUrl}
+                            style={{
+                              width: "50px",
+                              height: "50px",
+                              borderRadius: "50%",
+                              objectFit: "cover",
+                            }}
+                            alt="no img"
+                          />
+                        </td>
+                        <td>{moment(res?.createdAt).format("DD-MM-YYYY")}</td>
+                        <td>
+                          <span
+                            className={
+                              res?.status == "ACTIVE" ? "Green" : "Red"
+                            }
+                          >
+                            {res?.status == "ACTIVE" ? "Enabled" : "Disabled"}
+                          </span>
+                        </td>
+                        {canPerformAction("Banner Management") && (
+                          <td>
+                            <div className="Actions">
+                              <label className="Switch">
+                                <input
+                                  type="checkbox"
+                                  name="status"
+                                  checked={res?.status == "ACTIVE"}
+                                  onChange={(e) => handleChecked(e, res?._id)}
+                                />
+                                <span className="slider" />
+                              </label>
+                              <a
+                                className="Red"
+                                onClick={() => handleOpenDeleteModal(res?._id)}
+                              >
+                                <i className="fa fa-trash" aria-hidden="true" />
+                              </a>
+                            </div>
+                          </td>
+                        )}
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div className="Small-Wrapper">
+            <div className="TableList">
+              <table>
                 <thead>
                   <tr>
                     <th>S.No.</th>
@@ -264,6 +365,31 @@ const BannerManagement = () => {
                   })}
                 </tbody>
               </table>
+            </div>
+            <div className="PaginationBox">
+              <div className="PaginationLeft">
+                <p>
+                  Total Records :{" "}
+                  <span>
+                    {bannerList?.result?.[0]?.totalCount?.[0]?.count || 0}
+                  </span>
+                </p>
+              </div>
+              <div className="PaginationRight">
+                {bannerList?.result?.[0]?.totalCount?.[0]?.count > 0 && (
+                  <CommonPagination
+                    activePage={page}
+                    itemsCountPerPage={10}
+                    totalItemsCount={
+                      bannerList?.result?.[0]?.totalCount?.[0]?.count || 0
+                    }
+                    pageRangeDisplayed={4}
+                    onChange={handlePageChange}
+                    itemClass="page-item"
+                    linkClass="page-link"
+                  />
+                )}
+              </div>
             </div>
           </div>
           {/* </div> */}

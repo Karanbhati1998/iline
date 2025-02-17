@@ -1,8 +1,10 @@
-import React from 'react'
-import PendingVechileTable from './PendingVechileTable';
-import BackButton from '../../BackButton';
+import React from "react";
+import PendingVechileTable from "./PendingVechileTable";
+import BackButton from "../../BackButton";
+import { useLocation } from "react-router-dom";
 
 const PendingVechilePage = () => {
+  const { state } = useLocation();
   return (
     <div className="WrapperArea">
       <div className="WrapperBox">
@@ -16,12 +18,12 @@ const PendingVechilePage = () => {
             </div>
           </div>
           <div className="tab-content">
-            <PendingVechileTable />
+            <PendingVechileTable categoryId={state} />
           </div>
         </div>
       </div>
     </div>
   );
-}
+};
 
-export default PendingVechilePage
+export default PendingVechilePage;

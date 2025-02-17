@@ -8,13 +8,18 @@ const initialState = {
   title: "",
   roleId: "",
   permission: [
+    // {
+    //   name: "Dashboard",
+    //   read: false,
+    //   fullAccess: false,
+    // },
     {
-      name: "Dashboard",
+      name: "User Management",
       read: false,
       fullAccess: false,
     },
     {
-      name: "User Management",
+      name: "Enterprise Management",
       read: false,
       fullAccess: false,
     },
@@ -54,12 +59,27 @@ const initialState = {
       fullAccess: false,
     },
     {
+      name: "Logistics Partner Management",
+      read: false,
+      fullAccess: false,
+    },
+    {
       name: "Banner Management",
       read: false,
       fullAccess: false,
     },
     {
       name: "Ad & Package Management",
+      read: false,
+      fullAccess: false,
+    },
+    {
+      name: "Charging Station",
+      read: false,
+      fullAccess: false,
+    },
+    {
+      name: "Online Booking View",
       read: false,
       fullAccess: false,
     },

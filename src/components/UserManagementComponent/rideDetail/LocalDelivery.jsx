@@ -190,9 +190,9 @@ const LocalDelivery = ({ state }) => {
                     <td>{res?.vehicleData?.vehicleNumberPlate}</td>
                     <td>{res?.tripCharge}</td>
                     <td>
-                      <Link to={"/userManagement/userBookingDetail"}>
+                      <a>
                         <span className="Green">{res?.requestStatus}</span>
-                      </Link>
+                      </a>
                     </td>
                     <td>{res?.scheduledDate}</td>
                     <td>{res?.pickUpLocationName}</td>

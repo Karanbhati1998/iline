@@ -193,39 +193,48 @@ useEffect(() => {
   const handleValidation = () => {
     let formErrors = {};
     let isValid = true;
-    if (!categoryName.trim()) {
+    // Validate categoryName
+    if (!categoryName?.toString().trim()) {
       formErrors.categoryName = "Category Name is required";
       isValid = false;
     }
-    if (!tagLine.trim()) {
+
+    // Validate tagLine
+    if (!tagLine?.toString().trim()) {
       formErrors.tagLine = "Tag Line is required";
       isValid = false;
     }
-    if (!weightCapicity.trim()) {
-      formErrors.weightCapicity = "Weight capicity Name is required";
+
+    // Validate weightCapicity
+    if (!weightCapicity?.toString().trim()) {
+      formErrors.weightCapicity = "Weight Capacity is required";
       isValid = false;
     }
-    if (!length.trim()) {
+    if (!length?.toString().trim()) {
       formErrors.length = "Length is required";
       isValid = false;
     }
-    if (!width.trim()) {
+    if (!width?.toString().trim()) {
       formErrors.width = "Width is required";
       isValid = false;
     }
-    if (!height.trim()) {
+    if (!height?.toString().trim()) {
       formErrors.height = "Height is required";
       isValid = false;
     }
-    if (!loadingTime.trim()) {
+    if (!loadingTime?.toString().trim()) {
       formErrors.loadingTime = "Height is required";
       isValid = false;
     }
-    if (!unloadingTime.trim()) {
+    if (!unloadingTime?.toString().trim()) {
       formErrors.unloadingTime = "unloading Time is required";
       isValid = false;
     }
-   
+    // Validate uploadIcon
+    if (!uploadIcon?.toString().trim()) {
+      formErrors.uploadIcon = "Upload Icon is required";
+      isValid = false;
+    }
     if (!uploadIcon.trim()) {
       formErrors.uploadIcon = "Upload icon Name is required";
       isValid = false;

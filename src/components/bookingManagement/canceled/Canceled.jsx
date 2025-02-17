@@ -1,11 +1,15 @@
-import React, { useEffect, useState } from 'react'
-import BookingManagementComponent from '../BookingManagementComponent';
-import { useDispatch, useSelector } from 'react-redux';
-import { getCanceledBookingList } from '../../../features/slices/bookingManagementSlice';
-import { Link, useLocation } from 'react-router-dom';
+import React, { useEffect, useRef, useState } from "react";
+import BookingManagementComponent from "../BookingManagementComponent";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  getAllCanceledBookingList,
+  getCanceledBookingList,
+} from "../../../features/slices/bookingManagementSlice";
+import { Link, useLocation } from "react-router-dom";
 import { toastService } from "../../../utils/toastify";
 import CommonPagination from "../../CommonPagination";
 import moment from "moment";
+import ExportToExcel from "../../ExportToExcel";
 const initialState = {
   page: 1,
   search: "",
@@ -17,13 +21,34 @@ const initialState = {
   id: "",
 };
 const Canceled = ({ categoryId }) => {
-   const [iState, setUpdateState] = useState(initialState);
-    const { page, search, fromDate, toDate, timeframe, id } = iState;
-    const dispatch = useDispatch();
+  const [iState, setUpdateState] = useState(initialState);
+  const { page, search, fromDate, toDate, timeframe, id } = iState;
+  const dispatch = useDispatch();
   const { state } = useLocation();
   const { canceledBookingList } = useSelector((state) => {
     return state.bookingManagement;
   });
+    const userRef = useRef();
+  const [allData, setAllData] = useState([]);
+  useEffect(() => {
+    const data = {
+      search,
+      fromDate,
+      toDate,
+      timeframe,
+      limit: 999999,
+      categoryId,
+    };
+    if (categoryId) {
+      dispatch(getAllCanceledBookingList(data)).then((res) => {
+        if (res?.payload?.code == 200) {
+          console.log({ res });
+          setAllData(res?.payload);
+        }
+      });
+    }
+  }, [timeframe, page, toDate, search, fromDate, categoryId]);
+
   useEffect(() => {
     dispatch(getCanceledBookingList({ categoryId: state }));
   }, []);
@@ -32,7 +57,7 @@ const Canceled = ({ categoryId }) => {
       dispatch(
         getCanceledBookingList({
           categoryId,
-          page
+          page,
         })
       );
     }
@@ -74,7 +99,7 @@ const Canceled = ({ categoryId }) => {
     dispatch(getCanceledBookingList(data));
   };
   console.log({ canceledBookingList });
-  
+
   return (
     <div className="Small-Wrapper">
       <div className="FilterArea">
@@ -138,16 +163,83 @@ const Canceled = ({ categoryId }) => {
           </div>
         </div>
         <div className="FilterRight">
-          <div className="form-group">
-            <label>&nbsp;</label>
-            <a href="#" className="Button" download="">
-              <span className="download">
-                <img src="images/download.png" alt="" />
-              </span>
-              Download CSV
-            </a>
-          </div>
+          <ExportToExcel ref={userRef} fileName="canceledBooking" />
         </div>
+      </div>
+      <div className="TableList mt-4" style={{ display: "none" }}>
+        <table style={{ width: "150%" }} ref={userRef}>
+          <thead>
+            <tr>
+              <th>S.No.</th>
+              <th>Booking ID</th>
+              <th>Driver ID </th>
+              <th>Driver Name</th>
+              <th>Customer ID</th>
+              <th>Customer Name</th>
+              <th>Vehicle ID</th>
+              <th>Pickup Location</th>
+              <th>Drop off Location</th>
+              <th>Total fare (in Rs)</th>
+              <th>Service Type</th>
+              <th>Booking Date &amp; Time</th>
+              <th>Payment Mode</th>
+              <th>Cancelled By</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {allData?.result?.[0]?.paginationData?.map((res, i) => {
+              return (
+                <tr key={i}>
+                  <td>{i + 1 + (page - 1) * 10}</td>
+                  <td>
+                    <a className="Blue">{res?.trip_number}</a>
+                  </td>
+                  <td>
+                    <a>
+                      {res?.driverData?.driver_number
+                        ? res?.driverData?.driver_number
+                        : "-"}
+                    </a>
+                  </td>
+                  <td>
+                    {res?.driverData?.fullName
+                      ? res?.driverData?.fullName
+                      : "-"}
+                  </td>
+                  <td>
+                    <a>{res?.userData?.user_number}</a>
+                  </td>
+                  <td>{res?.userData?.fullName}</td>
+                  <td>
+                    <a>{res?.vehicleData?.vehicleNumber || "-"}</a>
+                  </td>
+                  <td>{res?.pickUpLocationName}</td>
+                  <td>{res?.dropOffLocationName}</td>
+                  <td>{res?.tripCharge}</td>
+                  <td>{res?.rideType}</td>
+                  <td>
+                    {res?.scheduledDate} &amp; {res?.scheduledTime}{" "}
+                  </td>
+                  <td>{res?.paymentMode}</td>
+                  <td>
+                    <a href="">Driver</a>
+                  </td>
+                  <td>
+                    <div className="Actions">
+                      <Link to="canceldetail" className="Blue" state={res}>
+                        <i className="fa fa-info-circle" aria-hidden="true" />
+                      </Link>
+                      <span className="Orange">
+                        <Link to="track">Track</Link>
+                      </span>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
       </div>
       <div className="TableList mt-4">
         <table style={{ width: "150%" }}>
@@ -195,7 +287,7 @@ const Canceled = ({ categoryId }) => {
                   </td>
                   <td>{res?.userData?.fullName}</td>
                   <td>
-                    <a>{res?.vehicleData?.vehicleNumber ||"-"}</a>
+                    <a>{res?.vehicleData?.vehicleNumber || "-"}</a>
                   </td>
                   <td>{res?.pickUpLocationName}</td>
                   <td>{res?.dropOffLocationName}</td>
@@ -221,7 +313,6 @@ const Canceled = ({ categoryId }) => {
                 </tr>
               );
             })}
-            
           </tbody>
         </table>
       </div>
@@ -254,4 +345,4 @@ const Canceled = ({ categoryId }) => {
   );
 };
 
-export default Canceled
+export default Canceled;

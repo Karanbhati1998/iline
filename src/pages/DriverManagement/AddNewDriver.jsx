@@ -6,6 +6,7 @@ import { imageUpload } from "../../features/slices/imageUpload";
 import { addNewDriver } from "../../features/slices/DriverManagement/allDriver/allDriverReducer";
 import { useNavigate } from "react-router-dom";
 import ReactPlaceAutocomplete from "../../components/ReactPlaceAutocomplete";
+import LoaderForImage from "../../components/LoaderForImage";
 const initialState = {
   fullName: "",
   phoneNumber: "",
@@ -22,7 +23,7 @@ const initialState = {
   expiryDate: "",
   email: "",
   errors: {},
-  imageLoader: false,
+  // imageLoader: false,
   location: {
     address: "",
     lat: "",
@@ -31,6 +32,13 @@ const initialState = {
 };
 const AddNewDriver = () => {
   const [iState, setUpdateState] = useState(initialState);
+  const [imageLoader, updateImageLoader] = useState({
+    profilePic: false,
+    aadharFront: false,
+    aadharBack: false,
+    dlFront: false,
+    dlBack: false,
+  });
   const [input, setInput] = useState({
     address: "",
   });
@@ -53,17 +61,28 @@ const AddNewDriver = () => {
     expiryDate,
     email,
     errors,
-    imageLoader,
+    // imageLoader,
     location,
   } = iState;
+
+  const handleEditClick = (inputId) => {
+    console.log("Edit clicked:", inputId);
+
+    const fileInput = document.getElementById(inputId);
+    if (fileInput) {
+      console.log("File input found, triggering click.");
+      fileInput.click();
+    } else {
+      console.error("File input not found:", inputId);
+    }
+  };
 
   const uploadImage = (e) => {
     console.log({ errors });
     console.log(e.target.name);
-
+    updateImageLoader((prev) => ({ ...prev, [e.target.name]: true }));
     setUpdateState((prev) => ({
       ...prev,
-      imageLoader: true,
       errors: {
         ...prev.errors,
         [e.target.name]: "",
@@ -84,19 +103,20 @@ const AddNewDriver = () => {
               [e.target.name]: "",
             },
             [e.target.name]: res?.payload?.url,
-            imageLoader: false,
           }));
+          updateImageLoader((prev) => ({ ...prev, [e.target.name]: false }));
         } else {
           toastService.error("image upload failed");
           setUpdateState((prev) => ({
             ...prev,
             [e.target.name]: "",
-            imageLoader: false,
           }));
+          updateImageLoader((prev) => ({ ...prev, [e.target.name]: false }));
         }
       });
     } else {
       toastService.error("File not found");
+      updateImageLoader((prev) => ({ ...prev, [e.target.name]: false }));
     }
   };
 
@@ -111,73 +131,148 @@ const AddNewDriver = () => {
       },
     }));
   };
-  const handleValidation = () => {
-    let formErrors = {};
-    let isValid = false;
-    if (!fullName.trim()) {
-      formErrors.fullName = "Full Name is required";
-      isValid = true;
-    }
-    if (!location.trim()) {
-      formErrors.location = "Location is required";
-      isValid = true;
-    }
-    if (!gender.trim()) {
-      formErrors.gender = "Gender is required";
-      isValid = true;
-    }
-    if (!phoneNumber.trim()) {
-      formErrors.phoneNumber = "Phone Number is required";
-      isValid = true;
-    }
-    if (!aadharNumber.trim()) {
-      formErrors.aadharNumber = "Aadhar Number is required";
-      isValid = true;
-    }
-    if (!dlNumber.trim()) {
-      formErrors.dlNumber = "Driving License Number is required";
-      isValid = true;
-    }
-    if (!dob.trim()) {
-      formErrors.dob = "Date of Birth is required";
-      isValid = true;
-    }
-    if (!email.trim()) {
-      formErrors.email = "Email is required";
-      isValid = true;
-    }
-    if (!profilePic.trim()) {
-      formErrors.profilePic = "Profile Pic is required";
-      isValid = true;
-    }
-    if (!aadharFront.trim()) {
-      formErrors.aadharFront = "Aadhar Front Image is required";
-      isValid = true;
-    }
-    if (!aadharBack.trim()) {
-      formErrors.aadharBack = "Aadhar Back Image is required";
-      isValid = true;
-    }
-    if (!dlFront.trim()) {
-      formErrors.dlFront = "Driving License Front Image is required";
-      isValid = true;
-    }
-    if (!dlBack.trim()) {
-      formErrors.dlBack = "Driving License Back Image is required";
-      isValid = true;
-    }
-    if (!expiryDate.trim()) {
-      formErrors.expiryDate = "Expiry Date is required";
-      isValid = true;
-    }
-    setUpdateState((prev) => ({
-      ...prev,
-      errors: formErrors,
-    }));
-    console.log({ isValid });
+ const handleValidation = () => {
+   let formErrors = {};
+   let isValid = true;
 
-    return isValid;
-  };
+   if (!fullName.trim()) {
+     formErrors.fullName = "Full Name is required";
+     isValid = false;
+   }
+   // Phone Number Validation (10-15 digits, no special characters)
+   const phoneRegex = /^[0-9]{10,15}$/;
+   if (!phoneNumber.trim()) {
+     formErrors.phoneNumber = "Phone Number is required";
+     isValid = false;
+   } else if (!phoneRegex.test(phoneNumber)) {
+     formErrors.phoneNumber =
+       "Phone Number must be 10-15 digits without special characters";
+     isValid = false;
+   }
+
+   // Email Validation
+   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+   if (!email.trim()) {
+     formErrors.email = "Email is required";
+     isValid = false;
+   } else if (!emailRegex.test(email)) {
+     formErrors.email = "Invalid email format";
+     isValid = false;
+   }
+
+   // Date of Birth Validation (Age between 18 and 120)
+   if (!dob.trim()) {
+     formErrors.dob = "Date of Birth is required";
+     isValid = false;
+   } else {
+     const birthYear = new Date(dob).getFullYear();
+     const currentYear = new Date().getFullYear();
+     const age = currentYear - birthYear;
+
+     if (age < 18) {
+       formErrors.dob = "Age must be 18 or older";
+       isValid = false;
+     } else if (age > 120) {
+       formErrors.dob = "Invalid Date of Birth";
+       isValid = false;
+     }
+   }
+
+   // Aadhar Number Validation (Exactly 12 digits)
+   const aadharRegex = /^[0-9]{12}$/;
+   if (!aadharNumber.trim()) {
+     formErrors.aadharNumber = "Aadhar Number is required";
+     isValid = false;
+   } else if (!aadharRegex.test(aadharNumber)) {
+     formErrors.aadharNumber = "Aadhar Number must be exactly 12 digits";
+     isValid = false;
+   }
+
+   // Insurance Number Validation (10-15 digits, like phone number)
+  //  const insuranceRegex = /^[0-9]{10,15}$/;
+  //  if (!insuranceNumber.trim()) {
+  //    formErrors.insuranceNumber = "Insurance Number is required";
+  //    isValid = false;
+  //  } else if (!insuranceRegex.test(insuranceNumber)) {
+  //    formErrors.insuranceNumber = "Insurance Number must be 10-15 digits";
+  //    isValid = false;
+  //  }
+
+   // Location Validation
+   if (!location.address.trim()) {
+     formErrors.location = "Location is required";
+     isValid = false;
+   }
+
+   // Gender Validation
+   if (!gender.trim()) {
+     formErrors.gender = "Gender is required";
+     isValid = false;
+   }
+
+   // Driving License Validation
+  const dlRegex = /^[A-Za-z0-9]{12,16}$/;
+  if (!dlNumber.trim()) {
+    formErrors.dlNumber = "Driving License Number is required";
+    isValid = false;
+  } else if (!dlRegex.test(dlNumber)) {
+    formErrors.dlNumber =
+      "Driving License must be 12-16 alphanumeric characters";
+    isValid = false;
+  }
+
+
+   // Profile Picture Validation
+   if (!profilePic.trim()) {
+     formErrors.profilePic = "Profile Pic is required";
+     isValid = false;
+   }
+
+   // Aadhar Front & Back Image Validation
+   if (!aadharFront.trim()) {
+     formErrors.aadharFront = "Aadhar Front Image is required";
+     isValid = false;
+   }
+   if (!aadharBack.trim()) {
+     formErrors.aadharBack = "Aadhar Back Image is required";
+     isValid = false;
+   }
+
+   // Driving License Front & Back Image Validation
+   if (!dlFront.trim()) {
+     formErrors.dlFront = "Driving License Front Image is required";
+     isValid = false;
+   }
+   if (!dlBack.trim()) {
+     formErrors.dlBack = "Driving License Back Image is required";
+     isValid = false;
+   }
+
+   // Expiry Date Validation
+   if (!expiryDate.trim()) {
+     formErrors.expiryDate = "Expiry Date is required";
+     isValid = false;
+   } else {
+     const expiry = new Date(expiryDate);
+     const today = new Date();
+     if (expiry <= today) {
+       formErrors.expiryDate = "Expiry Date must be in the future";
+       isValid = false;
+     }
+   }if (!expiryDate.trim()) {
+     formErrors.expiryDate = "Expiry Date is required";
+     isValid = false;
+   }
+
+   setUpdateState((prev) => ({
+     ...prev,
+     errors: formErrors,
+   }));
+
+   console.log({ isValid });
+   return isValid;
+ };
+
   const handleAddDriver = () => {
     const data = {
       fullName,
@@ -193,9 +288,11 @@ const AddNewDriver = () => {
       dlBack,
       expiryDate,
       email,
-      location,
+      // location,
+      lat: location?.lat,
+      long: location?.long,
     };
-    if (!handleValidation()) {
+    if (handleValidation()) {
       console.log({ data });
       dispatch(addNewDriver(data)).then((res) => {
         if (res?.payload?.code == 200) {
@@ -273,15 +370,18 @@ const AddNewDriver = () => {
                 </div>
                 <div className="form-group">
                   <label>Upload Profile Image</label>
-                  {!profilePic ? (
+                  {imageLoader?.profilePic ? (
+                    <LoaderForImage />
+                  ) : !profilePic ? (
                     <div className="UploadBox">
                       <div className="Upload">
                         <i className="fa fa-upload" /> <span>Upload Icon</span>
                         <input
+                          id="inputimage1"
                           type="file"
                           name="profilePic"
                           onChange={uploadImage}
-                          accept=".jpg,.png,.jpeg"
+                          accept=".jpg,.png,.jpeg" // Hide the file input
                         />
                       </div>
                     </div>
@@ -289,15 +389,50 @@ const AddNewDriver = () => {
                     <figure
                       style={{
                         margin: "0",
-                        width: "120px",
+                        width: "150px",
+                        height: "150px",
                         borderRadius: "0",
                         overflow: "hidden",
                         border: "2px solid #979797",
+                        position: "relative",
                       }}
                     >
-                      <img src={profilePic} />
+                      <img
+                        src={profilePic}
+                        alt="Uploaded Icon"
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                          borderRadius: "5px",
+                          transition: "transform 0.3s ease",
+                        }}
+                      />
+                      <i
+                        className="fa fa-edit"
+                        style={{
+                          position: "absolute",
+                          top: "0px",
+                          right: "0px",
+                          color: "#fff",
+                          background: "rgba(0, 0, 0, 0.6)",
+                          borderRadius: "50%",
+                          padding: "5px",
+                          zIndex: 2, // Place icon above the image
+                          cursor: "pointer",
+                        }}
+                        onClick={() => handleEditClick("inputimage1")}
+                      />
                     </figure>
                   )}
+                  <input
+                    id="inputimage1"
+                    type="file"
+                    name="profilePic"
+                    onChange={uploadImage}
+                    accept=".jpg,.png,.jpeg"
+                    style={{ display: "none" }} // Hide input, but keep it accessible for click events
+                  />
                   {errors.profilePic && (
                     <p className="d-flex justify-content-start text-danger mt-2 ">
                       {errors.profilePic}
@@ -367,7 +502,7 @@ const AddNewDriver = () => {
                       <div className="CommonForm">
                         {/* <span>65465165165FSA54</span> */}
                         <div className="form-group">
-                          <label>Registration Certificate Number</label>
+                          <label>Adhaar Card Number</label>
                           <input
                             type="text"
                             className="form-control"
@@ -394,7 +529,9 @@ const AddNewDriver = () => {
                       <ul>
                         <li>
                           <span>Adhaar Card front Side</span>
-                          {!aadharFront ? (
+                          {imageLoader?.aadharFront ? (
+                            <LoaderForImage />
+                          ) : !aadharFront ? (
                             <div className="UploadBox">
                               <div className="Upload">
                                 <i className="fa fa-upload" />{" "}
@@ -403,15 +540,58 @@ const AddNewDriver = () => {
                                   type="file"
                                   name="aadharFront"
                                   onChange={uploadImage}
-                                  accept=".jpg,.png,.jpeg"
+                                  accept=".jpg,.png,.jpeg" // Hide the file input
                                 />
                               </div>
                             </div>
                           ) : (
-                            <figure>
-                              <img src={aadharFront} />
+                            <figure
+                              style={{
+                                margin: "0",
+                                width: "150px",
+                                height: "150px",
+                                borderRadius: "0",
+                                overflow: "hidden",
+                                border: "2px solid #979797",
+                                position: "relative",
+                              }}
+                            >
+                              <img
+                                src={aadharFront}
+                                alt="Uploaded Icon"
+                                style={{
+                                  width: "100%",
+                                  height: "100%",
+                                  objectFit: "cover",
+                                  borderRadius: "5px",
+                                  transition: "transform 0.3s ease",
+                                }}
+                              />
+                              <i
+                                className="fa fa-edit"
+                                style={{
+                                  position: "absolute",
+                                  top: "0px",
+                                  right: "0px",
+                                  color: "#fff",
+                                  background: "rgba(0, 0, 0, 0.6)",
+                                  borderRadius: "50%",
+                                  padding: "5px",
+                                  zIndex: 2, // Place icon above the image
+                                  cursor: "pointer",
+                                }}
+                                onClick={() => handleEditClick("inputimage2")}
+                              />
                             </figure>
                           )}
+                          <input
+                            id="inputimage2"
+                            type="file"
+                            name="aadharFront"
+                            onChange={uploadImage}
+                            accept=".jpg,.png,.jpeg"
+                            style={{ display: "none" }} // Hide input, but keep it accessible for click events
+                          />
                           {errors.aadharFront && (
                             <p className="d-flex justify-content-start text-danger mt-2 ">
                               {errors.aadharFront}
@@ -428,7 +608,9 @@ const AddNewDriver = () => {
                       <ul>
                         <li>
                           <span>Adhaar Card Back Side</span>
-                          {!aadharBack ? (
+                          {imageLoader?.aadharBack ? (
+                            <LoaderForImage />
+                          ) : !aadharBack ? (
                             <div className="UploadBox">
                               <div className="Upload">
                                 <i className="fa fa-upload" />{" "}
@@ -437,15 +619,59 @@ const AddNewDriver = () => {
                                   type="file"
                                   name="aadharBack"
                                   onChange={uploadImage}
-                                  accept=".jpg,.png,.jpeg"
+                                  accept=".jpg,.png,.jpeg" // Hide the file input
                                 />
                               </div>
                             </div>
                           ) : (
-                            <figure>
-                              <img src={aadharBack} />
+                            <figure
+                              style={{
+                                margin: "0",
+                                width: "150px",
+                                height: "150px",
+                                borderRadius: "0",
+                                overflow: "hidden",
+                                border: "2px solid #979797",
+                                position: "relative",
+                              }}
+                            >
+                              <img
+                                src={aadharBack}
+                                alt="Uploaded Icon"
+                                style={{
+                                  width: "100%",
+                                  height: "100%",
+                                  objectFit: "cover",
+                                  borderRadius: "5px",
+                                  transition: "transform 0.3s ease",
+                                }}
+                              />
+                              <i
+                                className="fa fa-edit"
+                                style={{
+                                  position: "absolute",
+                                  top: "0px",
+                                  right: "0px",
+                                  color: "#fff",
+                                  background: "rgba(0, 0, 0, 0.6)",
+                                  borderRadius: "50%",
+                                  padding: "5px",
+                                  zIndex: 2, // Place icon above the image
+                                  cursor: "pointer",
+                                }}
+                                onClick={() => handleEditClick("inputimage3")}
+                              />
                             </figure>
                           )}
+                          <input
+                            id="inputimage3"
+                            type="file"
+                            name="aadharBack"
+                            onChange={uploadImage}
+                            accept=".jpg,.png,.jpeg"
+                            style={{ display: "none" }} // Hide input, but keep it accessible for click events
+                          />
+
                           {errors.aadharBack && (
                             <p className="d-flex justify-content-start text-danger mt-2 ">
                               {errors.aadharBack}
@@ -469,7 +695,7 @@ const AddNewDriver = () => {
                       <div className="CommonForm">
                         {/* <span>65465165165FSA54</span> */}
                         <div className="form-group">
-                          <label>Registration Certificate Number</label>
+                          <label>Drivers License Number</label>
                           <input
                             type="text"
                             className="form-control"
@@ -502,7 +728,9 @@ const AddNewDriver = () => {
                       <ul>
                         <li>
                           <span>Drivers License front Side</span>
-                          {!dlFront ? (
+                          {imageLoader?.dlFront ? (
+                            <LoaderForImage />
+                          ) : !dlFront ? (
                             <div className="UploadBox">
                               <div className="Upload">
                                 <i className="fa fa-upload" />{" "}
@@ -510,17 +738,60 @@ const AddNewDriver = () => {
                                 <input
                                   type="file"
                                   name="dlFront"
-                                  value={dlFront}
                                   onChange={uploadImage}
-                                  accept=".jpg,.png,.jpeg"
+                                  accept=".jpg,.png,.jpeg" // Hide the file input
                                 />
                               </div>
                             </div>
                           ) : (
-                            <figure>
-                              <img src={dlFront} />
+                            <figure
+                              style={{
+                                margin: "0",
+                                width: "150px",
+                                height: "150px",
+                                borderRadius: "0",
+                                overflow: "hidden",
+                                border: "2px solid #979797",
+                                position: "relative",
+                              }}
+                            >
+                              <img
+                                src={dlFront}
+                                alt="Uploaded Icon"
+                                style={{
+                                  width: "100%",
+                                  height: "100%",
+                                  objectFit: "cover",
+                                  borderRadius: "5px",
+                                  transition: "transform 0.3s ease",
+                                }}
+                              />
+                              <i
+                                className="fa fa-edit"
+                                style={{
+                                  position: "absolute",
+                                  top: "0px",
+                                  right: "0px",
+                                  color: "#fff",
+                                  background: "rgba(0, 0, 0, 0.6)",
+                                  borderRadius: "50%",
+                                  padding: "5px",
+                                  zIndex: 2, // Place icon above the image
+                                  cursor: "pointer",
+                                }}
+                                onClick={() => handleEditClick("inputimage4")}
+                              />
                             </figure>
                           )}
+                          <input
+                            id="inputimage4"
+                            type="file"
+                            name="dlFront"
+                            onChange={uploadImage}
+                            accept=".jpg,.png,.jpeg"
+                            style={{ display: "none" }} // Hide input, but keep it accessible for click events
+                          />
+
                           {errors.dlFront && (
                             <p className="d-flex justify-content-start text-danger mt-2 ">
                               {errors.dlFront}
@@ -537,7 +808,9 @@ const AddNewDriver = () => {
                       <ul>
                         <li>
                           <span>Drivers License Back Side</span>
-                          {!dlBack ? (
+                          {imageLoader?.dlBack ? (
+                            <LoaderForImage />
+                          ) : !dlBack ? (
                             <div className="UploadBox">
                               <div className="Upload">
                                 <i className="fa fa-upload" />{" "}
@@ -545,17 +818,60 @@ const AddNewDriver = () => {
                                 <input
                                   type="file"
                                   name="dlBack"
-                                  value={dlBack}
                                   onChange={uploadImage}
-                                  accept=".jpg,.png,.jpeg"
+                                  accept=".jpg,.png,.jpeg" // Hide the file input
                                 />
                               </div>
                             </div>
                           ) : (
-                            <figure>
-                              <img src={dlBack} />
+                            <figure
+                              style={{
+                                margin: "0",
+                                width: "150px",
+                                height: "150px",
+                                borderRadius: "0",
+                                overflow: "hidden",
+                                border: "2px solid #979797",
+                                position: "relative",
+                              }}
+                            >
+                              <img
+                                src={dlBack}
+                                alt="Uploaded Icon"
+                                style={{
+                                  width: "100%",
+                                  height: "100%",
+                                  objectFit: "cover",
+                                  borderRadius: "5px",
+                                  transition: "transform 0.3s ease",
+                                }}
+                              />
+                              <i
+                                className="fa fa-edit"
+                                style={{
+                                  position: "absolute",
+                                  top: "0px",
+                                  right: "0px",
+                                  color: "#fff",
+                                  background: "rgba(0, 0, 0, 0.6)",
+                                  borderRadius: "50%",
+                                  padding: "5px",
+                                  zIndex: 2, // Place icon above the image
+                                  cursor: "pointer",
+                                }}
+                                onClick={() => handleEditClick("inputimage5")}
+                              />
                             </figure>
                           )}
+                          <input
+                            id="inputimage5"
+                            type="file"
+                            name="dlBack"
+                            onChange={uploadImage}
+                            accept=".jpg,.png,.jpeg"
+                            style={{ display: "none" }} // Hide input, but keep it accessible for click events
+                          />
+
                           {errors.dlBack && (
                             <p className="d-flex justify-content-start text-danger mt-2 ">
                               {errors.dlBack}

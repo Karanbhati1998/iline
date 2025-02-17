@@ -1,38 +1,49 @@
-import React, { useState } from 'react'
-import DisApproveModal from './DisApproveModal';
-import BackButton from '../../BackButton';
-import { useLocation, useNavigate } from 'react-router-dom';
-import moment from 'moment';
-import { useDispatch } from 'react-redux';
-import { rejectAndAcceptOfPendngForApproval } from '../../../features/slices/DriverManagement/pendingForApproval/pendingForApproval';
-import { toastService } from '../../../utils/toastify';
-const initialState={}
+import React, { useState } from "react";
+import DisApproveModal from "./DisApproveModal";
+import BackButton from "../../BackButton";
+import { useLocation, useNavigate } from "react-router-dom";
+import moment from "moment";
+import { useDispatch } from "react-redux";
+import { rejectAndAcceptOfPendngForApproval } from "../../../features/slices/DriverManagement/pendingForApproval/pendingForApproval";
+import { toastService } from "../../../utils/toastify";
+import ZoomEffect from "../../ZoomEffect";
+const initialState = {};
 const VechileStatus = () => {
-  const [showDisApproveModal,setShowDisApproveModal]=useState(false)
-  const [id,setId]=useState('')
-  const {state}=useLocation()
-  const navigate=useNavigate()
-  const dispatch=useDispatch()
-  console.log({state});
-  
-  const handleCloseDisApproveModal=()=>{
-    setShowDisApproveModal(false)
-  }
-  const handleApproveOrDisApprove=(val)=>{
-    const data={
-      id:state?._id,
-      status:val,
-    }
-    dispatch(rejectAndAcceptOfPendngForApproval(data)).then(res=>{
-      if(res?.payload?.code===200){
-        setShowDisApproveModal(false)
-        toastService.success("Status updated successfully")
+  const [showDisApproveModal, setShowDisApproveModal] = useState(false);
+  const [imageModal, setImageModal] = useState(false);
+  const [image, setImage] = useState("");
+  const [id, setId] = useState("");
+  const { state } = useLocation();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  console.log({ state });
+
+  const handleCloseDisApproveModal = () => {
+    setShowDisApproveModal(false);
+  };
+  const handleApproveOrDisApprove = (val) => {
+    const data = {
+      id: state?._id,
+      status: val,
+    };
+    dispatch(rejectAndAcceptOfPendngForApproval(data)).then((res) => {
+      if (res?.payload?.code === 200) {
+        setShowDisApproveModal(false);
+        toastService.success("Status updated successfully");
         navigate("/driverManagement/pendingForApproval");
-      }else{
-        toastService.error(res?.payload?.message)
+      } else {
+        toastService.error(res?.payload?.message);
       }
-    })
-  }
+    });
+  };
+  const handleViewImage = (image) => {
+    setImage(image);
+    setImageModal(true);
+  };
+  const handleCloseImageModal = () => {
+    setImageModal(false);
+    setImage("");
+  };
   return (
     <>
       <div className="WrapperArea">
@@ -106,9 +117,9 @@ const VechileStatus = () => {
                         </p>
                       </aside>
                       <aside>
-                        <p>
+                        {/* <p>
                           <label>Location</label> <span>-</span>
-                        </p>
+                        </p> */}
                         <p>
                           <label>Gender</label> <span>{state?.gender}</span>
                         </p>
@@ -136,7 +147,7 @@ const VechileStatus = () => {
                         <div className="VehicleDocument">
                           <aside>
                             <p>
-                              <strong>Registration Certificate Number</strong>
+                              <strong>Adhaar Card Number</strong>
                               <span>
                                 {state?.driverDocumentData?.[0]?.aadharNumber ||
                                   state?.aadharNumber}
@@ -150,7 +161,16 @@ const VechileStatus = () => {
                           <ul>
                             <li>
                               <span>Document</span>
-                              <figure>
+                              <figure
+                                style={{
+                                  cursor: "pointer",
+                                }}
+                                onClick={() =>
+                                  handleViewImage(
+                                    state?.driverDocumentData?.[0]?.aadharFront
+                                  )
+                                }
+                              >
                                 <img
                                   src={
                                     state?.driverDocumentData?.[0]?.aadharFront
@@ -161,7 +181,13 @@ const VechileStatus = () => {
                               <figure
                                 style={{
                                   marginTop: "10px",
+                                  cursor: "pointer",
                                 }}
+                                onClick={() =>
+                                  handleViewImage(
+                                    state?.driverDocumentData?.[0]?.aadharBack
+                                  )
+                                }
                               >
                                 <img
                                   src={
@@ -181,14 +207,14 @@ const VechileStatus = () => {
                         <div className="VehicleDocument">
                           <aside>
                             <p>
-                              <strong>Registration Certificate Number</strong>
+                              <strong>Drivers License Number</strong>
                               <span>{state?.dlNumber}</span>
                             </p>
                             <p>
                               <strong>Expiry</strong>
                               <span>
                                 {moment(
-                                  state?.driverDocumentData?.[0]?.expiryDate
+                                  state?.vechicleData?.[0]?.rcExpiryDate
                                 ).format("DD-MM-YYYY")}
                               </span>
                             </p>
@@ -196,7 +222,16 @@ const VechileStatus = () => {
                           <ul>
                             <li>
                               <span>Document</span>
-                              <figure>
+                              <figure
+                                style={{
+                                  cursor: "pointer",
+                                }}
+                                onClick={() =>
+                                  handleViewImage(
+                                    state?.driverDocumentData?.[0]?.dlFront
+                                  )
+                                }
+                              >
                                 <img
                                   src={
                                     state?.driverDocumentData?.[0]?.dlFront ||
@@ -207,7 +242,13 @@ const VechileStatus = () => {
                               <figure
                                 style={{
                                   marginTop: "10px",
+                                  cursor: "pointer",
                                 }}
+                                onClick={() =>
+                                  handleViewImage(
+                                    state?.driverDocumentData?.[0]?.dlBack
+                                  )
+                                }
                               >
                                 <img
                                   src={
@@ -221,13 +262,13 @@ const VechileStatus = () => {
                               <strong className="Red">
                                 <i className="fa fa-exclamation-triangle" />{" "}
                                 {moment(
-                                  state?.driverDocumentData?.[0]?.expiryDate
+                                  state?.vechicleData?.[0]?.rcExpiryDate
                                 ).isAfter(moment())
                                   ? `Expiring in ${moment(
-                                      state?.driverDocumentData?.[0]?.expiryDate
+                                      state?.vechicleData?.[0]?.rcExpiryDate
                                     ).fromNow()}`
                                   : `Expired ${moment(
-                                      state?.driverDocumentData?.[0]?.expiryDate
+                                      state?.vechicleData?.[0]?.rcExpiryDate
                                     ).fromNow()}`}
                               </strong>
                             </li>
@@ -265,8 +306,11 @@ const VechileStatus = () => {
           id={state?._id}
         />
       )}
+      {imageModal && (
+        <ZoomEffect image={image} handleClose={handleCloseImageModal} />
+      )}
     </>
   );
-}
+};
 
-export default VechileStatus
+export default VechileStatus;

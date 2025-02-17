@@ -7,7 +7,7 @@ export const SocketProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
-    const socketInstance = io("http://15.206.16.230:4100", {
+    const socketInstance = io("http://43.205.176.154:4100", {
       transports: ["websocket"],
       withCredentials: true,
     });

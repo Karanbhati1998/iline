@@ -28,7 +28,7 @@ const CompletedDetail = () => {
               <li>
                 <h2>
                   Driver Details{" "}
-                  <span> #{state?.driverData?.driver_number}</span>
+                  <span> {state?.driverData?.driver_number}</span>
                 </h2>
                 <a href="driver-management-all-driver-details.html">
                   <span className="Icon">
@@ -45,13 +45,13 @@ const CompletedDetail = () => {
                     <p>{state?.driverData?.phoneNumber}</p>
                   </span>
                   <span className="Count">
-                    ⭐ {state?.driverData?.avgRating}
+                    ⭐ {state?.driverData?.avgRating?.toFixed(2)}
                   </span>
                 </a>
               </li>
               <li>
                 <h2>
-                  Customer Details<span> #{state?.userData?.user_number}</span>
+                  Customer Details<span> {state?.userData?.user_number}</span>
                 </h2>
                 <a href="driver-management-all-driver-details.html">
                   <span className="Icon">
@@ -66,7 +66,9 @@ const CompletedDetail = () => {
                     {state?.userData?.fullName}{" "}
                     <p>{state?.userData?.phoneNumber}</p>
                   </span>
-                  <span className="Count">⭐ {state?.userData?.avgRating}</span>
+                  <span className="Count">
+                    ⭐ {state?.userData?.avgRating?.toFixed(2)}
+                  </span>
                 </a>
               </li>
               <li>
@@ -241,7 +243,7 @@ const CompletedDetail = () => {
                     <aside>
                       <p>
                         <strong>Trip Charges</strong>
-                        <span> Rs {state?.tripCharge}</span>
+                        <span> Rs {state?.tripCharge?.toFixed(2)}</span>
                       </p>
                       <p>
                         <strong>Loading/Unloading Charges</strong>
@@ -256,7 +258,7 @@ const CompletedDetail = () => {
                       {" "}
                       <p>
                         <strong>GST (5%)</strong>
-                        <span> Rs {state?.gstCharge}</span>
+                        <span> Rs {state?.gstCharge?.toFixed(2)}</span>
                       </p>
                       {/* <p>
                         <strong>Coupon Discount</strong>
@@ -266,7 +268,7 @@ const CompletedDetail = () => {
                   </article>
                 </div>
               </div>
-              <h3>Total Amount to Pay: Rs {state?.withoutGst}</h3>
+              <h3>Total Amount to Pay: Rs {state?.tripCharge?.toFixed(2)}</h3>
             </div>
             {/* <div className="Small-Wrapper">
               <div className="TitleBox">

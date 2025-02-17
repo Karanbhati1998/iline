@@ -9,6 +9,8 @@ const VehicleManagement = () => {
   const { categoryWiseVehicleData } = useSelector((state) => {
     return state?.vechile;
   });
+  console.log({ categoryWiseVehicleData });
+
   useEffect(() => {
     dispatch(getCategoryWiseVehicleData());
   }, []);
@@ -37,7 +39,7 @@ const VehicleManagement = () => {
               <div className="DriverCountList">
                 <ul>
                   <li>
-                    <a >
+                    <a>
                       <span className="Icon">
                         <img src={require("../../assets/images/car.png")} />
                       </span>
@@ -82,7 +84,13 @@ const VehicleManagement = () => {
                     </Link>
                   </li>
                   <li>
-                    <Link to="vechileService" state={"Local"}>
+                    <Link
+                      to="vechileService"
+                      state={{
+                        type: "Local",
+                        ind: res?._id,
+                      }}
+                    >
                       <span className="Icon">
                         <img src={require("../../assets/images/car.png")} />
                       </span>
@@ -93,7 +101,13 @@ const VehicleManagement = () => {
                     </Link>
                   </li>
                   <li>
-                    <Link to="vechileService" state={"Outstation"}>
+                    <Link
+                      to="vechileService"
+                      state={{
+                        type: "Outstation",
+                        ind: res?._id,
+                      }}
+                    >
                       <span className="Icon">
                         <img src={require("../../assets/images/car.png")} />
                       </span>
@@ -105,7 +119,13 @@ const VehicleManagement = () => {
                     </Link>
                   </li>
                   <li>
-                    <Link to="vechileService" state={"Express"}>
+                    <Link
+                      to="vechileService"
+                      state={{
+                        type: "Express",
+                        ind: res?._id,
+                      }}
+                    >
                       <span className="Icon">
                         <img src={require("../../assets/images/car.png")} />
                       </span>
@@ -134,7 +154,7 @@ const VehicleManagement = () => {
                     </a>
                   </li> */}
                   <li>
-                    <Link to="pendingVechilePage">
+                    <Link to="pendingVechilePage" state={res?._id}>
                       <span className="Icon">
                         <img src={require("../../assets/images/car.png")} />
                       </span>

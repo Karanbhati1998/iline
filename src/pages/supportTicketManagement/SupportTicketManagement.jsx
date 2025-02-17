@@ -23,7 +23,7 @@ const SupportTicketManagement = () => {
   const [iState, setUpdateState] = useState(initialState);
   const { page, search, fromDate, toDate, timeframe, closeChat, id } = iState;
   const dispatch = useDispatch();
-  const { supportTickets,count } = useSelector((state) => {
+  const { supportTickets, count } = useSelector((state) => {
     return state?.supportTicket;
   });
   console.log({ supportTickets, count });
@@ -92,9 +92,14 @@ const SupportTicketManagement = () => {
         <div className="WrapperBox">
           <div className="TitleBox">
             <h4 className="Title">Support Ticket Management</h4>
-            <Link className="TitleLink" to="callRequest">
-              Call Requests <span>{count?.result}</span>
-            </Link>
+            <div className="TitleLink">
+              <Link className="TitleLink" to="sosRequest">
+                Sos Requests List
+              </Link>
+              <Link className="TitleLink ml-5" to="callRequest">
+                Call Requests <span>{count?.result}</span>
+              </Link>
+            </div>
           </div>
           <div className="Small-Wrapper">
             <div className="FilterArea">
@@ -186,9 +191,9 @@ const SupportTicketManagement = () => {
                           {/* <td>-</td> */}
                           <td>{res?.userData?.fullName}</td>
                           <td>{res?.userData?.phoneNumber}</td>
-                          <td>{res?.userType ||"-"}</td>
+                          <td>{res?.userType || "-"}</td>
                           <td>{moment(res?.createdAt).format("DD-MM-YYYY")}</td>
-                          <td>L{res?.description}</td>
+                          <td>{res?.description}</td>
                           <td>
                             <span
                               className={
@@ -209,7 +214,7 @@ const SupportTicketManagement = () => {
                                   Reply
                                 </Link>
                               ) : (
-                                <span className="Disabled">Reply</span> // Add styling for "disabled" look
+                                <a className="Disabled">Reply</a> // Add styling for "disabled" look
                               )}
                             </div>
                           </td>

@@ -3,6 +3,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import {
   driverStatus,
+  
+  fetchAllILineDriverList,
+  
   fetchILineDriverList,
 } from "../../../features/slices/DriverManagement/allDriver/allDriverReducer";
 import { toastService } from "../../../utils/toastify";
@@ -10,6 +13,7 @@ import moment from "moment";
 import CommonPagination from "../../CommonPagination";
 import { canPerformAction } from "../../../utils/deniedAccess";
 import DeleteModal from "../../DeleteModal";
+import ExportToExcel from "../../ExportToExcel";
 const initialState = {
   page: 1,
   search: "",
@@ -24,6 +28,22 @@ const I_lineDriver = () => {
   const { page, search, fromDate, toDate, timeframe, deleteModal, id } = iState;
   const dispatch = useDispatch();
   const iLineRef = useRef();
+  const [allData, setAllData] = useState([]);
+    useEffect(() => {
+      const data = {
+        search,
+        fromDate,
+        toDate,
+        timeframe,
+        limit: 999999,
+      };
+      dispatch(fetchAllILineDriverList(data)).then((res) => {
+        if (res?.payload?.code == 200) {
+          console.log({ res });
+          setAllData(res?.payload);
+        }
+      });
+    }, [timeframe, page, toDate, search, fromDate]);
   const { iLineDriverList } = useSelector((state) => {
     return state?.driverManagementAllDrivers;
   });
@@ -169,21 +189,115 @@ const I_lineDriver = () => {
               </div>
             </div>
             <div className="FilterRight">
-              <div className="form-group">
-                <label>&nbsp;</label>
-                <a href="#" className="Button" download="">
-                  <span className="download">
-                    <img src="images/download.png" alt="" />
-                  </span>
-                  Download Receipt
-                </a>
-              </div>
+              <ExportToExcel ref={iLineRef} fileName="ilineDriver" />
             </div>
           </div>
         </div>
         <div className="Small-Wrapper">
-          <div className="TableList">
+          <div className="TableList" style={{ display: "none" }}>
             <table ref={iLineRef}>
+              <thead>
+                <tr>
+                  <th>S.No.</th>
+                  <th>Driver ID</th>
+                  <th>Driver Name</th>
+                  <th>Contact No.</th>
+                  <th>Vehicle ID</th>
+                  <th>Vehicle No</th>
+                  <th>Total Bookings</th>
+                  <th>Status</th>
+                  <th>Registered On</th>
+                  <th>Local Delivery</th>
+                  <th>Out Station</th>
+                  <th>Express Delivery</th>
+                  <th>Driver Status</th>
+                  {canPerformAction("Driver Management") && <th>Action</th>}
+                  <th>Details</th>
+                </tr>
+              </thead>
+              <tbody>
+                {allData?.result?.[0]?.paginationData?.map((res, i) => {
+                  console.log({ res });
+
+                  return (
+                    <tr>
+                      <td>{i + 1 + (page - 1) * 10}</td>
+                      <td>{res?.driver_number}</td>
+                      <td>
+                        <Link
+                          to="/driverManagement/detailDriverManagement"
+                          className="Blue"
+                          state={res}
+                        >
+                          {res?.fullName}
+                        </Link>
+                      </td>
+                      <td>{res?.phoneNumber}</td>
+                      <td>{res?.vehicleData?.[0]?.vehicleNumber}</td>
+                      <td>{res?.vehicleData?.[0]?.vehicleNumberPlate}</td>
+                      <td>{res?.totalRides}</td>
+                      <td>
+                        <span className={res?.is_online ? "Green" : "Red"}>
+                          {res?.is_online ? "Online" : "Offline"}
+                        </span>{" "}
+                      </td>
+                      <td>{moment(res?.createdAt).format("DD-MM-YYYY")}</td>
+                      <td>{res?.localRideCount}</td>
+                      <td>{res?.outstationRideCount}</td>
+                      <td>{res?.expressRideCount}</td>
+                      <td>
+                        <span
+                          className={
+                            res?.userStatus == "ACTIVE" ? "Green" : "Red"
+                          }
+                        >
+                          {res?.userStatus}
+                        </span>{" "}
+                      </td>
+                      {canPerformAction("Driver Management") && (
+                        <td>
+                          {" "}
+                          <div className="Actions">
+                            <label className="Switch">
+                              <input
+                                type="checkbox"
+                                name="status"
+                                checked={res?.userStatus == "ACTIVE"}
+                                onChange={(e) => handleChecked(e, res?._id)}
+                              />
+                              <span className="slider" />
+                            </label>
+                            <a
+                              className="Red"
+                              onClick={() => showDeleteModal(res?._id)}
+                            >
+                              <i className="fa fa-trash" aria-hidden="true" />
+                            </a>
+                          </div>
+                        </td>
+                      )}
+                      <td>
+                        <div className="Actions">
+                          <Link
+                            to="/driverManagement/detailDriverManagement"
+                            className="Blue"
+                            state={res}
+                          >
+                            <i
+                              className="fa fa-info-circle"
+                              aria-hidden="true"
+                            />
+                          </Link>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+          <div className="TableList">
+            <table>
               <thead>
                 <tr>
                   <th>S.No.</th>

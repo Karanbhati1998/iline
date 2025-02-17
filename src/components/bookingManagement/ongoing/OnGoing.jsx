@@ -37,14 +37,19 @@ const OnGoing = ({ categoryId }) => {
       toDate,
       timeframe,
       limit: 999999,
+      categoryId,
     };
-    dispatch(getAllOngoingBookingList(data)).then((res) => {
-      if (res?.payload?.code == 200) {
-        console.log({ res });
-        setAllData(res?.payload);
-      }
-    });
-  }, [timeframe, page, toDate, search, fromDate]);
+    if (categoryId) {
+      dispatch(getAllOngoingBookingList(data)).then((res) => {
+        if (res?.payload?.code == 200) {
+          console.log({ res });
+          setAllData(res?.payload);
+        }
+      });
+    }
+  }, [timeframe, page, toDate, search, fromDate, categoryId]);
+  console.log({ allData });
+
   useEffect(() => {
     if (categoryId) {
       dispatch(
@@ -181,7 +186,7 @@ const OnGoing = ({ categoryId }) => {
             </tr>
           </thead>
           <tbody>
-            {OngoingBookingList?.result?.[0]?.paginationData?.map((res, i) => {
+            {allData?.result?.[0]?.paginationData?.map((res, i) => {
               return (
                 <tr key={i}>
                   <td>{i + 1 + (page - 1) * 10}</td>

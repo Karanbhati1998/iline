@@ -21,7 +21,9 @@ const LogoutModal = ({ handleClose }) => {
           <p>Are you sure you want to log out?</p>
           <h4>
             <a onClick={handleClose}>no</a>
-            <a onClick={handleLogout}>Yes</a>
+            <a onClick={handleLogout} style={{
+              cursor:"pointer",
+            }}>Yes</a>
           </h4>
         </div>
       </div>

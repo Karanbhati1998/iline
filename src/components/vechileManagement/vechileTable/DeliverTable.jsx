@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  getAllServiceBasedVehicleList,
   getIlineOrP2pVechileList,
   getServiceBasedVehicleList,
   vehicleStatus,
@@ -12,6 +13,7 @@ import CommonPagination from "../../CommonPagination";
 import moment from "moment";
 import DeleteModal from "../../DeleteModal";
 import { canPerformAction } from "../../../utils/deniedAccess";
+import ExportToExcel from "../../ExportToExcel";
 const initialState = {
   page: 1,
   search: "",
@@ -27,15 +29,45 @@ const DeliverTable = () => {
   const { page, search, fromDate, toDate, timeframe, deleteModal, id } = iState;
   const dispatch = useDispatch();
   const { state } = useLocation();
+  const vechileService = useRef();
+    const [allData, setAllData] = useState([]);
+      useEffect(() => {
+        const data = {
+          search,
+          fromDate,
+          toDate,
+          timeframe,
+          serviceType: state?.type,
+          categoryId: state?.ind,
+          limit: 999999,
+        };
+         if (state) {
+           dispatch(getAllServiceBasedVehicleList(data)).then((res) => {
+             if (res?.payload?.code == 200) {
+               console.log({ res });
+               setAllData(res?.payload);
+             }
+           });
+
+         }
+      }, [timeframe, page, toDate, search, fromDate]);
+   
   const { serviceBasedVehicleList } = useSelector((state) => {
     return state?.vechile;
   });
+
   console.log({ serviceBasedVehicleList });
+  console.log({ state });
 
   useEffect(() => {
     if (state) {
       dispatch(
-        getServiceBasedVehicleList({ serviceType: state, page, timeframe })
+        getServiceBasedVehicleList({
+          serviceType: state?.type,
+          categoryId: state?.ind,
+          page,
+          timeframe,
+        })
       );
     }
   }, [state, page, timeframe]);
@@ -45,7 +77,8 @@ const DeliverTable = () => {
         getServiceBasedVehicleList({
           search: search.trim(),
           timeframe,
-          serviceType: state,
+          serviceType: state?.type,
+          categoryId: state?.ind,
         })
       );
     }, 1000);
@@ -55,7 +88,13 @@ const DeliverTable = () => {
 
   const handlePageChange = (page) => {
     setUpdateState({ ...iState, page });
-    dispatch(getServiceBasedVehicleList({ serviceType: state, page }));
+    dispatch(
+      getServiceBasedVehicleList({
+        serviceType: state?.type,
+        categoryId: state?.ind,
+        page,
+      })
+    );
   };
   const handleChecked = (e, id) => {
     const { name, checked } = e?.target;
@@ -65,7 +104,13 @@ const DeliverTable = () => {
       console.log("status update api", res);
       if (res?.payload?.code == 200) {
         toastService.success("Status updated successfully");
-        dispatch(getServiceBasedVehicleList({ serviceType: state, page }));
+        dispatch(
+          getServiceBasedVehicleList({
+            serviceType: state?.type,
+            categoryId: state?.ind,
+            page,
+          })
+        );
       } else {
         toastService.error("status update failed");
       }
@@ -76,7 +121,13 @@ const DeliverTable = () => {
   };
   const handleReset = () => {
     setUpdateState(initialState);
-    dispatch(getServiceBasedVehicleList({ serviceType: state, page: 1 }));
+    dispatch(
+      getServiceBasedVehicleList({
+        serviceType: state?.type,
+        categoryId: state?.ind,
+        page: 1,
+      })
+    );
   };
   const handleApply = () => {
     const data = {
@@ -84,7 +135,8 @@ const DeliverTable = () => {
       fromDate,
       toDate,
       page,
-      serviceType: state,
+      serviceType: state?.type,
+      categoryId: state?.ind,
     };
     dispatch(getServiceBasedVehicleList(data));
   };
@@ -96,7 +148,13 @@ const DeliverTable = () => {
       if (res?.payload?.code == 200) {
         toastService.success("Delete successfully");
         setUpdateState({ ...iState, deleteModal: false, id: "" });
-        dispatch(getServiceBasedVehicleList({ serviceType: state, page }));
+        dispatch(
+          getServiceBasedVehicleList({
+            serviceType: state?.type,
+            categoryId: state?.ind,
+            page,
+          })
+        );
       } else {
         toastService.error("Delete failed");
       }
@@ -107,7 +165,7 @@ const DeliverTable = () => {
       <div className="WrapperArea">
         <div className="WrapperBox">
           <div className="TitleBox">
-            <h4 className="Title">{state} Vehicles</h4>
+            <h4 className="Title">{state?.type} Vehicles</h4>
             <div className="TitleLink">
               <a className="TitleLink">
                 <BackButton />
@@ -188,16 +246,126 @@ const DeliverTable = () => {
                         <option>Freight-Truck</option>
                       </select>
                     </div>
-                    <div className="form-group">
-                      <label>&nbsp;</label>
-                      <a href="#" className="Button" download="">
-                        <span className="download">
-                          <img src="images/download.png" alt="" />
-                        </span>
-                        Download CSV
-                      </a>
-                    </div>
+                      <ExportToExcel
+                        ref={vechileService}
+                        fileName="vechileService"
+                      />
                   </div>
+                </div>
+                <div className="TableList mt-4" style={{ display: "none" }}>
+                  <table ref={vechileService}>
+                    <thead>
+                      <tr>
+                        <th>S.No.</th>
+                        <th>Vehicle ID</th>
+                        <th>Vehicle No.</th>
+                        <th>Vehicle Type</th>
+                        <th>Vehicle Added On</th>
+                        <th>Service Type</th>
+                        <th>Current Assigned Driver</th>
+                        <th>Assigned/Approved On</th>
+                        <th>Assigned/Approved By</th>
+                        <th>Status</th>
+                        {canPerformAction("Vehicle Management") && (
+                          <th>Action</th>
+                        )}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {allData?.result?.[0]?.paginationData?.map(
+                        (res, i) => {
+                          return (
+                            <tr key={res?._id}>
+                              <td>{i + 1 + (page - 1) * 10}</td>
+                              <td>{res?.vehicleNumber}</td>
+                              <td>{res?.vehicleNumberPlate}</td>
+
+                              <td>{res?.vehicleType}</td>
+                              <td>
+                                {moment(res?.createdAt).format("DD-MM-YYYY")}
+                              </td>
+                              <td>
+                                {(() => {
+                                  const labels = [];
+                                  if (res?.is_local) labels.push("Local");
+                                  if (res?.is_express) labels.push("Express");
+                                  if (res?.is_outstation)
+                                    labels.push("Outstation");
+                                  return labels.length > 0
+                                    ? labels.join(", ")
+                                    : "-";
+                                })()}
+                              </td>
+
+                              <td>{res?.driverData?.[0]?.fullName}</td>
+
+                              <td>
+                                {res.assignOn
+                                  ? moment(res.assignOn).format("DD-MM-YYYY")
+                                  : moment(
+                                      res?.driverData?.[0]?.approvedOn
+                                    ).format("DD-MM-YYYY")}
+                              </td>
+                              <td>
+                                {res?.assignBy ||
+                                  res?.driverData?.[0]?.approvedBy}
+                              </td>
+                              <td>
+                                <span
+                                  className={
+                                    res?.status == "ACTIVE" ? "Green" : "Red"
+                                  }
+                                >
+                                  {res?.status == "ACTIVE"
+                                    ? "Enabled"
+                                    : "Disabled"}
+                                </span>
+                              </td>
+                              {canPerformAction("Vehicle Management") && (
+                                <td>
+                                  <div className="Actions">
+                                    <label className="Switch">
+                                      <input
+                                        type="checkbox"
+                                        name="status"
+                                        checked={res?.status == "ACTIVE"}
+                                        onChange={(e) =>
+                                          handleChecked(e, res?._id)
+                                        }
+                                      />
+                                      <span className="slider" />
+                                    </label>
+                                    <a
+                                      className="Red"
+                                      onClick={() => {
+                                        setUpdateState({
+                                          ...iState,
+                                          deleteModal: true,
+                                          id: res?._id,
+                                        });
+                                      }}
+                                    >
+                                      <i className="fa fa-trash" />
+                                    </a>
+                                    <Link
+                                      to="/vehicleManagement/details"
+                                      className="Blue"
+                                      state={res}
+                                    >
+                                      <i
+                                        className="fa fa-info-circle"
+                                        aria-hidden="true"
+                                      />
+                                    </Link>
+                                  </div>
+                                </td>
+                              )}
+                            </tr>
+                          );
+                        }
+                      )}
+                    </tbody>
+                  </table>
                 </div>
                 <div className="TableList mt-4">
                   <table>
@@ -210,8 +378,8 @@ const DeliverTable = () => {
                         <th>Vehicle Added On</th>
                         <th>Service Type</th>
                         <th>Current Assigned Driver</th>
-                        <th>Assigned On</th>
-                        <th>Assigned By</th>
+                        <th>Assigned/Approved On</th>
+                        <th>Assigned/Approved By</th>
                         <th>Status</th>
                         {canPerformAction("Vehicle Management") && (
                           <th>Action</th>
@@ -244,9 +412,19 @@ const DeliverTable = () => {
                                 })()}
                               </td>
 
-                              <td>-</td>
-                              <td>-</td>
-                              <td>-</td>
+                              <td>{res?.driverData?.[0]?.fullName}</td>
+
+                              <td>
+                                {res.assignOn
+                                  ? moment(res.assignOn).format("DD-MM-YYYY")
+                                  : moment(
+                                      res?.driverData?.[0]?.approvedOn
+                                    ).format("DD-MM-YYYY")}
+                              </td>
+                              <td>
+                                {res?.assignBy ||
+                                  res?.driverData?.[0]?.approvedBy}
+                              </td>
                               <td>
                                 <span
                                   className={

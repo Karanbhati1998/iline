@@ -29,7 +29,7 @@ const PaymentDetail = () => {
                 <li>
                   <h2>
                     Driver Details{" "}
-                    <span> #{state?.driverData?.driver_number}</span>
+                    <span> {state?.driverData?.driver_number}</span>
                   </h2>
                   <a href="driver-management-all-driver-details.html">
                     <span className="Icon">
@@ -40,13 +40,13 @@ const PaymentDetail = () => {
                       <p>{state?.driverData?.phoneNumber}</p>
                     </span>
                     <span className="Count">
-                      ⭐ {state?.driverData?.avgRating}
+                      ⭐ {state?.driverData?.avgRating?.toFixed(2)}
                     </span>
                   </a>
                 </li>
                 <li>
                   <h2>
-                    Customer Details<span> #21335</span>
+                    Customer Details<span> {state?.userData?.user_number}</span>
                   </h2>
                   <a href="driver-management-all-driver-details.html">
                     <span className="Icon">
@@ -62,7 +62,7 @@ const PaymentDetail = () => {
                       <p>{state?.userData?.phoneNumber}</p>
                     </span>
                     <span className="Count">
-                      ⭐ {state?.userData?.avgRating}
+                      ⭐ {state?.userData?.avgRating?.toFixed(2)}
                     </span>
                   </a>
                 </li>
@@ -239,13 +239,19 @@ const PaymentDetail = () => {
                       <aside>
                         <p>
                           <strong>Trip Charges</strong>
-                          <span> Rs {state?.requestData?.tripCharge}</span>
+                          <span>
+                            {" "}
+                            Rs {state?.requestData?.tripCharge?.toFixed(2)}
+                          </span>
                         </p>
                         <p>
                           <strong>Loading/Unloading Charges</strong>
                           <span>
                             {" "}
-                            Rs {state?.requestData?.loadingUnloadingCharge}
+                            Rs{" "}
+                            {state?.requestData?.loadingUnloadingCharge.toFixed(
+                              2
+                            )}
                           </span>
                         </p>
                         {/* <p>
@@ -257,7 +263,10 @@ const PaymentDetail = () => {
                         {" "}
                         <p>
                           <strong>GST (5%)</strong>
-                          <span> Rs {state?.requestData?.gstCharge}</span>
+                          <span>
+                            {" "}
+                            Rs {state?.requestData?.gstCharge?.toFixed(2)}
+                          </span>
                         </p>
                         {/* <p>
                         <strong>Coupon Discount</strong>
@@ -268,7 +277,8 @@ const PaymentDetail = () => {
                   </div>
                 </div>
                 <h3>
-                  Total Amount to Pay: Rs {state?.requestData?.withoutGst}
+                  Total Amount to Pay: Rs{" "}
+                  {state?.requestData?.tripCharge?.toFixed(2)}
                 </h3>
               </div>
               {/* <div className="InformationBox mt-4">

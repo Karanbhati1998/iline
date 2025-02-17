@@ -9,6 +9,20 @@ const initialState = {
   loading: false,
   error: null,
 };
+export const getAllIlineOrP2pVechileList = createAsyncThunk(
+  "get/allilineOrP2pVechileList",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get("/vehicleList", {
+        params: payload,
+      });
+      return response.data;
+    } catch (error) {
+      console.log({ error });
+      rejectWithValue(error);
+    }
+  }
+);
 export const getIlineOrP2pVechileList = createAsyncThunk(
   "get/ilineOrP2pVechileList",
   async (payload, { rejectWithValue }) => {
@@ -73,6 +87,20 @@ export const vehicleStatus = createAsyncThunk(
     }
   }
 );
+export const getAllPendingVehicleList = createAsyncThunk(
+  "get/allpendingVehicle",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get("/pendingVehicle", {
+        params: payload,
+      });
+      return response.data;
+    } catch (error) {
+      console.log({ error });
+      rejectWithValue(error);
+    }
+  }
+);
 export const getPendingVehicleList = createAsyncThunk(
   "get/pendingVehicle",
   async (payload, { rejectWithValue }) => {
@@ -111,6 +139,20 @@ export const actionToService = createAsyncThunk(
     }
   }
 );
+export const getAllServiceBasedVehicleList = createAsyncThunk(
+  "get/allserviceBasedVehicleList",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get("/serviceBasedVehicleList", {
+        params: payload,
+      });
+      return response.data;
+    } catch (error) {
+      console.log({ error });
+      rejectWithValue(error);
+    }
+  }
+);
 export const getServiceBasedVehicleList = createAsyncThunk(
   "get/serviceBasedVehicleList",
   async (payload, { rejectWithValue }) => {
@@ -132,6 +174,21 @@ export const getCategoryWiseVehicleData = createAsyncThunk(
       const response = await axiosInstance.get("/categoryWiseVehicleData", {
         params: payload,
       });
+      return response.data;
+    } catch (error) {
+      console.log({ error });
+      rejectWithValue(error);
+    }
+  }
+);
+export const deleteVehicleHistory = createAsyncThunk(
+  "delete/categoryWiseVehicleData",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.delete(
+        "/deleteVehicleHistory",
+        payload
+      );
       return response.data;
     } catch (error) {
       console.log({ error });

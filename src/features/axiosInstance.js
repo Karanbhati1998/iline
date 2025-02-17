@@ -1,7 +1,7 @@
 import axios from "axios";
 import { getToken } from "../utils/getToken";
 const axiosInstance = axios.create({
-  baseURL: "http://15.206.16.230:4100/api/v1/admin",
+  baseURL: "http://43.205.176.154:4100/api/v1/admin",
 });
 axiosInstance.interceptors.request.use((config)=>{
     const token = getToken("ilineLogin", "token");

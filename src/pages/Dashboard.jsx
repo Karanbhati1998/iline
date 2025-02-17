@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {  getEarlyAccesData } from "../features/slices/Dashboard";
-import { downloadCSV } from "../utils/downloadGetEarlyAccesData"; 
+import { getEarlyAccesData } from "../features/slices/Dashboard";
+import { downloadCSV } from "../utils/downloadGetEarlyAccesData";
 
 const Dashboard = () => {
-  const dispatch=useDispatch()
-  useEffect(()=>{
+  const dispatch = useDispatch();
+  useEffect(() => {
     dispatch(getEarlyAccesData());
-  },[])
+  }, []);
   const { earlyAccesData } = useSelector((state) => state.dashboard);
   console.log({ earlyAccesData });
   const handleDownload = () => {
@@ -176,20 +176,15 @@ const Dashboard = () => {
               </div>
             </div>
           </div>
-          <div className="card-body">
+          {/* <div className="card-body">
             <div className="row mt-4">
               <div className="">
                 <figure className="graph">
                   <img src={require("../assets/images/graph-demo.jpg")} />
                 </figure>
               </div>
-              {/* <div class="col-4"><figure class="graph"><img src="images/graph-2.png"></figure></div> */}
             </div>
-            {/* <div class="row mt-4">
-          <div class="col-4"><figure class="graph"><img src="images/graph-3.png"></figure></div>
-          <div class="col-4"><figure class="graph"><img src="images/graph-4.png"></figure></div>
-      </div> */}
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

@@ -9,6 +9,7 @@ const initialState = {
   driverRequestList:[],
   driverVehicleHistory:[],
   rejectDriverList:[],
+  driverCount:[],
   loading: false,
 };
 export const fetchAllDriverList = createAsyncThunk(
@@ -30,6 +31,20 @@ export const fetchRejectDriverList = createAsyncThunk(
   async (payload, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get("/rejectDriverList", {
+        params: payload,
+      });
+      return response.data;
+    } catch (error) {
+      rejectWithValue(error);
+      console.log({ error });
+    }
+  }
+);
+export const fetchAllILineDriverList= createAsyncThunk(
+  "get/alliLineDriverList",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get("/iLineDriverList", {
         params: payload,
       });
       return response.data;
@@ -62,6 +77,20 @@ export const fetchDriverVehicleHistory = createAsyncThunk(
       });
       console.log({ response });
       
+      return response.data;
+    } catch (error) {
+      rejectWithValue(error);
+      console.log({ error });
+    }
+  }
+);
+export const fetchAllP2pDriverList = createAsyncThunk(
+  "get/allp2pDriverList",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get("/p2pDriverList", {
+        params: payload,
+      });
       return response.data;
     } catch (error) {
       rejectWithValue(error);
@@ -151,6 +180,20 @@ export const getDriverRequestList = createAsyncThunk(
     }
   }
 );
+export const getDriverCount = createAsyncThunk(
+  "get/driverCount",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get("/driverCount", {
+        params: payload,
+      });
+      return response.data;
+    } catch (error) {
+      rejectWithValue(error);
+      console.log({ error });
+    }
+  }
+);
 const allDriver = createSlice({
   name: "allDriver",
   initialState: initialState,
@@ -223,6 +266,16 @@ const allDriver = createSlice({
       state.rejectDriverList = action.payload;
     });
     builder.addCase(fetchRejectDriverList.rejected, (state, action) => {
+      state.loading = false;
+    });
+    builder.addCase(getDriverCount.pending, (state, action) => {
+      state.loading = true;
+    });
+    builder.addCase(getDriverCount.fulfilled, (state, action) => {
+      state.loading = false;
+      state.driverCount = action.payload;
+    });
+    builder.addCase(getDriverCount.rejected, (state, action) => {
       state.loading = false;
     });
   },

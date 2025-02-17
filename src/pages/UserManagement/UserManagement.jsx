@@ -250,7 +250,7 @@ const UserManagement = () => {
               <tbody>
                 {users?.payload?.result?.[0]?.paginationData?.map((res, i) => {
                   return (
-                    <tr>
+                    <tr key={i}>
                       <td>{i + 1 + (page - 1) * 10}</td>
                       <td>
                         <Link to={"userManagementDetail"} state={res}>
