@@ -1,16 +1,16 @@
-import React, { useEffect, useState } from 'react'
-import BookingManagementComponent from '../BookingManagementComponent';
-import { useDispatch, useSelector } from 'react-redux';
-import { getScheduledBookingList } from '../../../features/slices/bookingManagementSlice';
+import React, { useEffect, useState } from "react";
+import BookingManagementComponent from "../BookingManagementComponent";
+import { useDispatch, useSelector } from "react-redux";
+import { getScheduledBookingList } from "../../../features/slices/bookingManagementSlice";
 import { toastService } from "../../../utils/toastify";
 import CommonPagination from "../../CommonPagination";
 import moment from "moment";
-import { Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
 const initialState = {
   page: 1,
   search: "",
-  fromDate: "",
-  toDate: "",
+  startDate: "",
+  endDate: "",
   timeframe: "",
   id: "",
   deleteModal: false,
@@ -18,8 +18,8 @@ const initialState = {
 };
 const Scheduled = ({ categoryId }) => {
   const [iState, setUpdateState] = useState(initialState);
-   const { page, search, fromDate, toDate, timeframe, id } = iState;
-    const dispatch = useDispatch();
+  const { page, search, startDate, endDate, timeframe, id } = iState;
+  const dispatch = useDispatch();
   const { scheduledBookingList } = useSelector((state) => {
     return state.bookingManagement;
   });
@@ -27,53 +27,53 @@ const Scheduled = ({ categoryId }) => {
     dispatch(getScheduledBookingList());
   }, []);
   useEffect(() => {
-      if (categoryId) {
-        dispatch(
-          getScheduledBookingList({
-            categoryId,
-            page
-          })
-        );
-      }
-    }, [page, categoryId]);
-    useEffect(() => {
-      const delayDebounceFunc = setTimeout(() => {
-        dispatch(
-          getScheduledBookingList({
-            categoryId,
-            search: search.trim(),
-            timeframe,
-          })
-        );
-      }, 1000);
-  
-      return () => clearTimeout(delayDebounceFunc);
-    }, [search, timeframe, dispatch]);
-  
-    const handlePageChange = (page) => {
-      setUpdateState({ ...iState, page });
-      dispatch(getScheduledBookingList({ categoryId, page }));
+    if (categoryId) {
+      dispatch(
+        getScheduledBookingList({
+          categoryId,
+          page,
+        })
+      );
+    }
+  }, [page, categoryId]);
+  useEffect(() => {
+    const delayDebounceFunc = setTimeout(() => {
+      dispatch(
+        getScheduledBookingList({
+          categoryId,
+          search: search.trim(),
+          timeframe,
+        })
+      );
+    }, 1000);
+
+    return () => clearTimeout(delayDebounceFunc);
+  }, [search, timeframe, dispatch]);
+
+  const handlePageChange = (page) => {
+    setUpdateState({ ...iState, page });
+    dispatch(getScheduledBookingList({ categoryId, page }));
+  };
+
+  const handleChange = (e) => {
+    setUpdateState({ ...iState, [e.target.name]: e.target.value });
+  };
+  const handleReset = () => {
+    setUpdateState(initialState);
+    dispatch(getScheduledBookingList({ categoryId, page: 1 }));
+  };
+  const handleApply = () => {
+    const data = {
+      search,
+      startDate,
+      endDate,
+      page,
+      categoryId,
     };
-  
-    const handleChange = (e) => {
-      setUpdateState({ ...iState, [e.target.name]: e.target.value });
-    };
-    const handleReset = () => {
-      setUpdateState(initialState);
-      dispatch(getScheduledBookingList({ categoryId, page: 1 }));
-    };
-    const handleApply = () => {
-      const data = {
-        search,
-        fromDate,
-        toDate,
-        page,
-        categoryId,
-      };
-      dispatch(getScheduledBookingList(data));
-    };
-    console.log({ scheduledBookingList });
-  
+    dispatch(getScheduledBookingList(data));
+  };
+  console.log({ scheduledBookingList });
+
   return (
     <div className="Small-Wrapper">
       <div className="FilterArea">
@@ -95,7 +95,8 @@ const Scheduled = ({ categoryId }) => {
               className="form-control"
               name="timeframe"
               onChange={handleChange}
-              disabled={fromDate || toDate}
+              value={timeframe}
+              disabled={startDate || endDate}
             >
               <option value="select">--Select--</option>
               <option value="Today">Today</option>
@@ -109,8 +110,8 @@ const Scheduled = ({ categoryId }) => {
             <input
               type="date"
               className="form-control"
-              name="fromDate"
-              value={fromDate}
+              name="startDate"
+              value={startDate}
               disabled={timeframe}
               onChange={handleChange}
             />
@@ -120,8 +121,8 @@ const Scheduled = ({ categoryId }) => {
             <input
               type="date"
               className="form-control"
-              name="toDate"
-              value={toDate}
+              name="endDate"
+              value={endDate}
               onChange={handleChange}
               disabled={timeframe}
             />
@@ -203,10 +204,7 @@ const Scheduled = ({ categoryId }) => {
               <td>I-Line Wallet</td>
               <td>
                 <div className="Actions">
-                  <Link
-                    to="scheduledetail"
-                    className="Blue"
-                     >
+                  <Link to="scheduledetail" className="Blue">
                     <i className="fa fa-info-circle" aria-hidden="true" />
                   </Link>
                 </div>
@@ -373,4 +371,4 @@ const Scheduled = ({ categoryId }) => {
   );
 };
 
-export default Scheduled
+export default Scheduled;

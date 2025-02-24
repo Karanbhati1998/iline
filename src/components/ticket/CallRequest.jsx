@@ -14,14 +14,14 @@ import { canPerformAction } from "../../utils/deniedAccess";
 const initialState = {
   page: 1,
   search: "",
-  fromDate: "",
-  toDate: "",
+  startDate: "",
+  endDate: "",
   timeframe: "",
   closeChat: false,
 };
 const CallRequest = () => {
   const [iState, setUpdateState] = useState(initialState);
-  const { page, search, fromDate, toDate, timeframe, closeChat, id } = iState;
+  const { page, search, startDate, endDate, timeframe, closeChat, id } = iState;
   const dispatch = useDispatch();
   const { callRequestData } = useSelector((state) => {
     return state?.supportTicket;
@@ -50,8 +50,8 @@ const CallRequest = () => {
   const handleApply = () => {
     const data = {
       search,
-      fromDate,
-      toDate,
+      startDate,
+      endDate,
       page,
     };
     dispatch(callRequestList(data));
@@ -116,8 +116,8 @@ const CallRequest = () => {
                   <input
                     type="date"
                     className="form-control"
-                    name="fromDate"
-                    value={fromDate}
+                    name="startDate"
+                    value={startDate}
                     onChange={handleChange}
                   />
                 </div>
@@ -126,8 +126,8 @@ const CallRequest = () => {
                   <input
                     type="date"
                     className="form-control"
-                    name="toDate"
-                    value={toDate}
+                    name="endDate"
+                    value={endDate}
                     onChange={handleChange}
                   />
                 </div>
@@ -148,7 +148,8 @@ const CallRequest = () => {
                     className="form-control"
                     name="timeframe"
                     onChange={handleChange}
-                    disabled={fromDate || toDate}
+                    value={timeframe}
+                    disabled={startDate || endDate}
                   >
                     <option>Select </option>
                     <option value="Today">Today</option>
@@ -212,6 +213,9 @@ const CallRequest = () => {
                   )}
                 </tbody>
               </table>
+              {callRequestData?.result?.[0]?.paginationData?.length == 0 && (
+                <p className="text-center">No records found.</p>
+              )}
             </div>
             <div className="PaginationBox">
               <div className="PaginationLeft">

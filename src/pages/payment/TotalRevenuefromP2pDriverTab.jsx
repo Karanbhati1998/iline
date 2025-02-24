@@ -10,8 +10,8 @@ import ExportToExcel from "../../components/ExportToExcel";
 const initialState = {
   page: 1,
   search: "",
-  fromDate: "",
-  toDate: "",
+  startDate: "",
+  endDate: "",
   timeframe: "",
   id: "",
   deleteModal: false,
@@ -19,7 +19,7 @@ const initialState = {
 };
 const TotalRevenuefromP2pDriverTab = ({ categoryId }) => {
   const [iState, setUpdateState] = useState(initialState);
-  const { page, search, fromDate, toDate, timeframe, id } = iState;
+  const { page, search, startDate, endDate, timeframe, id } = iState;
   const dispatch = useDispatch();
   const { state } = useLocation();
   const totalRevenueP2pRef = useRef();
@@ -27,8 +27,8 @@ const TotalRevenuefromP2pDriverTab = ({ categoryId }) => {
   useEffect(() => {
     const data = {
       search,
-      fromDate,
-      toDate,
+      startDate,
+      endDate,
       timeframe,
       limit: 999999,
       categoryId,
@@ -42,7 +42,7 @@ const TotalRevenuefromP2pDriverTab = ({ categoryId }) => {
         }
       });
     }
-  }, [timeframe, page, toDate, search, fromDate, categoryId]);
+  }, [timeframe, page, endDate, search, startDate, categoryId]);
   const { p2pRevenueList } = useSelector((state) => {
     return state?.payment;
   });
@@ -58,7 +58,7 @@ const TotalRevenuefromP2pDriverTab = ({ categoryId }) => {
         })
       );
     }
-  }, [page, categoryId]);
+  }, [ categoryId]);
   useEffect(() => {
     const delayDebounceFunc = setTimeout(() => {
       dispatch(
@@ -72,11 +72,20 @@ const TotalRevenuefromP2pDriverTab = ({ categoryId }) => {
     }, 1000);
 
     return () => clearTimeout(delayDebounceFunc);
-  }, [search, timeframe, dispatch]);
+  }, [search, timeframe, dispatch, categoryId]);
 
   const handlePageChange = (page) => {
     setUpdateState({ ...iState, page });
-    dispatch(getP2pRevenueList({ categoryId, revenueType: "ILINE", page }));
+    dispatch(
+      getP2pRevenueList({
+        categoryId,
+        revenueType: "ILINE",
+        page,
+        timeframe,
+        startDate,
+        endDate,
+      })
+    );
   };
 
   const handleChange = (e) => {
@@ -89,8 +98,8 @@ const TotalRevenuefromP2pDriverTab = ({ categoryId }) => {
   const handleApply = () => {
     const data = {
       search,
-      fromDate,
-      toDate,
+      startDate,
+      endDate,
       page,
       categoryId,
       revenueType: "ILINE",
@@ -123,7 +132,8 @@ const TotalRevenuefromP2pDriverTab = ({ categoryId }) => {
                   className="form-control"
                   name="timeframe"
                   onChange={handleChange}
-                  disabled={fromDate || toDate}
+                  value={timeframe}
+                  disabled={startDate || endDate}
                 >
                   <option value="select">--Select--</option>
                   <option value="Today">Today</option>
@@ -137,8 +147,8 @@ const TotalRevenuefromP2pDriverTab = ({ categoryId }) => {
                 <input
                   type="date"
                   className="form-control"
-                  name="fromDate"
-                  value={fromDate}
+                  name="startDate"
+                  value={startDate}
                   disabled={timeframe}
                   onChange={handleChange}
                 />
@@ -148,8 +158,8 @@ const TotalRevenuefromP2pDriverTab = ({ categoryId }) => {
                 <input
                   type="date"
                   className="form-control"
-                  name="toDate"
-                  value={toDate}
+                  name="endDate"
+                  value={endDate}
                   onChange={handleChange}
                   disabled={timeframe}
                 />
@@ -293,7 +303,7 @@ const TotalRevenuefromP2pDriverTab = ({ categoryId }) => {
                       </td>
                       <td>{res?.requestData?.pickUpLocationName}</td>
                       <td>{res?.requestData?.dropOffLocationName}</td>
-                      <td>{res?.requestData?.tripCharge}</td>
+                      <td>{res?.requestData?.tripCharge?.toFixed(2)}</td>
                       <td>{res?.requestData?.rideType}</td>
                       <td>
                         {res?.requestData?.scheduledDate} &amp;{" "}
@@ -310,9 +320,7 @@ const TotalRevenuefromP2pDriverTab = ({ categoryId }) => {
                             />
                           </Link>
                           <span className="Orange">
-                            <a href="booking-management-completed-track-details.html">
-                              View Track Status
-                            </a>
+                            <a>View Track Status</a>
                           </span>
                         </div>
                       </td>
@@ -321,6 +329,9 @@ const TotalRevenuefromP2pDriverTab = ({ categoryId }) => {
                 })}
               </tbody>
             </table>
+            {p2pRevenueList?.result?.[0]?.paginationData?.length == 0 && (
+              <p className="text-center">No records found.</p>
+            )}
           </div>
           <div className="PaginationBox">
             <div className="PaginationLeft">

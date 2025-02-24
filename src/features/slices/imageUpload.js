@@ -6,8 +6,9 @@ export const imageUpload=createAsyncThunk("image/upoad",async(payload,{rejectWit
     try {
           const token = getToken("ilineLogin", "token");
         const response = await axios.post(
-          "http://15.206.16.230:4100/api/v1/static/uploadDocument",
-          payload,{
+          "http://43.205.176.154:4100/api/v1/static/uploadDocument",
+          payload,
+          {
             headers: {
               Authorization: `Bearer ${token}`,
             },

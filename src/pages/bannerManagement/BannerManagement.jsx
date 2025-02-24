@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import UploadBanner from "../../components/banner/UploadBanner";
 import DeleteBannerModal from "../../components/banner/DeleteBannerModal";
 import { useDispatch, useSelector } from "react-redux";
-import { bannerStatus, getBannerList } from "../../features/slices/bannerSlice";
+import { bannerStatus, getAllBannerList, getBannerList } from "../../features/slices/bannerSlice";
 import ExportToExcel from "../../components/ExportToExcel";
 import { toastService } from "../../utils/toastify";
 import moment from "moment";
@@ -11,8 +11,8 @@ import CommonPagination from "../../components/CommonPagination";
 const initialState = {
   page: 1,
   search: "",
-  fromDate: "",
-  toDate: "",
+  startDate: "",
+  endDate: "",
   timeframe: "",
   deleteModal: false,
   id: "",
@@ -23,8 +23,8 @@ const BannerManagement = () => {
   const {
     page,
     search,
-    fromDate,
-    toDate,
+    startDate,
+    endDate,
     timeframe,
     deleteModal,
     id,
@@ -36,19 +36,19 @@ const BannerManagement = () => {
   useEffect(() => {
     const data = {
       search,
-      fromDate,
-      toDate,
+      startDate,
+      endDate,
       timeframe,
       limit: 999999,
     };
 
-    dispatch(getBannerList(data)).then((res) => {
+    dispatch(getAllBannerList(data)).then((res) => {
       if (res?.payload?.code == 200) {
         console.log({ res });
         setAllData(res?.payload);
       }
     });
-  }, [timeframe, page, toDate, search, fromDate]);
+  }, [timeframe, page, endDate, search, startDate]);
   const { bannerList } = useSelector((state) => {
     return state?.banner;
   });
@@ -56,7 +56,7 @@ const BannerManagement = () => {
 
   useEffect(() => {
     dispatch(getBannerList({ page, timeframe }));
-  }, [page, timeframe]);
+  }, [ timeframe]);
 
   useEffect(() => {
     const delayDebounceFunc = setTimeout(() => {
@@ -76,8 +76,8 @@ const BannerManagement = () => {
   const handleApply = () => {
     const data = {
       search,
-      fromDate,
-      toDate,
+      startDate,
+      endDate,
       page,
     };
     dispatch(getBannerList(data));
@@ -119,10 +119,10 @@ const BannerManagement = () => {
       id: id,
     }));
   };
-   const handlePageChange = (page) => {
-      setUpdateState({ ...iState, page });
-      dispatch(getBannerList({  page }));
-    };
+  const handlePageChange = (page) => {
+    setUpdateState({ ...iState, page });
+    dispatch(getBannerList({ page, timeframe, startDate, endDate }));
+  };
   return (
     <>
       <div className="WrapperArea">
@@ -147,15 +147,15 @@ const BannerManagement = () => {
             <div className="FilterArea">
               <div className="FilterLeft">
                 <div className="form-group">
-                  {/* <label>Search</label> */}
-                  {/* <input
+                  <label>Search</label>
+                  <input
                     type="text"
                     className="form-control"
                     placeholder="Search"
                     name="search"
                     value={search}
                     onChange={handleChange}
-                  /> */}
+                  />
                 </div>
                 <div className="form-group">
                   <label>Duration</label>
@@ -163,7 +163,8 @@ const BannerManagement = () => {
                     className="form-control"
                     name="timeframe"
                     onChange={handleChange}
-                    disabled={fromDate || toDate}
+                    value={timeframe}
+                    disabled={startDate || endDate}
                   >
                     <option value="select">--Select--</option>
                     <option value="Today">Today</option>
@@ -177,8 +178,8 @@ const BannerManagement = () => {
                   <input
                     type="date"
                     className="form-control"
-                    name="fromDate"
-                    value={fromDate}
+                    name="startDate"
+                    value={startDate}
                     disabled={timeframe}
                     onChange={handleChange}
                   />
@@ -188,8 +189,8 @@ const BannerManagement = () => {
                   <input
                     type="date"
                     className="form-control"
-                    name="toDate"
-                    value={toDate}
+                    name="endDate"
+                    value={endDate}
                     onChange={handleChange}
                     disabled={timeframe}
                   />
@@ -365,6 +366,9 @@ const BannerManagement = () => {
                   })}
                 </tbody>
               </table>
+              {bannerList?.result?.[0]?.paginationData?.length == 0 && (
+                <p className="text-center">No records found.</p>
+              )}
             </div>
             <div className="PaginationBox">
               <div className="PaginationLeft">

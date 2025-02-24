@@ -2,24 +2,27 @@ import React, { useState } from 'react'
 import LocalDelivery from './LocalDelivery';
 import OutStationDelivery from './OutStationDelivery';
 import ExpressDelivery from './ExpressDelivery';
+import { useDispatch, useSelector } from 'react-redux';
+import { activeDeliveryTabFunc } from '../../../features/slices/userManagementReducer';
 
 const RideDetails = ({state}) => {
-  const [showState,setShowState]=useState({
-    local:true,
-    outstation:false,
-    express:false
-  })
-  const {local,outstation,express}=showState;
-  console.log({state});
-  
-  const handleClick=(name)=>{
-    setShowState((prev) => ({
-      local: false,
-      outstation: false,
-      express: false,
-      [name]:true
-    }));
-  }
+
+  const dispatch = useDispatch();
+  const { activeDeliveryTab } = useSelector((state) => {
+    return state?.userManagement;
+  });
+  console.log({ activeDeliveryTab });
+  const { local, outstation, express } = activeDeliveryTab;
+  const handleClick = (tab) => {
+    dispatch(
+      activeDeliveryTabFunc({
+        local: false,
+        outstation: false,
+        express: false,
+        [tab]: true,
+      })
+    );
+  };
   return (
     <div className="Small-Wrapper">
       <div className="tab-content">

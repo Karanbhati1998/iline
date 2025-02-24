@@ -6,6 +6,12 @@ const initialState = {
   totalRevenueList: [],
   ilineRevenueList: [],
   p2pRevenueList: [],
+  activePaymentTab: {
+    totalRevenue: true,
+    totalRevenuefromILineDriver: false,
+    totalRevenuefromP2pDriver: false,
+    totalPaymentfromP2pDriver: false,
+  },
   loading: false,
   error: null,
 };
@@ -124,6 +130,11 @@ export const getP2pRevenueList = createAsyncThunk(
 const paymentSlice = createSlice({
   name: "payment",
   initialState: initialState,
+  reducers: {
+    activePaymentTabFunc: (state, action) => {
+      state.activePaymentTab = action.payload;
+    },
+  },
   extraReducers: (builder) => {
     builder.addCase(getViewCommision.pending, (state) => {
       state.loading = true;
@@ -171,5 +182,5 @@ const paymentSlice = createSlice({
     });
   },
 });
-
+export const { activePaymentTabFunc } = paymentSlice.actions;
 export default paymentSlice.reducer;

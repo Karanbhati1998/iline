@@ -20,8 +20,8 @@ import ExportToExcel from "../../ExportToExcel";
 const initialState = {
   page: 1,
   search: "",
-  fromDate: "",
-  toDate: "",
+  startDate: "",
+  endDate: "",
   timeframe: "",
   id: "",
   deleteModal: false,
@@ -31,13 +31,13 @@ const initialState = {
 };
 const PendingVechileTable = ({ categoryId }) => {
   const [iState, setUpdateState] = useState(initialState);
-    const [imageModal, setImageModal] = useState(false);
-    const [image, setImage] = useState("");
+  const [imageModal, setImageModal] = useState(false);
+  const [image, setImage] = useState("");
   const {
     page,
     search,
-    fromDate,
-    toDate,
+    startDate,
+    endDate,
     timeframe,
     id,
     deleteModal,
@@ -46,25 +46,25 @@ const PendingVechileTable = ({ categoryId }) => {
     data,
   } = iState;
   const dispatch = useDispatch();
-   const pendingRef = useRef();
-    const [allData, setAllData] = useState([]);
-      useEffect(() => {
-        const data = {
-          search,
-          fromDate,
-          toDate,
-          timeframe,
-          limit: 999999,
-          categoryId,
-        };
-        dispatch(getAllPendingVehicleList(data)).then((res) => {
-          if (res?.payload?.code == 200) {
-            console.log({ res });
-            setAllData(res?.payload);
-          }
-        });
-      }, [timeframe, page, toDate, search, fromDate]);
-   
+  const pendingRef = useRef();
+  const [allData, setAllData] = useState([]);
+  useEffect(() => {
+    const data = {
+      search,
+      startDate,
+      endDate,
+      timeframe,
+      limit: 999999,
+      categoryId,
+    };
+    dispatch(getAllPendingVehicleList(data)).then((res) => {
+      if (res?.payload?.code == 200) {
+        console.log({ res });
+        setAllData(res?.payload);
+      }
+    });
+  }, [timeframe, page, endDate, search, startDate]);
+
   const { PendingVechileList } = useSelector((state) => {
     return state?.vechile;
   });
@@ -76,7 +76,7 @@ const PendingVechileTable = ({ categoryId }) => {
         timeframe,
       })
     );
-  }, [page, timeframe]);
+  }, [ timeframe]);
   useEffect(() => {
     const delayDebounceFunc = setTimeout(() => {
       dispatch(
@@ -93,7 +93,9 @@ const PendingVechileTable = ({ categoryId }) => {
 
   const handlePageChange = (page) => {
     setUpdateState({ ...iState, page });
-    dispatch(getPendingVehicleList({ page, categoryId }));
+    dispatch(
+      getPendingVehicleList({ page, categoryId, timeframe, startDate, endDate })
+    );
   };
   const handleChecked = (e, id) => {
     const { name, checked } = e?.target;
@@ -119,8 +121,8 @@ const PendingVechileTable = ({ categoryId }) => {
   const handleApply = () => {
     const data = {
       search,
-      fromDate,
-      toDate,
+      startDate,
+      endDate,
       categoryId,
       page,
     };
@@ -156,19 +158,19 @@ const PendingVechileTable = ({ categoryId }) => {
       }
     });
   };
-const handleViewImage = (image) => {
-  setImage(image);
-  setImageModal(true);
-  handleClose()
-};
-const handleCloseImageModal = () => {
-  setImageModal(false);
-  setImage("");
-   setUpdateState((prev) => ({
-     ...prev,
-     PENDING: true,
-   }));
-};
+  const handleViewImage = (image) => {
+    setImage(image);
+    setImageModal(true);
+    handleClose();
+  };
+  const handleCloseImageModal = () => {
+    setImageModal(false);
+    setImage("");
+    setUpdateState((prev) => ({
+      ...prev,
+      PENDING: true,
+    }));
+  };
   return (
     <>
       <div className="tab-pane fade active show">
@@ -192,7 +194,8 @@ const handleCloseImageModal = () => {
                   className="form-control"
                   name="timeframe"
                   onChange={handleChange}
-                  disabled={fromDate || toDate}
+                  value={timeframe}
+                  disabled={startDate || endDate}
                 >
                   <option value="select">--Select--</option>
                   <option value="Today">Today</option>
@@ -206,8 +209,8 @@ const handleCloseImageModal = () => {
                 <input
                   type="date"
                   className="form-control"
-                  name="fromDate"
-                  value={fromDate}
+                  name="startDate"
+                  value={startDate}
                   disabled={timeframe}
                   onChange={handleChange}
                 />
@@ -217,8 +220,8 @@ const handleCloseImageModal = () => {
                 <input
                   type="date"
                   className="form-control"
-                  name="toDate"
-                  value={toDate}
+                  name="endDate"
+                  value={endDate}
                   onChange={handleChange}
                   disabled={timeframe}
                 />
@@ -234,7 +237,7 @@ const handleCloseImageModal = () => {
               </div>
             </div>
             <div className="FilterRight">
-              <div className="form-group">
+              {/* <div className="form-group">
                 <label>Service Type</label>
                 <select className="form-control">
                   <option>Select</option>
@@ -243,7 +246,7 @@ const handleCloseImageModal = () => {
                   <option>Four-Wheeler</option>
                   <option>Freight-Truck</option>
                 </select>
-              </div>
+              </div> */}
               <ExportToExcel ref={pendingRef} fileName="pendingVechile" />
             </div>
           </div>
@@ -458,6 +461,9 @@ const handleCloseImageModal = () => {
                 )}
               </tbody>
             </table>
+            {PendingVechileList?.result?.[0]?.paginationData?.length == 0 && (
+              <p className="text-center">No records found.</p>
+            )}
           </div>
           <div className="PaginationBox">
             <div className="PaginationLeft">

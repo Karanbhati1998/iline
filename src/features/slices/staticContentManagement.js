@@ -10,7 +10,7 @@ export const getStaticContent = createAsyncThunk(
   async (payload, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(
-        "http://15.206.16.230:4100/api/v1/static/get-static-content",
+        "http://43.205.176.154:4100/api/v1/static/get-static-content",
         {
           params: payload,
         }
@@ -27,7 +27,7 @@ export const editStaticContent = createAsyncThunk(
   async (payload, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.put(
-        "http://15.206.16.230:4100/api/v1/static/edit-static-content",
+        "http://43.205.176.154:4100/api/v1/static/edit-static-content",
         payload
       );
       return response.data;

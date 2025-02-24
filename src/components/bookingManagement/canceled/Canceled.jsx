@@ -13,8 +13,8 @@ import ExportToExcel from "../../ExportToExcel";
 const initialState = {
   page: 1,
   search: "",
-  fromDate: "",
-  toDate: "",
+  startDate: "",
+  endDate: "",
   timeframe: "",
   id: "",
   deleteModal: false,
@@ -22,19 +22,19 @@ const initialState = {
 };
 const Canceled = ({ categoryId }) => {
   const [iState, setUpdateState] = useState(initialState);
-  const { page, search, fromDate, toDate, timeframe, id } = iState;
+  const { page, search, startDate, endDate, timeframe, id } = iState;
   const dispatch = useDispatch();
   const { state } = useLocation();
   const { canceledBookingList } = useSelector((state) => {
     return state.bookingManagement;
   });
-    const userRef = useRef();
+  const userRef = useRef();
   const [allData, setAllData] = useState([]);
   useEffect(() => {
     const data = {
       search,
-      fromDate,
-      toDate,
+      startDate,
+      endDate,
       timeframe,
       limit: 999999,
       categoryId,
@@ -47,7 +47,7 @@ const Canceled = ({ categoryId }) => {
         }
       });
     }
-  }, [timeframe, page, toDate, search, fromDate, categoryId]);
+  }, [timeframe, page, endDate, search, startDate, categoryId]);
 
   useEffect(() => {
     dispatch(getCanceledBookingList({ categoryId: state }));
@@ -57,7 +57,7 @@ const Canceled = ({ categoryId }) => {
       dispatch(
         getCanceledBookingList({
           categoryId,
-          page,
+          
         })
       );
     }
@@ -74,11 +74,19 @@ const Canceled = ({ categoryId }) => {
     }, 1000);
 
     return () => clearTimeout(delayDebounceFunc);
-  }, [search, timeframe, dispatch]);
+  }, [search, timeframe, dispatch, categoryId]);
 
   const handlePageChange = (page) => {
     setUpdateState({ ...iState, page });
-    dispatch(getCanceledBookingList({ categoryId, page }));
+    dispatch(
+      getCanceledBookingList({
+        categoryId,
+        page,
+        timeframe,
+        startDate,
+        endDate,
+      })
+    );
   };
 
   const handleChange = (e) => {
@@ -91,8 +99,8 @@ const Canceled = ({ categoryId }) => {
   const handleApply = () => {
     const data = {
       search,
-      fromDate,
-      toDate,
+      startDate,
+      endDate,
       page,
       categoryId,
     };
@@ -121,7 +129,8 @@ const Canceled = ({ categoryId }) => {
               className="form-control"
               name="timeframe"
               onChange={handleChange}
-              disabled={fromDate || toDate}
+              value={timeframe}
+              disabled={startDate || endDate}
             >
               <option value="select">--Select--</option>
               <option value="Today">Today</option>
@@ -135,8 +144,8 @@ const Canceled = ({ categoryId }) => {
             <input
               type="date"
               className="form-control"
-              name="fromDate"
-              value={fromDate}
+              name="startDate"
+              value={startDate}
               disabled={timeframe}
               onChange={handleChange}
             />
@@ -146,8 +155,8 @@ const Canceled = ({ categoryId }) => {
             <input
               type="date"
               className="form-control"
-              name="toDate"
-              value={toDate}
+              name="endDate"
+              value={endDate}
               onChange={handleChange}
               disabled={timeframe}
             />
@@ -223,7 +232,7 @@ const Canceled = ({ categoryId }) => {
                   </td>
                   <td>{res?.paymentMode}</td>
                   <td>
-                    <a href="">Driver</a>
+                    <a>{res?.cancelledBy}</a>
                   </td>
                   <td>
                     <div className="Actions">
@@ -298,16 +307,16 @@ const Canceled = ({ categoryId }) => {
                   </td>
                   <td>{res?.paymentMode}</td>
                   <td>
-                    <a href="">Driver</a>
+                    <a>{res?.cancelledBy}</a>
                   </td>
                   <td>
                     <div className="Actions">
                       <Link to="canceldetail" className="Blue" state={res}>
                         <i className="fa fa-info-circle" aria-hidden="true" />
                       </Link>
-                      <span className="Orange">
+                      {/* <span className="Orange">
                         <Link to="track">Track</Link>
-                      </span>
+                      </span> */}
                     </div>
                   </td>
                 </tr>
@@ -315,6 +324,9 @@ const Canceled = ({ categoryId }) => {
             })}
           </tbody>
         </table>
+        {canceledBookingList?.result?.[0]?.paginationData?.length == 0 && (
+          <p className="text-center">No records found.</p>
+        )}
       </div>
       <div className="PaginationBox">
         <div className="PaginationLeft">

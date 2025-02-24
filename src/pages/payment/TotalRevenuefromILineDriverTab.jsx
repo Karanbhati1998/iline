@@ -10,8 +10,8 @@ import ExportToExcel from "../../components/ExportToExcel";
 const initialState = {
   page: 1,
   search: "",
-  fromDate: "",
-  toDate: "",
+  startDate: "",
+  endDate: "",
   timeframe: "",
   id: "",
   deleteModal: false,
@@ -19,7 +19,7 @@ const initialState = {
 };
 const TotalRevenuefromILineDriverTab = ({ categoryId }) => {
   const [iState, setUpdateState] = useState(initialState);
-  const { page, search, fromDate, toDate, timeframe, id } = iState;
+  const { page, search, startDate, endDate, timeframe, id } = iState;
   const dispatch = useDispatch();
   const { state } = useLocation();
   const totalRevenueILineRef = useRef();
@@ -27,8 +27,8 @@ const TotalRevenuefromILineDriverTab = ({ categoryId }) => {
   useEffect(() => {
     const data = {
       search,
-      fromDate,
-      toDate,
+      startDate,
+      endDate,
       timeframe,
       limit: 999999,
       categoryId,
@@ -42,7 +42,7 @@ const TotalRevenuefromILineDriverTab = ({ categoryId }) => {
         }
       });
     }
-  }, [timeframe, page, toDate, search, fromDate, categoryId]);
+  }, [timeframe, page, endDate, search, startDate, categoryId]);
   const { ilineRevenueList } = useSelector((state) => {
     return state?.payment;
   });
@@ -58,7 +58,7 @@ const TotalRevenuefromILineDriverTab = ({ categoryId }) => {
         })
       );
     }
-  }, [page, categoryId]);
+  }, [ categoryId]);
   useEffect(() => {
     const delayDebounceFunc = setTimeout(() => {
       dispatch(
@@ -72,11 +72,20 @@ const TotalRevenuefromILineDriverTab = ({ categoryId }) => {
     }, 1000);
 
     return () => clearTimeout(delayDebounceFunc);
-  }, [search, timeframe, dispatch]);
+  }, [search, timeframe, dispatch, categoryId]);
 
   const handlePageChange = (page) => {
     setUpdateState({ ...iState, page });
-    dispatch(getIlineRevenueList({ categoryId, revenueType: "ILINE", page }));
+    dispatch(
+      getIlineRevenueList({
+        categoryId,
+        revenueType: "ILINE",
+        page,
+        timeframe,
+        startDate,
+        endDate,
+      })
+    );
   };
 
   const handleChange = (e) => {
@@ -91,8 +100,8 @@ const TotalRevenuefromILineDriverTab = ({ categoryId }) => {
   const handleApply = () => {
     const data = {
       search,
-      fromDate,
-      toDate,
+      startDate,
+      endDate,
       page,
       categoryId,
       revenueType: "ILINE",
@@ -125,7 +134,8 @@ const TotalRevenuefromILineDriverTab = ({ categoryId }) => {
                   className="form-control"
                   name="timeframe"
                   onChange={handleChange}
-                  disabled={fromDate || toDate}
+                  value={timeframe}
+                  disabled={startDate || endDate}
                 >
                   <option value="select">--Select--</option>
                   <option value="Today">Today</option>
@@ -139,8 +149,8 @@ const TotalRevenuefromILineDriverTab = ({ categoryId }) => {
                 <input
                   type="date"
                   className="form-control"
-                  name="fromDate"
-                  value={fromDate}
+                  name="startDate"
+                  value={startDate}
                   disabled={timeframe}
                   onChange={handleChange}
                 />
@@ -150,8 +160,8 @@ const TotalRevenuefromILineDriverTab = ({ categoryId }) => {
                 <input
                   type="date"
                   className="form-control"
-                  name="toDate"
-                  value={toDate}
+                  name="endDate"
+                  value={endDate}
                   onChange={handleChange}
                   disabled={timeframe}
                 />
@@ -195,59 +205,53 @@ const TotalRevenuefromILineDriverTab = ({ categoryId }) => {
                 </tr>
               </thead>
               <tbody>
-                {allData?.result?.[0]?.paginationData?.map(
-                  (res, i) => {
-                    return (
-                      <tr>
-                        <td>{i + 1 + (page - 1) * 10}</td>
-                        <td>
-                          <a
-                            className="Blue"
-                            data-toggle="modal"
-                            data-target="#ApprovalModal"
-                          >
-                            {res?.requestData?.requestId}
-                          </a>
-                        </td>
-                        <td>
-                          <a>{res?.driverData?.driver_number}</a>
-                        </td>
-                        <td>{res?.driverData?.fullName} </td>
-                        <td>
-                          <a>{res?.userData?.user_number}</a>
-                        </td>
-                        <td>{res?.userData?.fullName}</td>
-                        <td>
-                          <a>{res?.vehicleData?.vehicleNumber}</a>
-                        </td>
-                        <td>{res?.requestData?.pickUpLocationName}</td>
-                        <td>{res?.requestData?.dropOffLocationName}</td>
-                        <td>{res?.requestData?.tripCharge}</td>
-                        <td>{res?.requestData?.rideType}</td>
-                        <td>
-                          {res?.requestData?.scheduledDate} &amp;{" "}
-                          {res?.requestData?.scheduledTime}
-                        </td>
-                        <td>{res?.paymentType}</td>
-                        <td>{res?.requestData?.is_report ? "yes" : "No"}</td>
-                        <td>
-                          <div className="Actions">
-                            <Link
-                              className="Blue"
-                              to="paymentDetail"
-                              state={res}
-                            >
-                              <i
-                                className="fa fa-info-circle"
-                                aria-hidden="true"
-                              />
-                            </Link>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  }
-                )}
+                {allData?.result?.[0]?.paginationData?.map((res, i) => {
+                  return (
+                    <tr>
+                      <td>{i + 1 + (page - 1) * 10}</td>
+                      <td>
+                        <a
+                          className="Blue"
+                          data-toggle="modal"
+                          data-target="#ApprovalModal"
+                        >
+                          {res?.requestData?.requestId}
+                        </a>
+                      </td>
+                      <td>
+                        <a>{res?.driverData?.driver_number}</a>
+                      </td>
+                      <td>{res?.driverData?.fullName} </td>
+                      <td>
+                        <a>{res?.userData?.user_number}</a>
+                      </td>
+                      <td>{res?.userData?.fullName}</td>
+                      <td>
+                        <a>{res?.vehicleData?.vehicleNumber}</a>
+                      </td>
+                      <td>{res?.requestData?.pickUpLocationName}</td>
+                      <td>{res?.requestData?.dropOffLocationName}</td>
+                      <td>{res?.requestData?.tripCharge}</td>
+                      <td>{res?.requestData?.rideType}</td>
+                      <td>
+                        {res?.requestData?.scheduledDate} &amp;{" "}
+                        {res?.requestData?.scheduledTime}
+                      </td>
+                      <td>{res?.paymentType}</td>
+                      <td>{res?.requestData?.is_report ? "yes" : "No"}</td>
+                      <td>
+                        <div className="Actions">
+                          <Link className="Blue" to="paymentDetail" state={res}>
+                            <i
+                              className="fa fa-info-circle"
+                              aria-hidden="true"
+                            />
+                          </Link>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -300,7 +304,7 @@ const TotalRevenuefromILineDriverTab = ({ categoryId }) => {
                         </td>
                         <td>{res?.requestData?.pickUpLocationName}</td>
                         <td>{res?.requestData?.dropOffLocationName}</td>
-                        <td>{res?.requestData?.tripCharge}</td>
+                        <td>{res?.requestData?.tripCharge?.toFixed(2)}</td>
                         <td>{res?.requestData?.rideType}</td>
                         <td>
                           {res?.requestData?.scheduledDate} &amp;{" "}
@@ -328,6 +332,9 @@ const TotalRevenuefromILineDriverTab = ({ categoryId }) => {
                 )}
               </tbody>
             </table>
+            {ilineRevenueList?.result?.[0]?.paginationData?.length == 0 && (
+              <p className="text-center">No records found.</p>
+            )}
           </div>
           <div className="PaginationBox">
             <div className="PaginationLeft">

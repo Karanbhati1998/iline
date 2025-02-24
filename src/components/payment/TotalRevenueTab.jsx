@@ -1,14 +1,17 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getTotalRevenueList, getTotalRevenueListDownload} from "../../features/slices/payment";
+import {
+  getTotalRevenueList,
+  getTotalRevenueListDownload,
+} from "../../features/slices/payment";
 import { Link, useLocation } from "react-router-dom";
 import CommonPagination from "../CommonPagination";
 import ExportToExcel from "../ExportToExcel";
 const initialState = {
   page: 1,
   search: "",
-  fromDate: "",
-  toDate: "",
+  startDate: "",
+  endDate: "",
   timeframe: "",
   id: "",
   deleteModal: false,
@@ -16,7 +19,7 @@ const initialState = {
 };
 const TotalRevenueTab = ({ categoryId }) => {
   const [iState, setUpdateState] = useState(initialState);
-  const { page, search, fromDate, toDate, timeframe, id } = iState;
+  const { page, search, startDate, endDate, timeframe, id } = iState;
   const dispatch = useDispatch();
   const { state } = useLocation();
   const paymentRef = useRef();
@@ -24,8 +27,8 @@ const TotalRevenueTab = ({ categoryId }) => {
   useEffect(() => {
     const data = {
       search,
-      fromDate,
-      toDate,
+      startDate,
+      endDate,
       timeframe,
       limit: 999999,
       categoryId,
@@ -38,7 +41,7 @@ const TotalRevenueTab = ({ categoryId }) => {
         }
       });
     }
-  }, [timeframe, page, toDate, search, fromDate, categoryId]);
+  }, [timeframe, page, endDate, search, startDate, categoryId]);
   const { totalRevenueList } = useSelector((state) => {
     return state?.payment;
   });
@@ -53,7 +56,7 @@ const TotalRevenueTab = ({ categoryId }) => {
         })
       );
     }
-  }, [page, categoryId]);
+  }, [categoryId]);
   useEffect(() => {
     const delayDebounceFunc = setTimeout(() => {
       dispatch(
@@ -66,11 +69,13 @@ const TotalRevenueTab = ({ categoryId }) => {
     }, 1000);
 
     return () => clearTimeout(delayDebounceFunc);
-  }, [search, timeframe, dispatch]);
+  }, [search, timeframe, dispatch, categoryId]);
 
   const handlePageChange = (page) => {
     setUpdateState({ ...iState, page });
-    dispatch(getTotalRevenueList({ categoryId, page }));
+    dispatch(
+      getTotalRevenueList({ categoryId, page, timeframe, startDate, endDate })
+    );
   };
 
   const handleChange = (e) => {
@@ -83,8 +88,8 @@ const TotalRevenueTab = ({ categoryId }) => {
   const handleApply = () => {
     const data = {
       search,
-      fromDate,
-      toDate,
+      startDate,
+      endDate,
       page,
       categoryId,
     };
@@ -113,7 +118,8 @@ const TotalRevenueTab = ({ categoryId }) => {
                   className="form-control"
                   name="timeframe"
                   onChange={handleChange}
-                  disabled={fromDate || toDate}
+                  value={timeframe}
+                  disabled={startDate || endDate}
                 >
                   <option value="select">--Select--</option>
                   <option value="Today">Today</option>
@@ -127,8 +133,8 @@ const TotalRevenueTab = ({ categoryId }) => {
                 <input
                   type="date"
                   className="form-control"
-                  name="fromDate"
-                  value={fromDate}
+                  name="startDate"
+                  value={startDate}
                   disabled={timeframe}
                   onChange={handleChange}
                 />
@@ -138,8 +144,8 @@ const TotalRevenueTab = ({ categoryId }) => {
                 <input
                   type="date"
                   className="form-control"
-                  name="toDate"
-                  value={toDate}
+                  name="endDate"
+                  value={endDate}
                   onChange={handleChange}
                   disabled={timeframe}
                 />
@@ -205,7 +211,11 @@ const TotalRevenueTab = ({ categoryId }) => {
                       </td>
                       <td>{res?.requestData?.pickUpLocationName}</td>
                       <td>{res?.requestData?.dropOffLocationName}</td>
-                      <td>{res?.requestData?.tripCharge}</td>
+                      <td>
+                        {typeof res?.requestData?.tripCharge === "number"
+                          ? res.requestData.tripCharge.toFixed(2)
+                          : "0.00"}
+                      </td>
                       <td>{res?.requestData?.rideType}</td>
                       <td>
                         {res?.requestData?.scheduledDate} &amp;{" "}
@@ -286,7 +296,7 @@ const TotalRevenueTab = ({ categoryId }) => {
                         </td>
                         <td>{res?.requestData?.pickUpLocationName}</td>
                         <td>{res?.requestData?.dropOffLocationName}</td>
-                        <td>{res?.requestData?.tripCharge}</td>
+                        <td>{res?.requestData?.tripCharge?.toFixed(2)}</td>
                         <td>{res?.requestData?.rideType}</td>
                         <td>
                           {res?.requestData?.scheduledDate} &amp;{" "}
@@ -323,6 +333,9 @@ const TotalRevenueTab = ({ categoryId }) => {
                 )}
               </tbody>
             </table>
+            {totalRevenueList?.result?.[0]?.paginationData?.length == 0 && (
+              <p className="text-center">No records found.</p>
+            )}
           </div>
           <div className="PaginationBox">
             <div className="PaginationLeft">

@@ -4,10 +4,16 @@ import ProfileSummary from "./profileSummary/ProfileSummary";
 import RideDetails from '../../../UserManagementComponent/rideDetail/RideDetails';
 import { useLocation } from 'react-router-dom';
 import BackButton from "../../../BackButton"
+import { bookingSummaryType } from '../../../../features/slices/DriverManagement/allDriver/allDriverReducer';
+import { useDispatch, useSelector } from 'react-redux';
 const DetailDriverManagement = () => {
-  const [showBookingSummary,setShowBookingSummary]=useState(false)
+  // const [showBookingSummary,setShowBookingSummary]=useState(false)
   
   const {state}=useLocation()
+  const dispatch=useDispatch()
+   const { showBookingSummary } = useSelector((state) => {
+     return state?.driverManagementAllDrivers;
+   });
   console.log({state});
   const [location, setLocation] = useState(false);
 const getAddressFromLatLng = async (lat, lng) => {
@@ -45,7 +51,9 @@ const getAddressFromLatLng = async (lat, lng) => {
     }
   },[])
   console.log({ location });
-  
+  const handlebookingSummaryType=(type)=>{
+    dispatch(bookingSummaryType(type));
+  }
   return (
     <div className="WrapperArea">
       <div className="WrapperBox">
@@ -58,7 +66,7 @@ const getAddressFromLatLng = async (lat, lng) => {
                     showBookingSummary ? "nav-link" : "nav-link active"
                   }
                   onClick={() => {
-                    setShowBookingSummary(false);
+                    handlebookingSummaryType(false);
                   }}
                 >
                   Profile Summary
@@ -70,7 +78,7 @@ const getAddressFromLatLng = async (lat, lng) => {
                     !showBookingSummary ? "nav-link" : "nav-link active"
                   }
                   onClick={() => {
-                    setShowBookingSummary(true);
+                    handlebookingSummaryType(true);
                   }}
                 >
                   Booking Summary

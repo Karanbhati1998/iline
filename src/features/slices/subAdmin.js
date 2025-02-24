@@ -4,6 +4,7 @@ import axiosInstance from "../axiosInstance";
 const initialState = {
   subAdmin: [],
   role:[],
+  activeSubadminTab:false,
   loading: false,
   error: null,
 };
@@ -118,30 +119,35 @@ export const editRole = createAsyncThunk(
 const subAdminSlice = createSlice({
   name: "subAdmin",
   initialState: initialState,
+  reducers: {
+    activeSubadminTabFunc: (state, action) => {
+      state.activeSubadminTab = action.payload;
+    },
+  },
   extraReducers: (builder) => {
     builder.addCase(getSubAdminList.pending, (state) => {
-        state.loading = true;
-      });
-      builder.addCase(getSubAdminList.fulfilled, (state, action) => {
-        state.loading = false;
-        state.subAdmin = action.payload;
-      });
-      builder.addCase(getSubAdminList.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload || action.error.message; // Access the error message
-      });
-      builder.addCase(getRoleList.pending, (state) => {
-        state.loading = true;
-      });
-      builder.addCase(getRoleList.fulfilled, (state, action) => {
-        state.loading = false;
-        state.role = action.payload;
-      });
-      builder.addCase(getRoleList.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload || action.error.message; // Access the error message
-      });
+      state.loading = true;
+    });
+    builder.addCase(getSubAdminList.fulfilled, (state, action) => {
+      state.loading = false;
+      state.subAdmin = action.payload;
+    });
+    builder.addCase(getSubAdminList.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload || action.error.message; // Access the error message
+    });
+    builder.addCase(getRoleList.pending, (state) => {
+      state.loading = true;
+    });
+    builder.addCase(getRoleList.fulfilled, (state, action) => {
+      state.loading = false;
+      state.role = action.payload;
+    });
+    builder.addCase(getRoleList.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload || action.error.message; // Access the error message
+    });
   },
 });
-
+export const { activeSubadminTabFunc } = subAdminSlice.actions;
 export default subAdminSlice.reducer;

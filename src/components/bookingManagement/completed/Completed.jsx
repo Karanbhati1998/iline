@@ -11,8 +11,8 @@ import ExportToExcel from "../../ExportToExcel";
 const initialState = {
   page: 1,
   search: "",
-  fromDate: "",
-  toDate: "",
+  startDate: "",
+  endDate: "",
   timeframe: "",
   id: "",
   deleteModal: false,
@@ -20,19 +20,19 @@ const initialState = {
 };
 const Completed = ({ categoryId }) => {
   const [iState, setUpdateState] = useState(initialState);
-  const { page, search, fromDate, toDate, timeframe, id } = iState;
+  const { page, search, startDate, endDate, timeframe, id } = iState;
   const dispatch = useDispatch();
   const { state } = useLocation();
   const { completedBookingList } = useSelector((state) => {
     return state.bookingManagement;
   });
-     const userRef = useRef();
+  const userRef = useRef();
   const [allData, setAllData] = useState([]);
   useEffect(() => {
     const data = {
       search,
-      fromDate,
-      toDate,
+      startDate,
+      endDate,
       timeframe,
       limit: 999999,
       categoryId: state,
@@ -43,7 +43,7 @@ const Completed = ({ categoryId }) => {
         setAllData(res?.payload);
       }
     });
-  }, [timeframe, page, toDate, search, fromDate, categoryId]);
+  }, [timeframe, page, endDate, search, startDate, categoryId]);
 
   useEffect(() => {
     if (categoryId) {
@@ -54,7 +54,7 @@ const Completed = ({ categoryId }) => {
         })
       );
     }
-  }, [page, categoryId]);
+  }, [ categoryId]);
   useEffect(() => {
     const delayDebounceFunc = setTimeout(() => {
       dispatch(
@@ -67,11 +67,19 @@ const Completed = ({ categoryId }) => {
     }, 1000);
 
     return () => clearTimeout(delayDebounceFunc);
-  }, [search, timeframe, dispatch]);
+  }, [search, timeframe, dispatch, categoryId]);
 
   const handlePageChange = (page) => {
     setUpdateState({ ...iState, page });
-    dispatch(getCompletedBookingList({ categoryId, page }));
+    dispatch(
+      getCompletedBookingList({
+        categoryId,
+        page,
+        timeframe,
+        startDate,
+        endDate,
+      })
+    );
   };
 
   const handleChange = (e) => {
@@ -84,8 +92,8 @@ const Completed = ({ categoryId }) => {
   const handleApply = () => {
     const data = {
       search,
-      fromDate,
-      toDate,
+      startDate,
+      endDate,
       page,
       categoryId,
     };
@@ -114,7 +122,8 @@ const Completed = ({ categoryId }) => {
               className="form-control"
               name="timeframe"
               onChange={handleChange}
-              disabled={fromDate || toDate}
+              value={timeframe}
+              disabled={startDate || endDate}
             >
               <option value="select">--Select--</option>
               <option value="Today">Today</option>
@@ -128,8 +137,8 @@ const Completed = ({ categoryId }) => {
             <input
               type="date"
               className="form-control"
-              name="fromDate"
-              value={fromDate}
+              name="startDate"
+              value={startDate}
               disabled={timeframe}
               onChange={handleChange}
             />
@@ -139,8 +148,8 @@ const Completed = ({ categoryId }) => {
             <input
               type="date"
               className="form-control"
-              name="toDate"
-              value={toDate}
+              name="endDate"
+              value={endDate}
               onChange={handleChange}
               disabled={timeframe}
             />
@@ -288,6 +297,9 @@ const Completed = ({ categoryId }) => {
             )}
           </tbody>
         </table>
+        {completedBookingList?.result?.[0]?.paginationData?.length == 0 && (
+          <p className="text-center">No records found.</p>
+        )}
       </div>
       <div className="PaginationBox">
         <div className="PaginationLeft">

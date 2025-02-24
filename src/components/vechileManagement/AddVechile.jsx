@@ -159,10 +159,10 @@ const AddVechile = () => {
       formErrors.rcFront = "Registration Front is required";
       isValid = false;
     }
-    if (!rcBack.trim()) {
-      formErrors.rcBack = "Registration Back is required";
-      isValid = false;
-    }
+    // if (!rcBack.trim()) {
+    //   formErrors.rcBack = "Registration Back is required";
+    //   isValid = false;
+    // }
     if (!rcExpiryDate.trim()) {
       formErrors.rcExpiryDate = "Registration Expiry Date is required";
       isValid = false;
@@ -191,26 +191,26 @@ const AddVechile = () => {
       formErrors.vehicleBackImage = "vehicle back image  is required";
       isValid = false;
     }
-    if (!vehicleLeftImage.trim()) {
-      formErrors.vehicleLeftImage = "vehicle left image  is required";
-      isValid = false;
-    }
-    if (!vehicleRightImage.trim()) {
-      formErrors.vehicleRightImage = "vehicle right image  is required";
-      isValid = false;
-    }
-    if (!vehicleInsideImage.trim()) {
-      formErrors.vehicleInsideImage = "vehicle inside image  is required";
-      isValid = false;
-    }
-    if (!vehicleOverallImage.trim()) {
-      formErrors.vehicleOverallImage = "vehicle overall image  is required";
-      isValid = false;
-    }
-    if (!insurenceBack.trim()) {
-      formErrors.insurenceBack = "insurence back image  is required";
-      isValid = false;
-    }
+    // if (!vehicleLeftImage.trim()) {
+    //   formErrors.vehicleLeftImage = "vehicle left image  is required";
+    //   isValid = false;
+    // }
+    // if (!vehicleRightImage.trim()) {
+    //   formErrors.vehicleRightImage = "vehicle right image  is required";
+    //   isValid = false;
+    // }
+    // if (!vehicleInsideImage.trim()) {
+    //   formErrors.vehicleInsideImage = "vehicle inside image  is required";
+    //   isValid = false;
+    // }
+    // if (!vehicleOverallImage.trim()) {
+    //   formErrors.vehicleOverallImage = "vehicle overall image  is required";
+    //   isValid = false;
+    // }
+    // if (!insurenceBack.trim()) {
+    //   formErrors.insurenceBack = "insurence back image  is required";
+    //   isValid = false;
+    // }
     if (!insurenceFront.trim()) {
       formErrors.insurenceFront = "insurence front image  is required";
       isValid = false;
@@ -237,7 +237,7 @@ const AddVechile = () => {
         categoryId,
         rcNumber,
         rcFront,
-        rcBack,
+        // rcBack,
         rcExpiryDate,
         vehicleNumberPlate,
         vehicleColour,
@@ -245,12 +245,12 @@ const AddVechile = () => {
         vehicleManufacturer,
         vehicleFrontImage,
         vehicleBackImage,
-        vehicleLeftImage,
-        vehicleRightImage,
-        vehicleInsideImage,
-        vehicleOverallImage,
+        // vehicleLeftImage,
+        // vehicleRightImage,
+        // vehicleInsideImage,
+        // vehicleOverallImage,
         insurenceFront,
-        insurenceBack,
+        // insurenceBack,
         insurenceExpiryDate,
         // insurenceNumber,
       };
@@ -459,7 +459,7 @@ const AddVechile = () => {
                     </p>
                   )}
                 </div>
-                <div className="form-group">
+                {/* <div className="form-group">
                   <label>Upload Vehicle Left Image</label>
                   {imageLoader?.vehicleLeftImage ? (
                     <LoaderForImage />
@@ -598,7 +598,7 @@ const AddVechile = () => {
                       {errors.vehicleInsideImage}
                     </p>
                   )}
-                </div>
+                </div> */}
               </div>
               <div className="col-sm-6">
                 {/* <div className="form-group">
@@ -724,7 +724,7 @@ const AddVechile = () => {
                   )}
                 </div>
 
-                <div className="form-group">
+                {/* <div className="form-group">
                   <label>Upload Vehicle Right Image</label>
                   {imageLoader?.vehicleRightImage ? (
                     <LoaderForImage />
@@ -863,7 +863,7 @@ const AddVechile = () => {
                       {errors.vehicleOverallImage}
                     </p>
                   )}
-                </div>
+                </div> */}
               </div>
             </div>
             <h4>2.Documents</h4>
@@ -895,7 +895,7 @@ const AddVechile = () => {
                         )}
                       </div>
                       <div className="form-group">
-                        <label>Vehicle Registration Expiry Date</label>
+                        <label>Vehicle Registration  Date</label>
                         <input
                           type="date"
                           className="form-control"
@@ -985,7 +985,7 @@ const AddVechile = () => {
                               </p>
                             )}
                           </div>
-                          <div className="form-group">
+                          {/* <div className="form-group">
                             <label>
                               Upload Vehicle Registration Back Image
                             </label>
@@ -1057,7 +1057,7 @@ const AddVechile = () => {
                                 {errors.rcBack}
                               </p>
                             )}
-                          </div>
+                          </div> */}
                         </li>
                       </ul>
                     </div>
@@ -1177,7 +1177,7 @@ const AddVechile = () => {
                               </p>
                             )}
                           </div>
-                          <div className="form-group">
+                          {/* <div className="form-group">
                             <label>Upload insurence Back Image</label>
                             {imageLoader?.insurenceBack ? (
                               <LoaderForImage />
@@ -1249,7 +1249,7 @@ const AddVechile = () => {
                                 {errors.insurenceBack}
                               </p>
                             )}
-                          </div>
+                          </div> */}
                         </li>
                         {/* <li>
                                           <strong class="Red"><i class="fa fa-exclamation-triangle"></i> Expiring in 5 days</strong>

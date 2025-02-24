@@ -1,16 +1,32 @@
 import React, { useEffect, useState } from "react";
-import Modal from "../../Modal";
 import moment from "moment";
 import { toastService } from "../../../utils/toastify";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
+  actionToService,
   getPendingVehicleList,
   pendingVehicleStatus,
 } from "../../../features/slices/vechileManagement/vechileManagement";
-import DisApprovedModal from "./DisApprovedModal";
+import DisApprovedModal from "../../vechileManagement/vechileTable/DisApprovedModal";
 import ZoomEffect from "../../ZoomEffect";
-
-const PendingForApproval = ({ handleClose, data, handleViewImageFunc }) => {
+import { getVechailData } from "../../../features/slices/DriverManagement/allDriver/allDriverReducer";
+import LgZoomEffect from "../../LgZoomEffect";
+const initialState = {
+  id: "",
+  is_local_admin: false,
+  is_outstation_admin: false,
+  is_express_admin: false,
+  is_local: false,
+  is_outstation: false,
+  is_express: false,
+};
+const ApproveVechileInDriverPage = ({
+  handleClose,
+  data,
+  handleViewImageFunc,
+  setapproveVechileStatus,
+}) => {
+  const [iState, setUpdateState] = useState(initialState);
   const [imageModal, setImageModal] = useState(false);
   const [image, setImage] = useState("");
   const [approvalState, setApprovalState] = useState({
@@ -23,6 +39,15 @@ const PendingForApproval = ({ handleClose, data, handleViewImageFunc }) => {
     isApproveButtonDisabled: false,
     isDisapproveButtonDisabled: false,
   });
+  const {
+    id,
+    is_local_admin,
+    is_outstation_admin,
+    is_express_admin,
+    is_local,
+    is_outstation,
+    is_express,
+  } = iState;
   const { isApproveButtonDisabled, isDisapproveButtonDisabled } = disableBtn;
   const {
     approveInsuranceCheck,
@@ -36,6 +61,14 @@ const PendingForApproval = ({ handleClose, data, handleViewImageFunc }) => {
     insurenceError: "",
   });
   const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(getVechailData({ driverId: data }));
+  }, []);
+  const { vechileDetailsData } = useSelector((state) => {
+    return state?.driverManagementAllDrivers;
+  });
+  console.log({ vechileDetailsData });
+
   const handleValidation = () => {
     let errorObj = {};
     let isValid = true;
@@ -49,7 +82,7 @@ const PendingForApproval = ({ handleClose, data, handleViewImageFunc }) => {
       !approvalState.approveInsuranceCheck &&
       !approvalState.disApproveInsuranceCheck
     ) {
-      isValid = false; 
+      isValid = false;
       errorObj.insurenceError =
         "Please select one of the Insurance check options.";
     }
@@ -63,47 +96,58 @@ const PendingForApproval = ({ handleClose, data, handleViewImageFunc }) => {
     setApprovalState((prevState) => ({
       ...prevState,
       [name]: checked,
-      [oppositeType]: false, 
+      [oppositeType]: false,
     }));
   };
-
-//  useEffect(() => {
-//    if (approveRcCheck && approveInsuranceCheck) {
-//      setDisableBtn({
-//        isApproveButtonDisabled: false,
-//        isDisapproveButtonDisabled: true,
-//      });
-//    } else if (disApproveRcCheck && disApproveInsuranceCheck) {
-//      setDisableBtn({
-//        isApproveButtonDisabled: true,
-//        isDisapproveButtonDisabled: false,
-//      });
-//    } else {
-//      setDisableBtn({
-//        isApproveButtonDisabled: true,
-//        isDisapproveButtonDisabled: false,
-//      });
-//    }
-//  }, [
-//    approveRcCheck,
-//    approveInsuranceCheck,
-//    disApproveRcCheck,
-//    disApproveInsuranceCheck,
-//  ]);
-
   const isBothApproved = () => {
     return approveRcCheck && approveInsuranceCheck;
   };
+
+  //   useEffect(() => {
+  //     console.log({ sol: isBothApproved() });
+
+  //     // if (approveRcCheck && approveInsuranceCheck) {
+  //     //   setDisableBtn({
+  //     //     isApproveButtonDisabled: false,
+  //     //     isDisapproveButtonDisabled: true,
+  //     //   });
+  //     // } else if (disApproveRcCheck && disApproveInsuranceCheck) {
+  //     //   setDisableBtn({
+  //     //     isApproveButtonDisabled: true,
+  //     //     isDisapproveButtonDisabled: false,
+  //     //   });
+  //     // } else {
+  //     //   setDisableBtn({
+  //     //     isApproveButtonDisabled: true,
+  //     //     isDisapproveButtonDisabled: false,
+  //     //   });
+  //     // }
+  //   }, [
+  //     approveRcCheck,
+  //     approveInsuranceCheck,
+  //     disApproveRcCheck,
+  //     disApproveInsuranceCheck,
+  //   ]);
+
   const handleApprove = () => {
+    console.log({ aprove: "Aprrove" });
+
     if (handleValidation() && isBothApproved()) {
-      console.log("Appro rue");
+      console.log("inside Appro rue");
       dispatch(
         pendingVehicleStatus({
-          id: data?._id,
+          id: vechileDetailsData?.result?.[0]?._id,
           status: "APPROVED",
         })
       ).then((res) => {
         if (res?.payload?.code == 200) {
+          // console.log({ res });
+          dispatch(getVechailData({ driverId: data })).then(res=>{
+            console.log({res});
+              if(res?.payload?.code==200){
+                setapproveVechileStatus(res?.payload?.result?.[0]?.approvedStatus);
+              }
+          })
           toastService.success("Vehicle Approved successfully");
           handleClose();
           dispatch(getPendingVehicleList({ page: 1 }));
@@ -123,11 +167,55 @@ const PendingForApproval = ({ handleClose, data, handleViewImageFunc }) => {
     setShowModal(false);
   };
   const handleViewImage = (image) => {
-    handleViewImageFunc(image);
+    setImage(image);
+    setImageModal(true);
   };
   const handleCloseImageModal = () => {
     setImageModal(false);
     setImage("");
+  };
+  console.log({ error });
+  useEffect(() => {
+    setUpdateState((prev) => ({
+      ...prev,
+      is_local_admin: vechileDetailsData?.result?.[0]?.is_local_admin,
+      is_outstation_admin: vechileDetailsData?.result?.[0]?.is_outstation_admin,
+      is_express_admin: vechileDetailsData?.result?.[0]?.is_express_admin,
+      is_local: vechileDetailsData?.result?.[0]?.is_local,
+      is_outstation: vechileDetailsData?.result?.[0]?.is_outstation,
+      is_express: vechileDetailsData?.result?.[0]?.is_express,
+    }));
+  }, [vechileDetailsData]);
+  const handleChecked = (e, id, type) => {
+    const { name, checked } = e?.target;
+    const data = {
+      id: vechileDetailsData?.result?.[0]?._id,
+      is_local_admin: is_local,
+      is_outstation_admin: is_outstation,
+      is_express_admin: is_express,
+      is_local: is_local,
+      is_outstation: is_outstation,
+      is_express: is_express,
+      [type]: checked,
+      [name]: checked,
+    };
+    dispatch(actionToService(data)).then((res) => {
+      console.log("status update api", res);
+      if (res?.payload?.code == 200) {
+        setUpdateState((prev) => ({
+          ...prev,
+          is_local_admin: res?.payload?.editCategory?.is_local_admin,
+          is_outstation_admin: res?.payload?.editCategory?.is_outstation_admin,
+          is_express_admin: res?.payload?.editCategory?.is_express_admin,
+          is_local: res?.payload?.editCategory?.is_local,
+          is_outstation: res?.payload?.editCategory?.is_outstation,
+          is_express: res?.payload?.editCategory?.is_express,
+        }));
+        toastService.success("Status updated successfully");
+      } else {
+        toastService.error("status update failed");
+      }
+    });
   };
   return (
     <>
@@ -149,35 +237,169 @@ const PendingForApproval = ({ handleClose, data, handleViewImageFunc }) => {
                     </a>
                     <h3>Pending For Approval</h3>
                     <figure>
-                      <img src={data?.driverData?.profilePic} alt="" />
+                      <img
+                        src={
+                          vechileDetailsData?.result?.[0]?.driverData?.[0]
+                            ?.profilePic
+                        }
+                        alt=""
+                      />
                     </figure>
                     <h3>
-                      {data?.driverData?.fullName} <br />
-                      <span>Driver ID: {data?.driverData?.driver_number}</span>
+                      {
+                        vechileDetailsData?.result?.[0]?.driverData?.[0]
+                          ?.fullName
+                      }{" "}
+                      <br />
+                      <span>
+                        Driver ID:{" "}
+                        {
+                          vechileDetailsData?.result?.[0]?.driverData?.[0]
+                            ?.driver_number
+                        }
+                      </span>
                     </h3>
                     <br />
                     <div className="RequestBox">
                       <div className="form-group">
-                        <p>
-                          <strong>Driver ID </strong>
-                          <span>{data?.driverData?.driver_number}</span>
-                        </p>
-                        <p>
-                          <strong>Driver Name </strong>
-                          <span>{data?.driverData?.fullName}</span>
-                        </p>
-                        <p>
-                          <strong>Created on </strong>
-                          <span>
-                            {moment(data?.driverData?.createdAt).format(
-                              "DD-MM-YYYY"
-                            )}
-                          </span>
-                        </p>
-                        <p>
-                          <strong>Created By </strong>
-                          <span>{data?.driverData?.fullName} </span>
-                        </p>
+                        <article
+                          style={{
+                            width: "100%",
+                          }}
+                        >
+                          <aside
+                            style={{
+                              width: "100%",
+                            }}
+                          >
+                            <p>
+                              <strong>Driver ID </strong>
+                              <span>
+                                {
+                                  vechileDetailsData?.result?.[0]
+                                    ?.driverData?.[0]?.driver_number
+                                }
+                              </span>
+                            </p>
+                            <p>
+                              <strong>Driver Name </strong>
+                              <span>
+                                {
+                                  vechileDetailsData?.result?.[0]
+                                    ?.driverData?.[0]?.fullName
+                                }
+                              </span>
+                            </p>
+                            <p>
+                              <strong>Created on </strong>
+                              <span>
+                                {moment(
+                                  vechileDetailsData?.result?.[0]
+                                    ?.driverData?.[0]?.createdAt
+                                ).format("DD-MM-YYYY")}
+                              </span>
+                            </p>
+                            <p>
+                              <strong>Created By </strong>
+                              <span>
+                                {
+                                  vechileDetailsData?.result?.[0]
+                                    ?.driverData?.[0]?.fullName
+                                }{" "}
+                              </span>
+                            </p>
+                          </aside>
+                          <aside
+                            style={{
+                              width: "100%",
+                            }}
+                          >
+                            <p>
+                              <strong>Vechile Id </strong>
+                              <span>
+                                {vechileDetailsData?.result?.[0]?.vehicleNumber}{" "}
+                              </span>
+                            </p>
+                            <p>
+                              <strong>Vechile Number </strong>
+                              <span>
+                                {
+                                  vechileDetailsData?.result?.[0]
+                                    ?.vehicleNumberPlate
+                                }{" "}
+                              </span>
+                            </p>
+                            <p>
+                              <strong>Vechile Model </strong>
+                              <span>
+                                {vechileDetailsData?.result?.[0]?.vehicleModel}{" "}
+                              </span>
+                            </p>
+                          </aside>
+                        </article>
+                      </div>
+                      <div className="InformationBox">
+                        <h3>Vehicle Status</h3>
+                        <div className="Informations">
+                          <div className="VehicleStatus">
+                            <ul>
+                              <li>
+                                <label>Local</label>
+                                <label className="Switch">
+                                  <input
+                                    type="checkbox"
+                                    name="is_local"
+                                    checked={is_local}
+                                    onChange={(e) =>
+                                      handleChecked(
+                                        e,
+                                        vechileDetailsData?.result?.[0]?._id,
+                                        "is_local_admin"
+                                      )
+                                    }
+                                  />
+                                  <span className="slider" />
+                                </label>
+                              </li>
+                              <li>
+                                <label>Express</label>
+                                <label className="Switch">
+                                  <input
+                                    type="checkbox"
+                                    name="is_express"
+                                    checked={is_express}
+                                    onChange={(e) =>
+                                      handleChecked(
+                                        e,
+                                        vechileDetailsData?.result?.[0]?._id,
+                                        "is_express_admin"
+                                      )
+                                    }
+                                  />
+                                  <span className="slider" />
+                                </label>
+                              </li>
+                              <li>
+                                <label>Out Station</label>
+                                <label className="Switch">
+                                  <input
+                                    type="checkbox"
+                                    name="is_outstation"
+                                    checked={is_outstation}
+                                    onChange={(e) =>
+                                      handleChecked(
+                                        e,
+                                        vechileDetailsData?.result?.[0]?._id,
+                                        "is_outstation_admin"
+                                      )
+                                    }
+                                  />
+                                  <span className="slider" />
+                                </label>
+                              </li>
+                            </ul>
+                          </div>
+                        </div>
                       </div>
                       <div className="form-group">
                         <div className="ModalTable">
@@ -199,14 +421,20 @@ const PendingForApproval = ({ handleClose, data, handleViewImageFunc }) => {
                                         <strong>
                                           Registration Certificate Number
                                         </strong>
-                                        <span>{data?.rcNumber}</span>
+                                        <span>
+                                          {
+                                            vechileDetailsData?.result?.[0]
+                                              ?.rcNumber
+                                          }
+                                        </span>
                                       </p>
                                       <p>
                                         <strong>Registration</strong>
                                         <span>
-                                          {moment(data?.rcExpiryDate).format(
-                                            "DD-MM-YYYY"
-                                          )}
+                                          {moment(
+                                            vechileDetailsData?.result?.[0]
+                                              ?.rcExpiryDate
+                                          ).format("DD-MM-YYYY")}
                                         </span>
                                       </p>
                                     </aside>
@@ -219,10 +447,18 @@ const PendingForApproval = ({ handleClose, data, handleViewImageFunc }) => {
                                             cursor: "pointer",
                                           }}
                                           onClick={() =>
-                                            handleViewImage(data?.rcFront)
+                                            handleViewImage(
+                                              vechileDetailsData?.result?.[0]
+                                                ?.rcFront
+                                            )
                                           }
                                         >
-                                          <img src={data?.rcFront} />
+                                          <img
+                                            src={
+                                              vechileDetailsData?.result?.[0]
+                                                ?.rcFront
+                                            }
+                                          />
                                         </figure>
                                         {/* <figure
                                           style={{
@@ -293,7 +529,8 @@ const PendingForApproval = ({ handleClose, data, handleViewImageFunc }) => {
                                         <span>
                                           {" "}
                                           {moment(
-                                            data?.insurenceExpiryDate
+                                            vechileDetailsData?.result?.[0]
+                                              ?.insurenceExpiryDate
                                           ).format("DD-MM-YYYY")}
                                         </span>
                                       </p>
@@ -308,11 +545,17 @@ const PendingForApproval = ({ handleClose, data, handleViewImageFunc }) => {
                                           }}
                                           onClick={() =>
                                             handleViewImage(
-                                              data?.insurenceFront
+                                              vechileDetailsData?.result?.[0]
+                                                ?.insurenceFront
                                             )
                                           }
                                         >
-                                          <img src={data?.insurenceFront} />
+                                          <img
+                                            src={
+                                              vechileDetailsData?.result?.[0]
+                                                ?.insurenceFront
+                                            }
+                                          />
                                         </figure>
                                         {/* <figure
                                           className="mb-3"
@@ -376,18 +619,10 @@ const PendingForApproval = ({ handleClose, data, handleViewImageFunc }) => {
                         </div>
                       </div>
                       <div className="Buttons">
-                        <button
-                          className="Approve"
-                          onClick={handleApprove}
-                          disabled={isApproveButtonDisabled}
-                        >
+                        <button className="Approve" onClick={handleApprove}>
                           Approve
                         </button>
-                        <button
-                          className="Reject"
-                          onClick={handleDisApprove}
-                          disabled={isDisapproveButtonDisabled}
-                        >
+                        <button className="Reject" onClick={handleDisApprove}>
                           Disapprove
                         </button>
                       </div>
@@ -401,16 +636,21 @@ const PendingForApproval = ({ handleClose, data, handleViewImageFunc }) => {
       </div>
       {showModal && (
         <DisApprovedModal
-          id={data?._id}
+          id={vechileDetailsData?.result?.[0]?._id}
           handleClose={handleDisapproveModalClose}
           handleMainModalClose={handleClose}
+          setapproveVechileStatus={setapproveVechileStatus}
         />
       )}
       {imageModal && (
         <ZoomEffect image={image} handleClose={handleCloseImageModal} />
+        // <LgZoomEffect
+        //   image={image}
+        //   handleClose={handleCloseImageModal}
+        // />
       )}
     </>
   );
 };
 
-export default PendingForApproval;
+export default ApproveVechileInDriverPage;

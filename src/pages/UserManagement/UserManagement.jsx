@@ -14,13 +14,13 @@ import { canPerformAction } from "../../utils/deniedAccess";
 const initialState = {
   page: 1,
   search: "",
-  fromDate: "",
-  toDate: "",
+  startDate: "",
+  endDate: "",
   timeframe: "",
 };
 const UserManagement = () => {
   const [iState, setUpdateState] = useState(initialState);
-  const { page, search, fromDate, toDate, timeframe } = iState;
+  const { page, search, startDate, endDate, timeframe } = iState;
   const dispatch = useDispatch();
   const { users } = useSelector((state) => {
     return state?.userManagement;
@@ -30,8 +30,8 @@ const UserManagement = () => {
   useEffect(() => {
     const data = {
       search,
-      fromDate,
-      toDate,
+      startDate,
+      endDate,
       timeframe,
       limit: 999999,
     };
@@ -41,10 +41,10 @@ const UserManagement = () => {
         setAllData(res?.payload);
       }
     });
-  }, [timeframe, page, toDate, search, fromDate]);
+  }, [timeframe, page, endDate, search, startDate]);
   useEffect(() => {
     dispatch(userList({ page, timeframe }));
-  }, [timeframe, page]);
+  }, []);
   useEffect(() => {
     const delayDebounceFunc = setTimeout(() => {
       dispatch(
@@ -60,7 +60,7 @@ const UserManagement = () => {
 
   const handlePageChange = (page) => {
     setUpdateState({ ...iState, page });
-    dispatch(userList({ page }));
+    dispatch(userList({ page, startDate, endDate, timeframe }));
   };
   const handleChecked = (e, id) => {
     const { name, checked } = e?.target;
@@ -85,8 +85,8 @@ const UserManagement = () => {
   const handleApply = () => {
     const data = {
       search,
-      fromDate,
-      toDate,
+      startDate,
+      endDate,
       page,
     };
     dispatch(userList(data));
@@ -129,7 +129,8 @@ const UserManagement = () => {
                   className="form-control"
                   name="timeframe"
                   onChange={handleChange}
-                  disabled={fromDate || toDate}
+                  value={timeframe}
+                  disabled={startDate || endDate}
                 >
                   <option value="select">--Select--</option>
                   <option value="Today">Today</option>
@@ -143,8 +144,8 @@ const UserManagement = () => {
                 <input
                   type="date"
                   className="form-control"
-                  name="fromDate"
-                  value={fromDate}
+                  name="startDate"
+                  value={startDate}
                   disabled={timeframe}
                   onChange={handleChange}
                 />
@@ -154,8 +155,8 @@ const UserManagement = () => {
                 <input
                   type="date"
                   className="form-control"
-                  name="toDate"
-                  value={toDate}
+                  name="endDate"
+                  value={endDate}
                   onChange={handleChange}
                   disabled={timeframe}
                 />

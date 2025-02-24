@@ -10,10 +10,24 @@ export const getEarlyAccesData = createAsyncThunk("get/getEarlyAccessData",async
         rejectWithValue(error.message);
     }
 });
+export const getDashboardData = createAsyncThunk(
+  "get/DashboardData",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get("count", {
+        params: payload,
+      });
+      return response.data;
+    } catch (error) {
+      rejectWithValue(error.message);
+    }
+  }
+);
 export const dashboardSlice = createSlice({
   name: "dashboard",
   initialState: {
     earlyAccesData: [],
+    dashboardData:[],
     loading: false,
   },
   extraReducers: (builder) => {
@@ -27,7 +41,17 @@ export const dashboardSlice = createSlice({
       })
       .addCase(getEarlyAccesData.rejected, (state, action) => {
         state.loading = false;
-      });
+      })
+      .addCase(getDashboardData.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(getDashboardData.fulfilled, (state, action) => {
+        state.loading = false;
+        state.dashboardData = action.payload;
+      })
+      .addCase(getDashboardData.rejected, (state, action) => {
+        state.loading = false;
+      })
   },
 });
 

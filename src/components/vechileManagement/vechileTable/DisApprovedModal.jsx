@@ -7,7 +7,12 @@ import {
 } from "../../../features/slices/vechileManagement/vechileManagement";
 import { toastService } from "../../../utils/toastify";
 
-const DisApprovedModal = ({ handleClose, id, handleMainModalClose }) => {
+const DisApprovedModal = ({
+  handleClose,
+  id,
+  handleMainModalClose,
+  setapproveVechileStatus,
+}) => {
   const [data, setData] = useState({
     rejectReason: "",
     rejectNote: "",
@@ -49,6 +54,8 @@ const DisApprovedModal = ({ handleClose, id, handleMainModalClose }) => {
         })
       ).then((res) => {
         if (res?.payload?.code === 200) {
+          console.log({ res });
+          setapproveVechileStatus("REJECT");
           toastService.success("Disapproved successfully.");
           handleClose();
           handleMainModalClose();

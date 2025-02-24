@@ -7,6 +7,20 @@ const initialState = {
   error: null,
 };
 
+export const getAllBannerList = createAsyncThunk(
+  "get/allbannerList",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get("/bannerList", {
+        params: payload,
+      });
+      return response.data;
+    } catch (error) {
+      console.log({ error });
+      return rejectWithValue(error); // Return error instead of just rejecting
+    }
+  }
+);
 export const getBannerList = createAsyncThunk(
   "get/bannerList",
   async (payload, { rejectWithValue }) => {

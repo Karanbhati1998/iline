@@ -4,12 +4,19 @@ import SubAminComponent from "../../components/subAdmin/SubAminComponent";
 import RoleComponent from "../../components/subAdmin/RoleComponent";
 import AddSubAdmin from "../../components/subAdmin/AddSubAdmin";
 import { canPerformAction } from "../../utils/deniedAccess";
+import { useDispatch, useSelector } from "react-redux";
+import { activeSubadminTabFunc } from "../../features/slices/subAdmin";
 
 const SubAdmin = () => {
   const [showRole, setShowRole] = useState(false);
   const [showAddSubAdminModal, setShowAddSubAdminModal] = useState(false);
+  const dispatch = useDispatch();
+  const { activeSubadminTab } = useSelector((state) => {
+    return state?.subAdmin;
+  });
   const handleShowRole = () => {
-    setShowRole(!showRole);
+    // setShowRole(!showRole);
+    dispatch(activeSubadminTabFunc(!activeSubadminTab));
   };
   const handleShowAddSubAdminModal = () => {
     setShowAddSubAdminModal(!showAddSubAdminModal);
@@ -20,9 +27,7 @@ const SubAdmin = () => {
         <div className="WrapperBox">
           <div className="TitleBox">
             <h4 className="Title">Sub Admin Management</h4>
-            {
-              canPerformAction("Sub-Admin Management") &&
-            !showRole ? (
+            {canPerformAction("Sub-Admin Management") && !showRole ? (
               <a
                 className="TitleLink"
                 onClick={() => {
@@ -35,20 +40,19 @@ const SubAdmin = () => {
               <Link className="TitleLink" to="createRole">
                 Create Role
               </Link>
-            )
-            }
+            )}
           </div>
           <div className="CommonLinks">
             <ul>
-              <li className={!showRole && "active"}>
+              <li className={!activeSubadminTab && "active"}>
                 <a onClick={handleShowRole}>Sub Admins</a>
               </li>
-              <li className={showRole && "active"}>
+              <li className={activeSubadminTab && "active"}>
                 <a onClick={handleShowRole}>Roles</a>
               </li>
             </ul>
           </div>
-          {!showRole ? <SubAminComponent /> : <RoleComponent />}
+          {!activeSubadminTab ? <SubAminComponent /> : <RoleComponent />}
         </div>
       </div>
       {showAddSubAdminModal && (

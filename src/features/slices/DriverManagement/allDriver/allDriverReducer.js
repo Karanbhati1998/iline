@@ -1,15 +1,17 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axiosInstance from "../../../axiosInstance";
-import axios from "axios";
 const initialState = {
   iLineDriverList: [],
   p2pDriverList: [],
   vehicleListForAssign: [],
   allDriverData: [],
-  driverRequestList:[],
-  driverVehicleHistory:[],
-  rejectDriverList:[],
-  driverCount:[],
+  driverRequestList: [],
+  driverVehicleHistory: [],
+  rejectDriverList: [],
+  driverCount: [],
+  vechileDetailsData: [],
+  type: false,
+  showBookingSummary: false,
   loading: false,
 };
 export const fetchAllDriverList = createAsyncThunk(
@@ -194,9 +196,31 @@ export const getDriverCount = createAsyncThunk(
     }
   }
 );
+export const getVechailData = createAsyncThunk(
+  "get/vechileData",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get("/vehicleDetails", {
+        params: payload,
+      });
+      return response.data;
+    } catch (error) {
+      rejectWithValue(error);
+      console.log({ error });
+    }
+  }
+);
 const allDriver = createSlice({
   name: "allDriver",
   initialState: initialState,
+  reducers: {
+    driverType: (state, action) => {
+      state.type = action.payload;
+    },
+    bookingSummaryType: (state, action) => {
+      state.showBookingSummary = action.payload;
+    },
+  },
   extraReducers: (builder) => {
     builder.addCase(fetchILineDriverList.pending, (state, action) => {
       state.loading = true;
@@ -278,7 +302,17 @@ const allDriver = createSlice({
     builder.addCase(getDriverCount.rejected, (state, action) => {
       state.loading = false;
     });
+    builder.addCase(getVechailData.pending, (state, action) => {
+      state.loading = true;
+    });
+    builder.addCase(getVechailData.fulfilled, (state, action) => {
+      state.loading = false;
+      state.vechileDetailsData = action.payload;
+    });
+    builder.addCase(getVechailData.rejected, (state, action) => {
+      state.loading = false;
+    });
   },
 });
-
+export const { driverType, bookingSummaryType } = allDriver.actions;
 export default allDriver.reducer;

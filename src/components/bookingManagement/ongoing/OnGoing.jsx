@@ -13,8 +13,8 @@ import ExportToExcel from "../../ExportToExcel";
 const initialState = {
   page: 1,
   search: "",
-  fromDate: "",
-  toDate: "",
+  startDate: "",
+  endDate: "",
   timeframe: "",
   id: "",
   deleteModal: false,
@@ -22,7 +22,7 @@ const initialState = {
 };
 const OnGoing = ({ categoryId }) => {
   const [iState, setUpdateState] = useState(initialState);
-  const { page, search, fromDate, toDate, timeframe, id } = iState;
+  const { page, search, startDate, endDate, timeframe, id } = iState;
   const dispatch = useDispatch();
 
   const { OngoingBookingList } = useSelector((state) => {
@@ -33,8 +33,8 @@ const OnGoing = ({ categoryId }) => {
   useEffect(() => {
     const data = {
       search,
-      fromDate,
-      toDate,
+      startDate,
+      endDate,
       timeframe,
       limit: 999999,
       categoryId,
@@ -47,7 +47,7 @@ const OnGoing = ({ categoryId }) => {
         }
       });
     }
-  }, [timeframe, page, toDate, search, fromDate, categoryId]);
+  }, [timeframe, page, endDate, search, startDate, categoryId]);
   console.log({ allData });
 
   useEffect(() => {
@@ -59,7 +59,7 @@ const OnGoing = ({ categoryId }) => {
         })
       );
     }
-  }, [page, categoryId]);
+  }, [categoryId]);
   useEffect(() => {
     const delayDebounceFunc = setTimeout(() => {
       dispatch(
@@ -72,11 +72,13 @@ const OnGoing = ({ categoryId }) => {
     }, 1000);
 
     return () => clearTimeout(delayDebounceFunc);
-  }, [search, timeframe, dispatch]);
+  }, [search, timeframe, dispatch, categoryId]);
 
   const handlePageChange = (page) => {
     setUpdateState({ ...iState, page });
-    dispatch(getOngoingBookingList({ categoryId, page }));
+    dispatch(
+      getOngoingBookingList({ categoryId, page, timeframe, startDate, endDate })
+    );
   };
 
   const handleChange = (e) => {
@@ -89,8 +91,8 @@ const OnGoing = ({ categoryId }) => {
   const handleApply = () => {
     const data = {
       search,
-      fromDate,
-      toDate,
+      startDate,
+      endDate,
       page,
       categoryId,
     };
@@ -119,7 +121,8 @@ const OnGoing = ({ categoryId }) => {
               className="form-control"
               name="timeframe"
               onChange={handleChange}
-              disabled={fromDate || toDate}
+              value={timeframe}
+              disabled={startDate || endDate}
             >
               <option value="select">--Select--</option>
               <option value="Today">Today</option>
@@ -133,8 +136,8 @@ const OnGoing = ({ categoryId }) => {
             <input
               type="date"
               className="form-control"
-              name="fromDate"
-              value={fromDate}
+              name="startDate"
+              value={startDate}
               disabled={timeframe}
               onChange={handleChange}
             />
@@ -144,8 +147,8 @@ const OnGoing = ({ categoryId }) => {
             <input
               type="date"
               className="form-control"
-              name="toDate"
-              value={toDate}
+              name="endDate"
+              value={endDate}
               onChange={handleChange}
               disabled={timeframe}
             />
@@ -293,6 +296,9 @@ const OnGoing = ({ categoryId }) => {
             })}
           </tbody>
         </table>
+        {OngoingBookingList?.result?.[0]?.paginationData?.length == 0 && (
+          <p className="text-center">No records found.</p>
+        )}
       </div>
       <div className="PaginationBox">
         <div className="PaginationLeft">

@@ -12,15 +12,16 @@ import { canPerformAction } from "../../utils/deniedAccess";
 const initialState = {
   page: 1,
   search: "",
-  fromDate: "",
-  toDate: "",
+  startDate: "",
+  endDate: "",
   timeframe: "",
   deleteModal: false,
   id: "",
 };
 const DisApprovedList = () => {
   const [iState, setUpdateState] = useState(initialState);
-  const { page, search, fromDate, toDate, timeframe, deleteModal, id } = iState;
+  const { page, search, startDate, endDate, timeframe, deleteModal, id } =
+    iState;
   const dispatch = useDispatch();
   const iLineRef = useRef();
   const { rejectDriverList } = useSelector((state) => {
@@ -28,7 +29,7 @@ const DisApprovedList = () => {
   });
   useEffect(() => {
     dispatch(fetchRejectDriverList({ page, timeframe }));
-  }, [page, timeframe]);
+  }, [ timeframe]);
   useEffect(() => {
     const delayDebounceFunc = setTimeout(() => {
       dispatch(
@@ -44,7 +45,7 @@ const DisApprovedList = () => {
 
   const handlePageChange = (page) => {
     setUpdateState({ ...iState, page });
-    dispatch(fetchRejectDriverList({ page }));
+    dispatch(fetchRejectDriverList({ page, timeframe, startDate, endDate }));
   };
   const handleChecked = (e, id) => {
     const { name, checked } = e?.target;
@@ -70,8 +71,8 @@ const DisApprovedList = () => {
   const handleApply = () => {
     const data = {
       search,
-      fromDate,
-      toDate,
+      startDate,
+      endDate,
       page,
     };
     dispatch(fetchRejectDriverList(data));
@@ -83,7 +84,6 @@ const DisApprovedList = () => {
       <div className="WrapperBox">
         <div className="TitleBox">
           <h4 className="Title">Disapprove Drivers</h4>
-         
         </div>
         <div className="Small-Wrapper">
           <div className="FilterArea">
@@ -105,7 +105,8 @@ const DisApprovedList = () => {
                   className="form-control"
                   name="timeframe"
                   onChange={handleChange}
-                  disabled={fromDate || toDate}
+                  value={timeframe}
+                  disabled={startDate || endDate}
                 >
                   <option value="select">--Select--</option>
                   <option value="Today">Today</option>
@@ -119,8 +120,8 @@ const DisApprovedList = () => {
                 <input
                   type="date"
                   className="form-control"
-                  name="fromDate"
-                  value={fromDate}
+                  name="startDate"
+                  value={startDate}
                   disabled={timeframe}
                   onChange={handleChange}
                 />
@@ -130,8 +131,8 @@ const DisApprovedList = () => {
                 <input
                   type="date"
                   className="form-control"
-                  name="toDate"
-                  value={toDate}
+                  name="endDate"
+                  value={endDate}
                   onChange={handleChange}
                   disabled={timeframe}
                 />
@@ -146,7 +147,6 @@ const DisApprovedList = () => {
                 </button>
               </div>
             </div>
-           
           </div>
         </div>
         <div className="Small-Wrapper">
@@ -193,6 +193,9 @@ const DisApprovedList = () => {
                 )}
               </tbody>
             </table>
+            {rejectDriverList?.result?.[0]?.paginationData?.length == 0 && (
+              <p className="text-center">No records found.</p>
+            )}
           </div>
           <div className="PaginationBox">
             <div className="PaginationLeft">

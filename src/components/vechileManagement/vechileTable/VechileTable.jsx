@@ -15,8 +15,8 @@ import ExportToExcel from "../../ExportToExcel";
 const initialState = {
   page: 1,
   search: "",
-  fromDate: "",
-  toDate: "",
+  startDate: "",
+  endDate: "",
   timeframe: "",
   id: "",
   deleteModal: false,
@@ -24,15 +24,16 @@ const initialState = {
 };
 const VechileTable = ({ categoryId, vehicleType }) => {
   const [iState, setUpdateState] = useState(initialState);
-  const { page, search, fromDate, toDate, timeframe, deleteModal, id } = iState;
+  const { page, search, startDate, endDate, timeframe, deleteModal, id } =
+    iState;
   const dispatch = useDispatch();
   const vechileRef = useRef();
   const [allData, setAllData] = useState([]);
   useEffect(() => {
     const data = {
       search,
-      fromDate,
-      toDate,
+      startDate,
+      endDate,
       timeframe,
       limit: 999999,
       categoryId,
@@ -46,7 +47,7 @@ const VechileTable = ({ categoryId, vehicleType }) => {
         }
       });
     }
-  }, [timeframe, page, toDate, search, fromDate, categoryId, vehicleType]);
+  }, [timeframe, page, endDate, search, startDate, categoryId, vehicleType]);
   const { ilineOrP2pVechileList } = useSelector((state) => {
     return state?.vechile;
   });
@@ -61,7 +62,7 @@ const VechileTable = ({ categoryId, vehicleType }) => {
         })
       );
     }
-  }, [page, timeframe, categoryId, vehicleType]);
+  }, [ timeframe, categoryId, vehicleType]);
   useEffect(() => {
     const delayDebounceFunc = setTimeout(() => {
       dispatch(
@@ -75,11 +76,20 @@ const VechileTable = ({ categoryId, vehicleType }) => {
     }, 1000);
 
     return () => clearTimeout(delayDebounceFunc);
-  }, [search, timeframe, dispatch]);
+  }, [search, timeframe, dispatch, categoryId]);
 
   const handlePageChange = (page) => {
     setUpdateState({ ...iState, page });
-    dispatch(getIlineOrP2pVechileList({ categoryId, vehicleType, page }));
+    dispatch(
+      getIlineOrP2pVechileList({
+        categoryId,
+        vehicleType,
+        page,
+        timeframe,
+        startDate,
+        endDate,
+      })
+    );
   };
   const handleChecked = (e, id) => {
     const { name, checked } = e?.target;
@@ -105,8 +115,8 @@ const VechileTable = ({ categoryId, vehicleType }) => {
   const handleApply = () => {
     const data = {
       search,
-      fromDate,
-      toDate,
+      startDate,
+      endDate,
       page,
       categoryId,
       vehicleType,
@@ -152,7 +162,8 @@ const VechileTable = ({ categoryId, vehicleType }) => {
                     className="form-control"
                     name="timeframe"
                     onChange={handleChange}
-                    disabled={fromDate || toDate}
+                    value={timeframe}
+                    disabled={startDate || endDate}
                   >
                     <option value="select">--Select--</option>
                     <option value="Today">Today</option>
@@ -166,8 +177,8 @@ const VechileTable = ({ categoryId, vehicleType }) => {
                   <input
                     type="date"
                     className="form-control"
-                    name="fromDate"
-                    value={fromDate}
+                    name="startDate"
+                    value={startDate}
                     disabled={timeframe}
                     onChange={handleChange}
                   />
@@ -177,8 +188,8 @@ const VechileTable = ({ categoryId, vehicleType }) => {
                   <input
                     type="date"
                     className="form-control"
-                    name="toDate"
-                    value={toDate}
+                    name="endDate"
+                    value={endDate}
                     onChange={handleChange}
                     disabled={timeframe}
                   />
@@ -194,7 +205,7 @@ const VechileTable = ({ categoryId, vehicleType }) => {
                 </div>
               </div>
               <div className="FilterRight">
-                <div className="form-group">
+                {/* <div className="form-group">
                   <label>Service Type</label>
                   <select className="form-control">
                     <option>Select</option>
@@ -203,9 +214,8 @@ const VechileTable = ({ categoryId, vehicleType }) => {
                     <option>Four-Wheeler</option>
                     <option>Freight-Truck</option>
                   </select>
-                </div>
-                  <ExportToExcel ref={vechileRef} fileName="vechileTable" />
-              
+                </div> */}
+                <ExportToExcel ref={vechileRef} fileName="vechileTable" />
               </div>
             </div>
             <div className="TableList mt-4" style={{ display: "none" }}>
@@ -237,93 +247,89 @@ const VechileTable = ({ categoryId, vehicleType }) => {
                   </tr>
                 </thead>
                 <tbody>
-                  {allData?.result?.[0]?.paginationData?.map(
-                    (res, i) => {
-                      console.log({ res });
+                  {allData?.result?.[0]?.paginationData?.map((res, i) => {
+                    console.log({ res });
 
-                      return (
-                        <tr key={res?._id}>
-                          <td>{i + 1 + (page - 1) * 10}</td>
-                          <td>{res?.vehicleNumber}</td>
-                          <td>{res?.vehicleNumberPlate}</td>
+                    return (
+                      <tr key={res?._id}>
+                        <td>{i + 1 + (page - 1) * 10}</td>
+                        <td>{res?.vehicleNumber}</td>
+                        <td>{res?.vehicleNumberPlate}</td>
 
-                          <td>{res?.vehicleType}</td>
-                          <td>{moment(res?.createdAt).format("DD-MM-YYYY")}</td>
-                          <td>
-                            {(() => {
-                              const labels = [];
-                              if (res?.is_local) labels.push("Local");
-                              if (res?.is_express) labels.push("Express");
-                              if (res?.is_outstation) labels.push("Outstation");
-                              return labels.length > 0
-                                ? labels.join(", ")
-                                : "-";
-                            })()}
-                          </td>
+                        <td>{res?.vehicleType}</td>
+                        <td>{moment(res?.createdAt).format("DD-MM-YYYY")}</td>
+                        <td>
+                          {(() => {
+                            const labels = [];
+                            if (res?.is_local) labels.push("Local");
+                            if (res?.is_express) labels.push("Express");
+                            if (res?.is_outstation) labels.push("Outstation");
+                            return labels.length > 0 ? labels.join(", ") : "-";
+                          })()}
+                        </td>
 
-                          <td>{res?.driverData?.[0]?.fullName}</td>
+                        <td>{res?.driverData?.[0]?.fullName}</td>
+                        <td>
+                          {res?.vehicleType == "ILINE"
+                            ? moment(res?.assignOn).format("DD-MM-YYYY")
+                            : moment(res?.driverData?.[0]?.approvedOn).format(
+                                "DD-MM-YYYY"
+                              )}
+                        </td>
+                        <td>
+                          {res?.vehicleType == "ILINE"
+                            ? res?.assignBy
+                            : res?.driverData?.[0]?.approvedBy}
+                        </td>
+                        <td>
+                          <span
+                            className={
+                              res?.status == "ACTIVE" ? "Green" : "Red"
+                            }
+                          >
+                            {res?.status == "ACTIVE" ? "Enabled" : "Disabled"}
+                          </span>
+                        </td>
+                        {canPerformAction("Vehicle Management") && (
                           <td>
-                            {res?.vehicleType == "ILINE"
-                              ? moment(res?.assignOn).format("DD-MM-YYYY")
-                              : moment(res?.driverData?.[0]?.approvedOn).format(
-                                  "DD-MM-YYYY"
-                                )}
+                            <div className="Actions">
+                              <label className="Switch">
+                                <input
+                                  type="checkbox"
+                                  name="status"
+                                  checked={res?.status == "ACTIVE"}
+                                  onChange={(e) => handleChecked(e, res?._id)}
+                                />
+                                <span className="slider" />
+                              </label>
+                              <a
+                                className="Red"
+                                onClick={() => {
+                                  setUpdateState({
+                                    ...iState,
+                                    deleteModal: true,
+                                    id: res?._id,
+                                  });
+                                }}
+                              >
+                                <i className="fa fa-trash" />
+                              </a>
+                              <Link
+                                to="/vehicleManagement/details"
+                                state={res}
+                                className="Blue"
+                              >
+                                <i
+                                  className="fa fa-info-circle"
+                                  aria-hidden="true"
+                                />
+                              </Link>
+                            </div>
                           </td>
-                          <td>
-                            {res?.vehicleType == "ILINE"
-                              ? res?.assignBy
-                              : res?.driverData?.[0]?.approvedBy}
-                          </td>
-                          <td>
-                            <span
-                              className={
-                                res?.status == "ACTIVE" ? "Green" : "Red"
-                              }
-                            >
-                              {res?.status == "ACTIVE" ? "Enabled" : "Disabled"}
-                            </span>
-                          </td>
-                          {canPerformAction("Vehicle Management") && (
-                            <td>
-                              <div className="Actions">
-                                <label className="Switch">
-                                  <input
-                                    type="checkbox"
-                                    name="status"
-                                    checked={res?.status == "ACTIVE"}
-                                    onChange={(e) => handleChecked(e, res?._id)}
-                                  />
-                                  <span className="slider" />
-                                </label>
-                                <a
-                                  className="Red"
-                                  onClick={() => {
-                                    setUpdateState({
-                                      ...iState,
-                                      deleteModal: true,
-                                      id: res?._id,
-                                    });
-                                  }}
-                                >
-                                  <i className="fa fa-trash" />
-                                </a>
-                                <Link
-                                  to="/vehicleManagement/details"
-                                  state={res}
-                                  className="Blue"
-                                >
-                                  <i
-                                    className="fa fa-info-circle"
-                                    aria-hidden="true"
-                                  />
-                                </Link>
-                              </div>
-                            </td>
-                          )}
-                        </tr>
-                      );
-                    }
-                  )}
+                        )}
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -445,6 +451,8 @@ const VechileTable = ({ categoryId, vehicleType }) => {
                   )}
                 </tbody>
               </table>
+              {ilineOrP2pVechileList?.result?.[0]?.paginationData?.length ==
+                0 && <p className="text-center">No records found.</p>}
             </div>
             <div className="PaginationBox">
               <div className="PaginationLeft">

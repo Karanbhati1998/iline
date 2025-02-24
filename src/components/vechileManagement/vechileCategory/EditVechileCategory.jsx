@@ -411,7 +411,7 @@ const EditVechileCategory = () => {
               </div>
               <div className="col-sm-4">
                 <div className="form-group">
-                  <label>Length (in meter)</label>
+                  <label>Length (in inches)</label>
                   <input
                     type="number"
                     className="form-control"
@@ -429,7 +429,7 @@ const EditVechileCategory = () => {
               </div>
               <div className="col-sm-4">
                 <div className="form-group">
-                  <label>Width (in meter)</label>
+                  <label>Width (in inches)</label>
                   <input
                     type="number"
                     className="form-control"
@@ -447,7 +447,7 @@ const EditVechileCategory = () => {
               </div>
               <div className="col-sm-4">
                 <div className="form-group">
-                  <label>Height (in meter)</label>
+                  <label>Height (in inches)</label>
                   <input
                     type="number"
                     className="form-control"
@@ -483,7 +483,7 @@ const EditVechileCategory = () => {
               </div>
               <div className="col-sm-4">
                 <div className="form-group">
-                  <label>Loading Time (in minus)</label>
+                  <label>Loading Time (in minutes)</label>
                   <input
                     type="number"
                     className="form-control"
@@ -501,7 +501,7 @@ const EditVechileCategory = () => {
               </div>
               <div className="col-sm-4">
                 <div className="form-group">
-                  <label>Unloading Time (in minus)</label>
+                  <label>Unloading Time (in minutes)</label>
                   <input
                     type="number"
                     className="form-control"

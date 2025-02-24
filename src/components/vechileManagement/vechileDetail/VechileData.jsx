@@ -244,7 +244,7 @@ const VechileData = ({ state }) => {
                   <li>
                     <img src={state?.vehicleBackImage} />
                   </li>
-                  <li>
+                  {/* <li>
                     <img src={state?.vehicleLeftImage} />
                   </li>
                   <li>
@@ -255,7 +255,7 @@ const VechileData = ({ state }) => {
                   </li>
                   <li>
                     <img src={state?.vehicleInsideImage} />
-                  </li>
+                  </li> */}
                 </ul>
               </div>
             </div>
@@ -305,7 +305,7 @@ const VechileData = ({ state }) => {
                       <span>{state?.rcNumber}</span>
                     </p>
                     <p>
-                      <strong>Expiry</strong>
+                      <strong>Registration</strong>
                       <span>
                         {moment(state?.rcExpiryDate).format("DD-MM-YYYY")}
                       </span>
@@ -324,7 +324,7 @@ const VechileData = ({ state }) => {
                       >
                         <img src={state?.rcFront} />
                       </figure>
-                      <figure
+                      {/* <figure
                         style={{
                           marginTop: "10px",
                           cursor: "pointer",
@@ -332,9 +332,9 @@ const VechileData = ({ state }) => {
                         onClick={() => handleViewImage(state?.rcBack)}
                       >
                         <img src={state?.rcBack} />
-                      </figure>
+                      </figure> */}
                     </li>
-                    <li>
+                    {/* <li>
                       <strong className="Red">
                         <i className="fa fa-exclamation-triangle" />{" "}
                         {moment(state?.rcExpiryDate).isAfter(moment())
@@ -343,7 +343,7 @@ const VechileData = ({ state }) => {
                             ).fromNow()}`
                           : `Expired ${moment(state?.rcExpiryDate).fromNow()}`}
                       </strong>
-                    </li>
+                    </li> */}
                   </ul>
                 </div>
               </div>
@@ -379,7 +379,7 @@ const VechileData = ({ state }) => {
                       >
                         <img src={state?.insurenceFront} />
                       </figure>
-                      <figure
+                      {/* <figure
                         style={{
                           marginTop: "10px",
                           cursor: "pointer",
@@ -387,9 +387,9 @@ const VechileData = ({ state }) => {
                         onClick={() => handleViewImage(state?.insurenceBack)}
                       >
                         <img src={state?.insurenceBack} />
-                      </figure>
+                      </figure> */}
                     </li>
-                    <li>
+                    {/* <li>
                       <strong className="Red">
                         <i className="fa fa-exclamation-triangle" />{" "}
                         {moment(state?.insurenceExpiryDate).isAfter(moment())
@@ -400,7 +400,7 @@ const VechileData = ({ state }) => {
                               state?.insurenceExpiryDate
                             ).fromNow()}`}
                       </strong>
-                    </li>
+                    </li> */}
                   </ul>
                 </div>
               </div>

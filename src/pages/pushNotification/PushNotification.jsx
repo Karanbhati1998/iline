@@ -17,35 +17,45 @@ import ExportToExcel from "../../components/ExportToExcel";
 const initialState = {
   page: 1,
   search: "",
-  fromDate: "",
-  toDate: "",
+  startDate: "",
+  endDate: "",
   timeframe: "",
   id: "",
   deleteModals: false,
   id: "",
+  userGroup:"",
 };
 const PushNotification = () => {
   const [iState, setUpdateState] = useState(initialState);
-  const { page, search, fromDate, toDate, timeframe, id, deleteModals } =
-    iState;
+  const {
+    page,
+    search,
+    startDate,
+    endDate,
+    timeframe,
+    id,
+    deleteModals,
+    userGroup,
+  } = iState;
   const dispatch = useDispatch();
-    const notificationRef = useRef();
-    const [allData, setAllData] = useState([]);
-      useEffect(() => {
-        const data = {
-          search,
-          fromDate,
-          toDate,
-          timeframe,
-          limit: 999999,
-        };
-        dispatch(getAllNotificationList(data)).then((res) => {
-          if (res?.payload?.code == 200) {
-            console.log({ res });
-            setAllData(res?.payload);
-          }
-        });
-      }, [timeframe, page, toDate, search, fromDate]);
+  const notificationRef = useRef();
+  const [allData, setAllData] = useState([]);
+  useEffect(() => {
+    const data = {
+      search,
+      startDate,
+      endDate,
+      timeframe,
+      limit: 999999,
+      userGroup,
+    };
+    dispatch(getAllNotificationList(data)).then((res) => {
+      if (res?.payload?.code == 200) {
+        console.log({ res });
+        setAllData(res?.payload);
+      }
+    });
+  }, [timeframe, page, endDate, search, startDate, userGroup]);
   const { notification } = useSelector((state) => {
     return state.notification;
   });
@@ -62,23 +72,26 @@ const PushNotification = () => {
         page,
       })
     );
-  }, [page]);
+  }, []);
   useEffect(() => {
     const delayDebounceFunc = setTimeout(() => {
       dispatch(
         getNotificationList({
           search: search.trim(),
           timeframe,
+          userGroup,
         })
       );
     }, 1000);
 
     return () => clearTimeout(delayDebounceFunc);
-  }, [search, timeframe]);
+  }, [search, timeframe, userGroup]);
 
   const handlePageChange = (page) => {
     setUpdateState({ ...iState, page });
-    dispatch(getNotificationList({ page }));
+    dispatch(
+      getNotificationList({ page, timeframe, startDate, endDate, search })
+    );
   };
 
   const handleChange = (e) => {
@@ -91,8 +104,8 @@ const PushNotification = () => {
   const handleApply = () => {
     const data = {
       search,
-      fromDate,
-      toDate,
+      startDate,
+      endDate,
       page,
     };
     dispatch(getNotificationList(data));
@@ -169,7 +182,8 @@ const PushNotification = () => {
                       className="form-control"
                       name="timeframe"
                       onChange={handleChange}
-                      disabled={fromDate || toDate}
+                      value={timeframe}
+                      disabled={startDate || endDate}
                     >
                       <option value="select">--Select--</option>
                       <option value="Today">Today</option>
@@ -183,8 +197,8 @@ const PushNotification = () => {
                     <input
                       type="date"
                       className="form-control"
-                      name="fromDate"
-                      value={fromDate}
+                      name="startDate"
+                      value={startDate}
                       disabled={timeframe}
                       onChange={handleChange}
                     />
@@ -194,8 +208,8 @@ const PushNotification = () => {
                     <input
                       type="date"
                       className="form-control"
-                      name="toDate"
-                      value={toDate}
+                      name="endDate"
+                      value={endDate}
                       onChange={handleChange}
                       disabled={timeframe}
                     />
@@ -213,10 +227,15 @@ const PushNotification = () => {
                 <div className="FilterRight">
                   <div className="form-group">
                     <label>Select User group</label>
-                    <select className="form-control">
+                    <select
+                      className="form-control"
+                      name="userGroup"
+                      onChange={handleChange}
+                      value={userGroup}
+                    >
                       <option>Select</option>
-                      <option>Driver</option>
-                      <option>User</option>
+                      <option value={"DRIVER"}>Driver</option>
+                      <option value={"USER"}>User</option>
                     </select>
                   </div>
                   <ExportToExcel
@@ -349,6 +368,9 @@ const PushNotification = () => {
                     )}
                   </tbody>
                 </table>
+                {notification?.result?.[0]?.paginationData?.length == 0 && (
+                  <p className="text-center">No records found.</p>
+                )}
               </div>
               <div className="PaginationBox">
                 <div className="PaginationLeft">

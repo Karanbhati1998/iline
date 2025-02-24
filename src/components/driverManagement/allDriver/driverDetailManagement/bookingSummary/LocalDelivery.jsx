@@ -1,25 +1,25 @@
-import React, { useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
-import { getDriverRequestList } from '../../../../../features/slices/DriverManagement/allDriver/allDriverReducer';
-import CommonPagination from '../../../../CommonPagination';
-import { toastService } from '../../../../../utils/toastify';
-import moment from 'moment';
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+import { getDriverRequestList } from "../../../../../features/slices/DriverManagement/allDriver/allDriverReducer";
+import CommonPagination from "../../../../CommonPagination";
+import { toastService } from "../../../../../utils/toastify";
+import moment from "moment";
 const initialState = {
   page: 1,
   search: "",
-  fromDate: "",
-  toDate: "",
+  startDate: "",
+  endDate: "",
   timeframe: "",
 };
-const LocalDelivery = ({state}) => {
-   const [iState, setUpdateState] = useState(initialState);
-    const { page, search, fromDate, toDate, timeframe } = iState;
-    
-  const dispatch=useDispatch()
-  const {driverRequestList}=useSelector(state=>{
+const LocalDelivery = ({ state }) => {
+  const [iState, setUpdateState] = useState(initialState);
+  const { page, search, startDate, endDate, timeframe } = iState;
+
+  const dispatch = useDispatch();
+  const { driverRequestList } = useSelector((state) => {
     return state?.driverManagementAllDrivers;
-  })
+  });
   useEffect(() => {
     dispatch(
       getDriverRequestList({
@@ -27,72 +27,72 @@ const LocalDelivery = ({state}) => {
         rideType: "LOCAL",
       })
     );
-  }, [page, timeframe,state]);
+  }, [page, timeframe, state]);
   console.log({ driverRequestList });
-   useEffect(() => {
-      const delayDebounceFunc = setTimeout(() => {
-        dispatch(
-          getDriverRequestList({
-            driverId: state?._id,
-            rideType: "LOCAL",
-            search: search.trim(),
-            timeframe,
-          })
-        );
-      }, 1000);
-  
-      return () => clearTimeout(delayDebounceFunc);
-    }, [search, timeframe, dispatch]);
-  
-    const handlePageChange = (page) => {
-      setUpdateState({ ...iState, page });
-      dispatch(
-        getDriverRequestList({ page, driverId: state?._id, rideType: "LOCAL" })
-      );
-    };
-    // const handleChecked = (e, id) => {
-    //   const { name, checked } = e?.target;
-    //   const status = checked ? "ACTIVE" : "INACTIVE";
-    //   const data = { id, status };
-    //   dispatch(driverStatus(data)).then((res) => {
-    //     if (res?.payload?.code == 200) {
-    //       toastService.success("Status updated successfully");
-    //       dispatch(
-    //         getDriverRequestList({
-    //           page,
-    //           driverId: state?._id,
-    //           rideType: "LOCAL",
-    //         })
-    //       );
-    //     } else {
-    //       toastService.error("status update failed");
-    //     }
-    //   });
-    // };
-    const handleChange = (e) => {
-      setUpdateState({ ...iState, [e.target.name]: e.target.value });
-    };
-    const handleReset = () => {
-      setUpdateState(initialState);
+  useEffect(() => {
+    const delayDebounceFunc = setTimeout(() => {
       dispatch(
         getDriverRequestList({
-          page: 1,
           driverId: state?._id,
           rideType: "LOCAL",
+          search: search.trim(),
+          timeframe,
         })
       );
-    };
-    const handleApply = () => {
-      const data = {
-        search,
-        fromDate,
-        toDate,
-        page,
+    }, 1000);
+
+    return () => clearTimeout(delayDebounceFunc);
+  }, [search, timeframe, dispatch]);
+
+  const handlePageChange = (page) => {
+    setUpdateState({ ...iState, page });
+    dispatch(
+      getDriverRequestList({ page, driverId: state?._id, rideType: "LOCAL" })
+    );
+  };
+  // const handleChecked = (e, id) => {
+  //   const { name, checked } = e?.target;
+  //   const status = checked ? "ACTIVE" : "INACTIVE";
+  //   const data = { id, status };
+  //   dispatch(driverStatus(data)).then((res) => {
+  //     if (res?.payload?.code == 200) {
+  //       toastService.success("Status updated successfully");
+  //       dispatch(
+  //         getDriverRequestList({
+  //           page,
+  //           driverId: state?._id,
+  //           rideType: "LOCAL",
+  //         })
+  //       );
+  //     } else {
+  //       toastService.error("status update failed");
+  //     }
+  //   });
+  // };
+  const handleChange = (e) => {
+    setUpdateState({ ...iState, [e.target.name]: e.target.value });
+  };
+  const handleReset = () => {
+    setUpdateState(initialState);
+    dispatch(
+      getDriverRequestList({
+        page: 1,
         driverId: state?._id,
         rideType: "LOCAL",
-      };
-      dispatch(getDriverRequestList(data));
+      })
+    );
+  };
+  const handleApply = () => {
+    const data = {
+      search,
+      startDate,
+      endDate,
+      page,
+      driverId: state?._id,
+      rideType: "LOCAL",
     };
+    dispatch(getDriverRequestList(data));
+  };
   return (
     <>
       {" "}
@@ -117,7 +117,8 @@ const LocalDelivery = ({state}) => {
                   className="form-control"
                   name="timeframe"
                   onChange={handleChange}
-                  disabled={fromDate || toDate}
+                  value={timeframe}
+                  disabled={startDate || endDate}
                 >
                   <option value="select">--Select--</option>
                   <option value="Today">Today</option>
@@ -131,8 +132,8 @@ const LocalDelivery = ({state}) => {
                 <input
                   type="date"
                   className="form-control"
-                  name="fromDate"
-                  value={fromDate}
+                  name="startDate"
+                  value={startDate}
                   disabled={timeframe}
                   onChange={handleChange}
                 />
@@ -142,8 +143,8 @@ const LocalDelivery = ({state}) => {
                 <input
                   type="date"
                   className="form-control"
-                  name="toDate"
-                  value={toDate}
+                  name="endDate"
+                  value={endDate}
                   onChange={handleChange}
                   disabled={timeframe}
                 />
@@ -194,7 +195,7 @@ const LocalDelivery = ({state}) => {
             </tr>
           </thead>
           <tbody>
-            {driverRequestList?.result?.[0]?.paginationData?.map((res,i) => {
+            {driverRequestList?.result?.[0]?.paginationData?.map((res, i) => {
               return (
                 <tr>
                   <td>{i + 1 + (page - 1) * 10}</td>
@@ -234,7 +235,6 @@ const LocalDelivery = ({state}) => {
                 </tr>
               );
             })}
-           
           </tbody>
         </table>
       </div>
@@ -266,6 +266,6 @@ const LocalDelivery = ({state}) => {
       </div>
     </>
   );
-}
+};
 
-export default LocalDelivery
+export default LocalDelivery;

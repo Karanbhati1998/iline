@@ -1,88 +1,87 @@
-import React, { useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux';
-import { blogStatus, getBlogList } from '../../features/slices/blogSlice';
-import { toastService } from '../../utils/toastify';
-import moment from 'moment';
-import CommonPagination from '../../components/CommonPagination';
-import { Link } from 'react-router-dom';
-import { canPerformAction } from '../../utils/deniedAccess';
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { blogStatus, getBlogList } from "../../features/slices/blogSlice";
+import { toastService } from "../../utils/toastify";
+import moment from "moment";
+import CommonPagination from "../../components/CommonPagination";
+import { Link } from "react-router-dom";
+import { canPerformAction } from "../../utils/deniedAccess";
 const initialState = {
   page: 1,
   search: "",
-  fromDate: "",
-  toDate: "",
+  startDate: "",
+  endDate: "",
   timeframe: "",
   id: "",
 };
 const BlogManagement = () => {
-    const [iState, setUpdateState] = useState(initialState);
-    const { page, search, fromDate, toDate, timeframe } = iState;
-    const dispatch = useDispatch();
-     const { blog } = useSelector((state) => {
-       return state?.blog;
-     });
-      useEffect(() => {
-         dispatch(getBlogList({ page, timeframe }));
-       }, [page, timeframe]);
-       useEffect(() => {
-           const delayDebounceFunc = setTimeout(() => {
-             dispatch(
-               getBlogList({
-                 search: search.trim(), 
-                 timeframe,
-               })
-             );
-           }, 1000);
-       
-           return () => clearTimeout(delayDebounceFunc);
-         }, [search, timeframe, dispatch]); 
-       
-         const handlePageChange = (page) => {
-           setUpdateState({ ...iState, page });
-           dispatch(getBlogList({ page }));
-         };
-         const handleChecked = (e, id) => {
-           const { name, checked } = e?.target;
-           const status = checked ? "ACTIVE" : "INACTIVE";
-           const data = { id, status };
-           dispatch(blogStatus(data)).then((res) => {
-             console.log("status update api", res);
-             if (res?.payload?.code == 200) {
-               toastService.success("Status updated successfully");
-               dispatch(getBlogList({ page }));
-             } else {
-               toastService.error("status update failed");
-             }
-           });
-         };
-         const handleChange = (e) => {
-           setUpdateState({ ...iState, [e.target.name]: e.target.value });
-         };
-         const handleReset = () => {
-           setUpdateState(initialState);
-           dispatch(getBlogList({ page: 1 }));
-         };
-         const handleApply = () => {
-           const data = {
-             search,
-             fromDate,
-             toDate,
-             page,
-           };
-           dispatch(getBlogList(data));
-         };
-       
+  const [iState, setUpdateState] = useState(initialState);
+  const { page, search, startDate, endDate, timeframe } = iState;
+  const dispatch = useDispatch();
+  const { blog } = useSelector((state) => {
+    return state?.blog;
+  });
+  useEffect(() => {
+    dispatch(getBlogList({ page, timeframe }));
+  }, [timeframe]);
+  useEffect(() => {
+    const delayDebounceFunc = setTimeout(() => {
+      dispatch(
+        getBlogList({
+          search: search.trim(),
+          timeframe,
+        })
+      );
+    }, 1000);
+
+    return () => clearTimeout(delayDebounceFunc);
+  }, [search, timeframe, dispatch]);
+
+  const handlePageChange = (page) => {
+    setUpdateState({ ...iState, page });
+    dispatch(getBlogList({ page, timeframe, startDate, endDate, search }));
+  };
+  const handleChecked = (e, id) => {
+    const { name, checked } = e?.target;
+    const status = checked ? "ACTIVE" : "INACTIVE";
+    const data = { id, status };
+    dispatch(blogStatus(data)).then((res) => {
+      console.log("status update api", res);
+      if (res?.payload?.code == 200) {
+        toastService.success("Status updated successfully");
+        dispatch(getBlogList({ page }));
+      } else {
+        toastService.error("status update failed");
+      }
+    });
+  };
+  const handleChange = (e) => {
+    setUpdateState({ ...iState, [e.target.name]: e.target.value });
+  };
+  const handleReset = () => {
+    setUpdateState(initialState);
+    dispatch(getBlogList({ page: 1 }));
+  };
+  const handleApply = () => {
+    const data = {
+      search,
+      startDate,
+      endDate,
+      page,
+    };
+    dispatch(getBlogList(data));
+  };
+
   return (
     <div className="WrapperArea">
       <div className="WrapperBox">
         <div className="TitleBox">
           <h4 className="Title">Blog Management</h4>
-          {
-            canPerformAction("Blog") &&
-          <Link className="TitleLink" to="addblog">
-            Publish New Blog
-          </Link>
-          }
+          {canPerformAction("Blog") && (
+            <Link className="TitleLink" to="addblog">
+              Publish New Blog
+            </Link>
+          )}
         </div>
         <div className="Small-Wrapper">
           <div className="FilterArea">
@@ -103,8 +102,8 @@ const BlogManagement = () => {
                 <input
                   type="date"
                   className="form-control"
-                  name="fromDate"
-                  value={fromDate}
+                  name="startDate"
+                  value={startDate}
                   disabled={timeframe}
                   onChange={handleChange}
                 />
@@ -114,8 +113,8 @@ const BlogManagement = () => {
                 <input
                   type="date"
                   className="form-control"
-                  name="toDate"
-                  value={toDate}
+                  name="endDate"
+                  value={endDate}
                   onChange={handleChange}
                   disabled={timeframe}
                 />
@@ -137,7 +136,8 @@ const BlogManagement = () => {
                   className="form-control"
                   name="timeframe"
                   onChange={handleChange}
-                  disabled={fromDate || toDate}
+                  value={timeframe}
+                  disabled={startDate || endDate}
                 >
                   <option value="select">--Select--</option>
                   <option value="Today">Today</option>
@@ -214,6 +214,9 @@ const BlogManagement = () => {
                 })}
               </tbody>
             </table>
+            {blog?.result?.[0]?.paginationData?.length == 0 && (
+              <p className="text-center">No records found.</p>
+            )}
           </div>
           <div className="PaginationBox">
             <div className="PaginationLeft">
@@ -244,6 +247,6 @@ const BlogManagement = () => {
       </div>
     </div>
   );
-}
+};
 
-export default BlogManagement
+export default BlogManagement;

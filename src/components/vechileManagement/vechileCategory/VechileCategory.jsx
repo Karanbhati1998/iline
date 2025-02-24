@@ -14,15 +14,16 @@ import CommonPagination from "../../CommonPagination";
 const initialState = {
   page: 1,
   search: "",
-  fromDate: "",
-  toDate: "",
+  startDate: "",
+  endDate: "",
   timeframe: "",
   deleteModal: false,
   id: "",
 };
 const VechileCategory = () => {
   const [iState, setUpdateState] = useState(initialState);
-  const { page, search, fromDate, toDate, timeframe, deleteModal, id } = iState;
+  const { page, search, startDate, endDate, timeframe, deleteModal, id } =
+    iState;
   const dispatch = useDispatch();
   const vechileCategoryRef = useRef();
   const { VechileCategories } = useSelector((state) => {
@@ -52,8 +53,8 @@ const VechileCategory = () => {
   const handleApply = () => {
     const data = {
       search,
-      fromDate,
-      toDate,
+      startDate,
+      endDate,
       page,
     };
     dispatch(getVechileCategory(data));
@@ -89,10 +90,10 @@ const VechileCategory = () => {
       deleteModal: false,
     }));
   };
-   const handlePageChange = (page) => {
-      setUpdateState({ ...iState, page });
-      dispatch(getVechileCategory({ page }));
-    };
+  const handlePageChange = (page) => {
+    setUpdateState({ ...iState, page });
+    dispatch(getVechileCategory({ page }));
+  };
   return (
     <>
       <div className="WrapperArea">
@@ -132,7 +133,7 @@ const VechileCategory = () => {
                       className="form-control"
                       name="timeframe"
                       onChange={handleChange}
-                      disabled={fromDate || toDate}
+                      disabled={startDate || endDate}
                     >
                       <option value="select">--Select--</option>
                       <option value="Today">Today</option>
@@ -146,8 +147,8 @@ const VechileCategory = () => {
                     <input
                       type="date"
                       className="form-control"
-                      name="fromDate"
-                      value={fromDate}
+                      name="startDate"
+                      value={startDate}
                       disabled={timeframe}
                       onChange={handleChange}
                     />
@@ -157,8 +158,8 @@ const VechileCategory = () => {
                     <input
                       type="date"
                       className="form-control"
-                      name="toDate"
-                      value={toDate}
+                      name="endDate"
+                      value={endDate}
                       onChange={handleChange}
                       disabled={timeframe}
                     />
@@ -203,7 +204,12 @@ const VechileCategory = () => {
                             <td>{res?.category_number}</td>
                             <td>
                               <span
-                                style={{ color: "green", fontWeight: "bold" ,display:"inline",padding:"0px"}}
+                                style={{
+                                  color: "green",
+                                  fontWeight: "bold",
+                                  display: "inline",
+                                  padding: "0px",
+                                }}
                               >
                                 {res?.categoryName?.slice(0, 2)}
                               </span>
@@ -290,18 +296,21 @@ const VechileCategory = () => {
                   <p>
                     Total Records :{" "}
                     <span>
-                      {VechileCategories?.result?.[0]?.totalCount?.[0]?.count || 0}
+                      {VechileCategories?.result?.[0]?.totalCount?.[0]?.count ||
+                        0}
                     </span>
                   </p>
                 </div>
 
                 <div className="PaginationRight">
-                  {VechileCategories?.result?.[0]?.totalCount?.[0]?.count > 0 && (
+                  {VechileCategories?.result?.[0]?.totalCount?.[0]?.count >
+                    0 && (
                     <CommonPagination
                       activePage={page}
                       itemsCountPerPage={10}
                       totalItemsCount={
-                        VechileCategories?.result?.[0]?.totalCount?.[0]?.count || 0
+                        VechileCategories?.result?.[0]?.totalCount?.[0]
+                          ?.count || 0
                       }
                       pageRangeDisplayed={4}
                       onChange={handlePageChange}

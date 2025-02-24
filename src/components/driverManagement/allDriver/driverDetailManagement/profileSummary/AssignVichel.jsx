@@ -13,19 +13,19 @@ import { useLocation } from "react-router-dom";
 const initialState = {
   page: 1,
   search: "",
-  fromDate: "",
-  toDate: "",
+  startDate: "",
+  endDate: "",
   timeframe: "",
   id: "",
 };
 const AssignVichel = () => {
   const [iState, setUpdateState] = useState(initialState);
   const [status, setStatus] = useState(false);
-  const { page, search, fromDate, toDate, timeframe } = iState;
+  const { page, search, startDate, endDate, timeframe } = iState;
   const dispatch = useDispatch();
-  const {state}=useLocation()
-  console.log({state});
-  
+  const { state } = useLocation();
+  console.log({ state });
+
   const { vehicleListForAssign } = useSelector((state) => {
     return state?.driverManagementAllDrivers;
   });
@@ -45,13 +45,13 @@ const AssignVichel = () => {
     return () => clearTimeout(delayDebounceFunc);
   }, [search, timeframe, dispatch]);
 
-  useEffect(()=>{
+  useEffect(() => {
     if (state?.userStatus === "ACTIVE") {
       setStatus(true);
     } else {
       setStatus(false);
     }
-  },[])
+  }, []);
 
   const handlePageChange = (page) => {
     setUpdateState({ ...iState, page });
@@ -68,8 +68,8 @@ const AssignVichel = () => {
   const handleApply = () => {
     const data = {
       search,
-      fromDate,
-      toDate,
+      startDate,
+      endDate,
       page,
     };
     dispatch(getVehicleListForAssign(data));
@@ -77,30 +77,32 @@ const AssignVichel = () => {
   const handleAssign = (id) => {
     console.log({ id, driverId: state?._id });
 
-    dispatch(assignVehicleToDriver({ id, driverId:state?._id })).then((res) => {
+    dispatch(assignVehicleToDriver({ id, driverId: state?._id })).then(
+      (res) => {
+        if (res?.payload?.code == 200) {
+          toastService.success("vechile assigned vehicle to driver");
+          dispatch(getVehicleListForAssign({ page }));
+        } else {
+          toastService.error("Failed to assign vehicle to driver");
+        }
+      }
+    );
+  };
+  console.log({ vehicleListForAssign });
+  const handleChecked = (e, id) => {
+    const { name, checked } = e?.target;
+    const status = checked ? "ACTIVE" : "INACTIVE";
+    const data = { id, status };
+    dispatch(driverStatus(data)).then((res) => {
+      console.log("status update api", res);
       if (res?.payload?.code == 200) {
-        toastService.success("vechile assigned vehicle to driver");
-         dispatch(getVehicleListForAssign({ page }));
+        toastService.success("Status updated successfully");
+        setStatus(checked);
       } else {
-        toastService.error("Failed to assign vehicle to driver");
+        toastService.error("status update failed");
       }
     });
   };
-  console.log({ vehicleListForAssign });
-   const handleChecked = (e, id) => {
-        const { name, checked } = e?.target;
-        const status = checked ? "ACTIVE" : "INACTIVE";
-        const data = { id, status };
-        dispatch(driverStatus(data)).then((res) => {
-          console.log('status update api',res)
-          if (res?.payload?.code == 200) {
-            toastService.success("Status updated successfully");
-         setStatus(checked)
-          } else {
-            toastService.error("status update failed");
-          }
-        });
-      };
   return (
     <div className="WrapperArea">
       <div className="WrapperBox">
@@ -137,7 +139,6 @@ const AssignVichel = () => {
                     />
                     <span className="slider" />
                   </label>
-                 
                 </div>
               </div>
             </div>
@@ -163,8 +164,8 @@ const AssignVichel = () => {
                 <input
                   type="date"
                   className="form-control"
-                  name="fromDate"
-                  value={fromDate}
+                  name="startDate"
+                  value={startDate}
                   disabled={timeframe}
                   onChange={handleChange}
                 />
@@ -174,8 +175,8 @@ const AssignVichel = () => {
                 <input
                   type="date"
                   className="form-control"
-                  name="toDate"
-                  value={toDate}
+                  name="endDate"
+                  value={endDate}
                   onChange={handleChange}
                   disabled={timeframe}
                 />

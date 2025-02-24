@@ -2,9 +2,18 @@ import React, { useState } from "react";
 import BackButton from "../../components/BackButton";
 import I_lineDriver from "../../components/driverManagement/allDriver/I_lineDriver";
 import P2PDriver from "../../components/driverManagement/allDriver/P2PDriver";
+import { useDispatch, useSelector } from "react-redux";
+import { driverType } from "../../features/slices/DriverManagement/allDriver/allDriverReducer";
 
 const AllDriverDetail = () => {
   const [p2pDriver,setP2pDriver]=useState(false)
+  const dispatch=useDispatch()
+  const handleDriverType=(type)=>{
+    dispatch(driverType(type));
+  }
+  const {type}=useSelector(state=>{
+    return state?.driverManagementAllDrivers;
+  })
   return (
     <div className="WrapperArea">
       <div className="WrapperBox">
@@ -13,16 +22,16 @@ const AllDriverDetail = () => {
             <ul className="nav nav-tabs">
               <li className="nav-item">
                 <a
-                  className={!p2pDriver ? "nav-link active" : "nav-link"}
-                  onClick={() => setP2pDriver(false)}
+                  className={!type ? "nav-link active" : "nav-link"}
+                  onClick={() => handleDriverType(false)}
                 >
                   I-line Drivers
                 </a>
               </li>
               <li className="nav-item">
                 <a
-                  className={p2pDriver ? "nav-link active" : "nav-link"}
-                  onClick={() => setP2pDriver(true)}
+                  className={type ? "nav-link active" : "nav-link"}
+                  onClick={() => handleDriverType(true)}
                 >
                   P2P Drivers
                 </a>
@@ -31,11 +40,10 @@ const AllDriverDetail = () => {
           </div>
           <BackButton />
         </div>
-        
-    <div className="tab-content">
 
-        {!p2pDriver ? <I_lineDriver /> : <P2PDriver />}
-    </div>
+        <div className="tab-content">
+          {!type ? <I_lineDriver /> : <P2PDriver />}
+        </div>
       </div>
     </div>
   );

@@ -10,15 +10,16 @@ import { canPerformAction } from "../../utils/deniedAccess";
 const initialState = {
   page: 1,
   search: "",
-  fromDate: "",
-  toDate: "",
+  startDate: "",
+  endDate: "",
   timeframe: "",
   id: "",
   deleteModal: false,
 };
 const RoleComponent = () => {
   const [iState, setUpdateState] = useState(initialState);
-  const { page, search, fromDate, toDate, timeframe, deleteModal, id } = iState;
+  const { page, search, startDate, endDate, timeframe, deleteModal, id } =
+    iState;
   const dispatch = useDispatch();
   const { role } = useSelector((state) => {
     return state?.subAdmin;
@@ -69,8 +70,8 @@ const RoleComponent = () => {
   const handleApply = () => {
     const data = {
       search,
-      fromDate,
-      toDate,
+      startDate,
+      endDate,
       page,
     };
     dispatch(getRoleList(data));
@@ -111,8 +112,8 @@ const RoleComponent = () => {
               <input
                 type="date"
                 className="form-control"
-                name="fromDate"
-                value={fromDate}
+                name="startDate"
+                value={startDate}
                 disabled={timeframe}
                 onChange={handleChange}
               />
@@ -122,8 +123,8 @@ const RoleComponent = () => {
               <input
                 type="date"
                 className="form-control"
-                name="toDate"
-                value={toDate}
+                name="endDate"
+                value={endDate}
                 onChange={handleChange}
                 disabled={timeframe}
               />
@@ -145,7 +146,8 @@ const RoleComponent = () => {
                 className="form-control"
                 name="timeframe"
                 onChange={handleChange}
-                disabled={fromDate || toDate}
+                value={timeframe}
+                disabled={startDate || endDate}
               >
                 <option value="select">--Select--</option>
                 <option value="Today">Today</option>
@@ -221,6 +223,9 @@ const RoleComponent = () => {
               })}
             </tbody>
           </table>
+          {role?.result?.[0]?.paginationData?.length == 0 && (
+            <p className="text-center">No records found.</p>
+          )}
         </div>
         <div className="PaginationBox">
           <div className="PaginationLeft">

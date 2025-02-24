@@ -6,15 +6,16 @@ import DateList from "./DateList";
 const initialState = {
   page: 1,
   search: "",
-  fromDate: "",
-  toDate: "",
+  startDate: "",
+  endDate: "",
   timeframe: "",
-  data:[],
-  dateModal:false
+  data: [],
+  dateModal: false,
 };
 const AllAssignedUser = ({ state }) => {
   const [iState, setUpdateState] = useState(initialState);
-  const { page, search, fromDate, toDate, timeframe, data, dateModal } = iState;
+  const { page, search, startDate, endDate, timeframe, data, dateModal } =
+    iState;
 
   console.log({ state });
   const dispatch = useDispatch();
@@ -38,18 +39,18 @@ const AllAssignedUser = ({ state }) => {
   const handleApply = () => {
     const data = {
       search,
-      fromDate,
-      toDate,
+      startDate,
+      endDate,
       page,
     };
     dispatch(getVechileHistory(data));
   };
-  const handleClose=()=>{
+  const handleClose = () => {
     setUpdateState((prev) => ({
-     ...prev,
-      dateModal: false
+      ...prev,
+      dateModal: false,
     }));
-  }
+  };
   console.log({ vehicleHistory });
   return (
     <>
@@ -73,8 +74,8 @@ const AllAssignedUser = ({ state }) => {
                 <input
                   type="date"
                   className="form-control"
-                  name="fromDate"
-                  value={fromDate}
+                  name="startDate"
+                  value={startDate}
                   disabled={timeframe}
                   onChange={handleChange}
                 />
@@ -84,8 +85,8 @@ const AllAssignedUser = ({ state }) => {
                 <input
                   type="date"
                   className="form-control"
-                  name="toDate"
-                  value={toDate}
+                  name="endDate"
+                  value={endDate}
                   onChange={handleChange}
                   disabled={timeframe}
                 />
@@ -107,7 +108,8 @@ const AllAssignedUser = ({ state }) => {
                   className="form-control"
                   name="timeframe"
                   onChange={handleChange}
-                  disabled={fromDate || toDate}
+                  value={timeframe}
+                  disabled={startDate || endDate}
                 >
                   <option value="select">--Select--</option>
                   <option value="Today">Today</option>

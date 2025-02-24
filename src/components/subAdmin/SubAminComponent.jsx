@@ -16,8 +16,8 @@ import { canPerformAction } from "../../utils/deniedAccess";
 const initialState = {
   page: 1,
   search: "",
-  fromDate: "",
-  toDate: "",
+  startDate: "",
+  endDate: "",
   timeframe: "",
   id: "",
   deleteModal: false,
@@ -29,8 +29,8 @@ const SubAminComponent = () => {
   const {
     page,
     search,
-    fromDate,
-    toDate,
+    startDate,
+    endDate,
     timeframe,
     deleteModal,
     id,
@@ -43,7 +43,7 @@ const SubAminComponent = () => {
   });
   useEffect(() => {
     dispatch(getSubAdminList({ page, timeframe }));
-  }, [page, timeframe]);
+  }, [ timeframe]);
   useEffect(() => {
     const delayDebounceFunc = setTimeout(() => {
       dispatch(
@@ -59,7 +59,7 @@ const SubAminComponent = () => {
 
   const handlePageChange = (page) => {
     setUpdateState({ ...iState, page });
-    dispatch(getSubAdminList({ page }));
+    dispatch(getSubAdminList({ page, timeframe, startDate, endDate, search }));
   };
   const handleChecked = (e, id) => {
     const { name, checked } = e?.target;
@@ -85,8 +85,8 @@ const SubAminComponent = () => {
   const handleApply = () => {
     const data = {
       search,
-      fromDate,
-      toDate,
+      startDate,
+      endDate,
       page,
     };
     dispatch(getSubAdminList(data));
@@ -132,8 +132,8 @@ const SubAminComponent = () => {
               <input
                 type="date"
                 className="form-control"
-                name="fromDate"
-                value={fromDate}
+                name="startDate"
+                value={startDate}
                 disabled={timeframe}
                 onChange={handleChange}
               />
@@ -143,8 +143,8 @@ const SubAminComponent = () => {
               <input
                 type="date"
                 className="form-control"
-                name="toDate"
-                value={toDate}
+                name="endDate"
+                value={endDate}
                 onChange={handleChange}
                 disabled={timeframe}
               />
@@ -166,7 +166,8 @@ const SubAminComponent = () => {
                 className="form-control"
                 name="timeframe"
                 onChange={handleChange}
-                disabled={fromDate || toDate}
+                value={timeframe}
+                disabled={startDate || endDate}
               >
                 <option value="select">--Select--</option>
                 <option value="Today">Today</option>
@@ -258,6 +259,9 @@ const SubAminComponent = () => {
               })}
             </tbody>
           </table>
+          {subAdmin?.result?.[0]?.paginationData?.length == 0 && (
+            <p className="text-center">No records found.</p>
+          )}
         </div>
         <div className="PaginationBox">
           <div className="PaginationLeft">

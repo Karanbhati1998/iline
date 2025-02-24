@@ -1,20 +1,44 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { getUserRequestList } from "../../../features/slices/userManagementReducer";
+import { getAllUserRequestList, getUserRequestList } from "../../../features/slices/userManagementReducer";
 import CommonPagination from "../../CommonPagination";
+import ExportToExcel from "../../ExportToExcel";
 const initialState = {
   page: 1,
   search: "",
-  fromDate: "",
-  toDate: "",
+  startDate: "",
+  endDate: "",
   timeframe: "",
 };
-const ExpressDelivery = ({state}) => {
+const ExpressDelivery = ({ state }) => {
   const [iState, setUpdateState] = useState(initialState);
-  const { page, search, fromDate, toDate, timeframe } = iState;
+  const { page, search, startDate, endDate, timeframe } = iState;
 
   const dispatch = useDispatch();
+      const userRef = useRef();
+      const [allData, setAllData] = useState([]);
+      useEffect(() => {
+        const data = {
+          search,
+          startDate,
+          endDate,
+          timeframe,
+          limit: 999999,
+          passengerId: state?._id,
+          rideType: "EXPRESS",
+        };
+        if(state){
+          dispatch(getAllUserRequestList(data)).then((res) => {
+            if (res?.payload?.code == 200) {
+              console.log({ res });
+              setAllData(res?.payload);
+            }
+          });
+  
+        }
+      }, [timeframe, page, endDate, search, startDate]);
+  
   const { userRequestList } = useSelector((state) => {
     return state?.userManagement;
   });
@@ -69,8 +93,8 @@ const ExpressDelivery = ({state}) => {
   const handleApply = () => {
     const data = {
       search,
-      fromDate,
-      toDate,
+      startDate,
+      endDate,
       page,
       passengerId: state?._id,
       rideType: "EXPRESS",
@@ -101,7 +125,8 @@ const ExpressDelivery = ({state}) => {
                   className="form-control"
                   name="timeframe"
                   onChange={handleChange}
-                  disabled={fromDate || toDate}
+                  value={timeframe}
+                  disabled={startDate || endDate}
                 >
                   <option value="select">--Select--</option>
                   <option value="Today">Today</option>
@@ -115,8 +140,8 @@ const ExpressDelivery = ({state}) => {
                 <input
                   type="date"
                   className="form-control"
-                  name="fromDate"
-                  value={fromDate}
+                  name="startDate"
+                  value={startDate}
                   disabled={timeframe}
                   onChange={handleChange}
                 />
@@ -126,8 +151,8 @@ const ExpressDelivery = ({state}) => {
                 <input
                   type="date"
                   className="form-control"
-                  name="toDate"
-                  value={toDate}
+                  name="endDate"
+                  value={endDate}
                   onChange={handleChange}
                   disabled={timeframe}
                 />
@@ -143,20 +168,76 @@ const ExpressDelivery = ({state}) => {
               </div>
             </div>
             <div className="FilterRight">
-              <div className="form-group">
-                <label>&nbsp;</label>
-                <a href="#" className="Button" download="">
-                  <span className="download">
-                    <img src="images/download.png" alt="" />
-                  </span>
-                  Download Receipt
-                </a>
-              </div>
+              <ExportToExcel ref={userRef} fileName="userExpressRide" />
             </div>
           </div>
         </div>
       </div>
       <br />
+      <div className="TableList" style={{ display: "none" }}>
+        <table style={{ width: "120%" }} ref={userRef}>
+          <thead>
+            <tr>
+              <th>S.No</th>
+              <th>Booking ID</th>
+              <th>Driver ID</th>
+              <th>Driver Name</th>
+              <th>Vehicle ID</th>
+              <th>Assigned Vehicle</th>
+              <th>Total Cost</th>
+              <th>Booking Status</th>
+              <th>Booking Date</th>
+              <th>Pickup Location</th>
+              <th>Drop Location</th>
+              <th>Payment Mode</th>
+              <th>Payment Status</th>
+              <th>Details</th>
+            </tr>
+          </thead>
+          <tbody>
+            {allData?.result?.[0]?.paginationData?.map((res, i) => {
+              return (
+                <tr>
+                  <td>{i + 1 + (page - 1) * 10}</td>
+                  <td>{res?.requestId}</td>
+                  <td>{res?.driverData?.driver_number}</td>
+                  <td>{res?.driverData?.fullName}</td>
+                  <td>{res?.vehicleData?.vehicleNumber}</td>
+                  <td>{res?.vehicleData?.vehicleNumberPlate}</td>
+                  <td>{res?.tripCharge}</td>
+                  <td>
+                    <Link to={"/userManagement/userBookingDetail"}>
+                      <span className="Green">{res?.requestStatus}</span>
+                    </Link>
+                  </td>
+                  <td>{res?.scheduledDate}</td>
+                  <td>{res?.pickUpLocationName}</td>
+                  <td>{res?.dropOffLocationName}</td>
+                  <td>{res?.paymentMode}</td>
+                  <td>
+                    {res?.requestStatus == "ENDED"
+                      ? "COMPLETED"
+                      : res?.requestStatus == "PENDING"
+                      ? "PENDING"
+                      : "CANCELLED"}
+                  </td>
+                  <td>
+                    <div className="Actions">
+                      <Link
+                        to="/userManagement/detail_ride"
+                        className="Blue"
+                        state={res}
+                      >
+                        <i className="fa fa-info-circle" aria-hidden="true" />
+                      </Link>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
       <div className="TableList">
         <table style={{ width: "120%" }}>
           <thead>
@@ -222,6 +303,9 @@ const ExpressDelivery = ({state}) => {
             )}
           </tbody>
         </table>
+        {userRequestList?.payload?.result?.[0]?.paginationData?.length == 0 && (
+          <p className="text-center">No records found.</p>
+        )}
       </div>
       <div className="PaginationBox">
         <div className="PaginationLeft">
@@ -255,6 +339,5 @@ const ExpressDelivery = ({state}) => {
     </>
   );
 };
-
 
 export default ExpressDelivery;

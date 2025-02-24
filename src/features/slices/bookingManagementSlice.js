@@ -6,6 +6,12 @@ const initialState = {
   scheduledBookingList: [],
   completedBookingList: [],
   canceledBookingList: [],
+  activeBookingTab: {
+    ongoing: true,
+    scheduled: false,
+    completed: false,
+    canceled: false,
+  },
   loading: false,
   error: null,
 };
@@ -126,6 +132,11 @@ export const ongoingBookingStatus = createAsyncThunk(
 const bookingManagementSlice = createSlice({
   name: "BookingManagement",
   initialState: initialState,
+  reducers: {
+    activeTabFunc: (state, action) => {
+      state.activeBookingTab = action.payload;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(getOngoingBookingList.pending, (state) => {
@@ -174,5 +185,5 @@ const bookingManagementSlice = createSlice({
       });
   },
 });
-
+export const { activeTabFunc } = bookingManagementSlice.actions;
 export default bookingManagementSlice.reducer;

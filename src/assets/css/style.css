@@ -1812,6 +1812,15 @@ input[type="date"] {
   padding-left: 0px !important;
   width: 0px !important;
 }
-.TitleLink ,.CloseModal{
+.TitleLink,
+.CloseModal {
   cursor: pointer;
+}
+.largeModal .modal-dialog {
+  max-width: 750px;
+  margin-top: 300px;
+}
+.iiz  {
+  width: 100% !important;
+  height: 100% !important;
 }

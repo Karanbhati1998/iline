@@ -10,13 +10,13 @@ import { toastService } from "../../../../../utils/toastify";
 const initialState = {
   page: 1,
   search: "",
-  fromDate: "",
-  toDate: "",
+  startDate: "",
+  endDate: "",
   timeframe: "",
 };
 const AssignedVichelHistory = () => {
   const [iState, setUpdateState] = useState(initialState);
-  const { page, search, fromDate, toDate, timeframe } = iState;
+  const { page, search, startDate, endDate, timeframe } = iState;
 
   const dispatch = useDispatch();
   const { state } = useLocation();
@@ -94,8 +94,8 @@ const AssignedVichelHistory = () => {
   const handleApply = () => {
     const data = {
       search,
-      fromDate,
-      toDate,
+      startDate,
+      endDate,
       page,
       driverId: state?._id,
     };
@@ -150,7 +150,7 @@ const AssignedVichelHistory = () => {
                     className="form-control"
                     name="timeframe"
                     onChange={handleChange}
-                    disabled={fromDate || toDate}
+                    disabled={startDate || endDate}
                   >
                     <option value="select">--Select--</option>
                     <option value="Today">Today</option>
@@ -164,8 +164,8 @@ const AssignedVichelHistory = () => {
                   <input
                     type="date"
                     className="form-control"
-                    name="fromDate"
-                    value={fromDate}
+                    name="startDate"
+                    value={startDate}
                     disabled={timeframe}
                     onChange={handleChange}
                   />
@@ -175,8 +175,8 @@ const AssignedVichelHistory = () => {
                   <input
                     type="date"
                     className="form-control"
-                    name="toDate"
-                    value={toDate}
+                    name="endDate"
+                    value={endDate}
                     onChange={handleChange}
                     disabled={timeframe}
                   />

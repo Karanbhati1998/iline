@@ -15,6 +15,12 @@ const initialState = {
   tagLine: "",
   uploadIcon: "",
   weightCapicity: "",
+  length: 0,
+  width: 0,
+  height: 0,
+  volume: 0,
+  loadingTime: 0,
+  unloadingTime: 0,
   fareData: [
     {
       serviceType: "LOCAL",
@@ -67,6 +73,12 @@ const VechileCategoryDetail = () => {
     weightCapicity,
     uploadIcon,
     tagLine,
+    length,
+    width,
+    height,
+    volume,
+    unloadingTime,
+    loadingTime,
     categoryId,
   } = iState;
   const { state } = useLocation();
@@ -79,6 +91,12 @@ const VechileCategoryDetail = () => {
       weightCapicity: state?.weightCapicity || "",
       uploadIcon: state?.uploadIcon || "",
       fareData: state?.fareData[0]?.fareData || [],
+      length: state?.length,
+      width: state?.width,
+      height: state?.height,
+      volume: state?.volume,
+      unloadingTime: state?.unloadingTime,
+      loadingTime: state?.loadingTime,
     }));
   }, [state]);
  
@@ -191,6 +209,84 @@ const VechileCategoryDetail = () => {
                   >
                     Add Offers
                   </Link>
+                </div>
+              </div>
+              <div className="col-sm-4">
+                <div className="form-group">
+                  <label>Length (in inches)</label>
+                  <input
+                    type="number"
+                    className="form-control"
+                    placeholder={0}
+                    name="length"
+                    value={length}
+                    disabled
+                  />
+                </div>
+              </div>
+              <div className="col-sm-4">
+                <div className="form-group">
+                  <label>Width (in inches)</label>
+                  <input
+                    type="number"
+                    className="form-control"
+                    placeholder={0}
+                    name="width"
+                    value={width}
+                    disabled
+                  />
+                </div>
+              </div>
+              <div className="col-sm-4">
+                <div className="form-group">
+                  <label>Height (in inches)</label>
+                  <input
+                    type="number"
+                    className="form-control"
+                    placeholder={0}
+                    name="height"
+                    value={height}
+                    disabled
+                  />
+                </div>
+              </div>
+              <div className="col-sm-4">
+                <div className="form-group">
+                  <label>Volume</label>
+                  <input
+                    type="number"
+                    className="form-control"
+                    placeholder={0}
+                    name="volume"
+                    value={volume}
+                    disabled
+                  />
+                </div>
+              </div>
+              <div className="col-sm-4">
+                <div className="form-group">
+                  <label>Loading Time (in minutes)</label>
+                  <input
+                    type="number"
+                    className="form-control"
+                    placeholder={0}
+                    name="loadingTime"
+                    value={loadingTime}
+                    disabled
+                  />
+                </div>
+              </div>
+              <div className="col-sm-4">
+                <div className="form-group">
+                  <label>Unloading Time (in minutes)</label>
+                  <input
+                    type="number"
+                    className="form-control"
+                    placeholder={0}
+                    name="unloadingTime"
+                    value={unloadingTime}
+                    disabled
+                  />
                 </div>
               </div>
               <div className="col-sm-4">

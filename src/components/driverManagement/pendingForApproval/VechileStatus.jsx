@@ -1,17 +1,26 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import DisApproveModal from "./DisApproveModal";
 import BackButton from "../../BackButton";
 import { useLocation, useNavigate } from "react-router-dom";
 import moment from "moment";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { rejectAndAcceptOfPendngForApproval } from "../../../features/slices/DriverManagement/pendingForApproval/pendingForApproval";
 import { toastService } from "../../../utils/toastify";
 import ZoomEffect from "../../ZoomEffect";
+import LgZoomEffect from "../../LgZoomEffect";
+import { getVechailData } from "../../../features/slices/DriverManagement/allDriver/allDriverReducer";
+import ApproveVechileInDriverPage from "./ApproveVechileInDriverPage";
 const initialState = {};
 const VechileStatus = () => {
   const [showDisApproveModal, setShowDisApproveModal] = useState(false);
   const [imageModal, setImageModal] = useState(false);
-  const [image, setImage] = useState("");
+  const [vechileModal, setvechileModal] = useState(false);
+  const [approveVehicleStatus, setapproveVechileStatus] = useState("");
+  const [image, setImage] = useState({
+    image1: "",
+    image2: "",
+  });
+  const { image1, image2 } = image;
   const [id, setId] = useState("");
   const { state } = useLocation();
   const navigate = useNavigate();
@@ -36,14 +45,26 @@ const VechileStatus = () => {
       }
     });
   };
-  const handleViewImage = (image) => {
-    setImage(image);
+  const handleViewImage = (img1, img2) => {
+    setImage({
+      image1: img1,
+      image2: img2,
+    });
     setImageModal(true);
   };
   const handleCloseImageModal = () => {
     setImageModal(false);
     setImage("");
   };
+  const handleClose = () => {
+    setvechileModal(false);
+  };
+  const handleViewImageFunc = () => {
+    //  setvechileModal(false);
+  };
+  useEffect(() => {
+    setapproveVechileStatus(state?.vechicleData?.[0]?.approvedStatus);
+  }, [state]);
   return (
     <>
       <div className="WrapperArea">
@@ -61,7 +82,12 @@ const VechileStatus = () => {
               <div className="RiderArea">
                 <div className="RiderBox">
                   <div className="RiderHead">
-                    <figure>
+                    <figure
+                      style={{
+                        cursor: "pointer",
+                      }}
+                      onClick={() => handleViewImage(state?.profilePic)}
+                    >
                       <img
                         src={
                           state?.profilePic ||
@@ -139,6 +165,32 @@ const VechileStatus = () => {
                   <br />
                 </div>
                 <h4>2.Documents</h4>
+                <div
+                  className="Buttons"
+                  style={{
+                    textAlign: "end",
+                  }}
+                >
+                  <button
+                    className="Approve"
+                    onClick={() => {
+                      setvechileModal(true);
+                    }}
+                    disabled={
+                      approveVehicleStatus == "APPROVED" ||
+                      approveVehicleStatus == "REJECT"
+                    }
+                    style={{
+                      padding: "12px",
+                    }}
+                  >
+                    {approveVehicleStatus == "APPROVED"
+                      ? "Already Approved"
+                      : approveVehicleStatus == "REJECT"
+                      ? "Vehicle Rejeted"
+                      : "Approve  Vehicle"}
+                  </button>
+                </div>
                 <div className="Small-Wrapper mt-4">
                   <div className="row">
                     <div className="col-sm-6">
@@ -164,10 +216,13 @@ const VechileStatus = () => {
                               <figure
                                 style={{
                                   cursor: "pointer",
+                                  height: "300px",
+                                  width: "300px",
                                 }}
                                 onClick={() =>
                                   handleViewImage(
-                                    state?.driverDocumentData?.[0]?.aadharFront
+                                    state?.driverDocumentData?.[0]?.aadharFront,
+                                    state?.driverDocumentData?.[0]?.aadharBack
                                   )
                                 }
                               >
@@ -182,9 +237,12 @@ const VechileStatus = () => {
                                 style={{
                                   marginTop: "10px",
                                   cursor: "pointer",
+                                  height: "300px",
+                                  width: "300px",
                                 }}
                                 onClick={() =>
                                   handleViewImage(
+                                    state?.driverDocumentData?.[0]?.aadharFront,
                                     state?.driverDocumentData?.[0]?.aadharBack
                                   )
                                 }
@@ -214,7 +272,7 @@ const VechileStatus = () => {
                               <strong>Expiry</strong>
                               <span>
                                 {moment(
-                                  state?.vechicleData?.[0]?.rcExpiryDate
+                                  state?.driverDocumentData?.[0]?.expiryDate
                                 ).format("DD-MM-YYYY")}
                               </span>
                             </p>
@@ -225,10 +283,13 @@ const VechileStatus = () => {
                               <figure
                                 style={{
                                   cursor: "pointer",
+                                  height: "300px",
+                                  width: "300px",
                                 }}
                                 onClick={() =>
                                   handleViewImage(
-                                    state?.driverDocumentData?.[0]?.dlFront
+                                    state?.driverDocumentData?.[0]?.dlFront,
+                                    state?.driverDocumentData?.[0]?.dlBack
                                   )
                                 }
                               >
@@ -243,10 +304,13 @@ const VechileStatus = () => {
                                 style={{
                                   marginTop: "10px",
                                   cursor: "pointer",
+                                  height: "300px",
+                                  width: "300px",
                                 }}
                                 onClick={() =>
                                   handleViewImage(
-                                    state?.driverDocumentData?.[0]?.dlBack
+                                    state?.driverDocumentData?.[0]?.dlBack,
+                                    state?.driverDocumentData?.[0]?.dlFront
                                   )
                                 }
                               >
@@ -262,13 +326,13 @@ const VechileStatus = () => {
                               <strong className="Red">
                                 <i className="fa fa-exclamation-triangle" />{" "}
                                 {moment(
-                                  state?.vechicleData?.[0]?.rcExpiryDate
+                                  state?.driverDocumentData?.[0]?.expiryDate
                                 ).isAfter(moment())
                                   ? `Expiring in ${moment(
-                                      state?.vechicleData?.[0]?.rcExpiryDate
+                                      state?.driverDocumentData?.[0]?.expiryDate
                                     ).fromNow()}`
                                   : `Expired ${moment(
-                                      state?.vechicleData?.[0]?.rcExpiryDate
+                                      state?.driverDocumentData?.[0]?.expiryDate
                                     ).fromNow()}`}
                               </strong>
                             </li>
@@ -307,7 +371,19 @@ const VechileStatus = () => {
         />
       )}
       {imageModal && (
-        <ZoomEffect image={image} handleClose={handleCloseImageModal} />
+        <LgZoomEffect
+          image={image1}
+          image2={image2}
+          handleClose={handleCloseImageModal}
+        />
+      )}
+      {vechileModal && (
+        <ApproveVechileInDriverPage
+          handleClose={handleClose}
+          data={state?._id}
+          handleViewImageFunc={handleViewImageFunc}
+          setapproveVechileStatus={setapproveVechileStatus}
+        />
       )}
     </>
   );

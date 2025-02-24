@@ -3,9 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import {
   driverStatus,
-  
   fetchAllILineDriverList,
-  
   fetchILineDriverList,
 } from "../../../features/slices/DriverManagement/allDriver/allDriverReducer";
 import { toastService } from "../../../utils/toastify";
@@ -17,39 +15,40 @@ import ExportToExcel from "../../ExportToExcel";
 const initialState = {
   page: 1,
   search: "",
-  fromDate: "",
-  toDate: "",
+  startDate: "",
+  endDate: "",
   timeframe: "",
   deleteModal: false,
   id: "",
 };
 const I_lineDriver = () => {
   const [iState, setUpdateState] = useState(initialState);
-  const { page, search, fromDate, toDate, timeframe, deleteModal, id } = iState;
+  const { page, search, startDate, endDate, timeframe, deleteModal, id } =
+    iState;
   const dispatch = useDispatch();
   const iLineRef = useRef();
   const [allData, setAllData] = useState([]);
-    useEffect(() => {
-      const data = {
-        search,
-        fromDate,
-        toDate,
-        timeframe,
-        limit: 999999,
-      };
-      dispatch(fetchAllILineDriverList(data)).then((res) => {
-        if (res?.payload?.code == 200) {
-          console.log({ res });
-          setAllData(res?.payload);
-        }
-      });
-    }, [timeframe, page, toDate, search, fromDate]);
+  useEffect(() => {
+    const data = {
+      search,
+      startDate,
+      endDate,
+      timeframe,
+      limit: 999999,
+    };
+    dispatch(fetchAllILineDriverList(data)).then((res) => {
+      if (res?.payload?.code == 200) {
+        console.log({ res });
+        setAllData(res?.payload);
+      }
+    });
+  }, [timeframe, page, endDate, search, startDate]);
   const { iLineDriverList } = useSelector((state) => {
     return state?.driverManagementAllDrivers;
   });
   useEffect(() => {
     dispatch(fetchILineDriverList({ page, timeframe }));
-  }, [page, timeframe]);
+  }, [ ]);
   useEffect(() => {
     const delayDebounceFunc = setTimeout(() => {
       dispatch(
@@ -65,7 +64,7 @@ const I_lineDriver = () => {
 
   const handlePageChange = (page) => {
     setUpdateState({ ...iState, page });
-    dispatch(fetchILineDriverList({ page }));
+    dispatch(fetchILineDriverList({ page, timeframe, startDate, endDate }));
   };
   const handleChecked = (e, id) => {
     const { name, checked } = e?.target;
@@ -91,8 +90,8 @@ const I_lineDriver = () => {
   const handleApply = () => {
     const data = {
       search,
-      fromDate,
-      toDate,
+      startDate,
+      endDate,
       page,
     };
     dispatch(fetchILineDriverList(data));
@@ -147,7 +146,8 @@ const I_lineDriver = () => {
                   className="form-control"
                   name="timeframe"
                   onChange={handleChange}
-                  disabled={fromDate || toDate}
+                  value={timeframe}
+                  disabled={startDate || endDate}
                 >
                   <option value="select">--Select--</option>
                   <option value="Today">Today</option>
@@ -161,8 +161,8 @@ const I_lineDriver = () => {
                 <input
                   type="date"
                   className="form-control"
-                  name="fromDate"
-                  value={fromDate}
+                  name="startDate"
+                  value={startDate}
                   disabled={timeframe}
                   onChange={handleChange}
                 />
@@ -172,8 +172,8 @@ const I_lineDriver = () => {
                 <input
                   type="date"
                   className="form-control"
-                  name="toDate"
-                  value={toDate}
+                  name="endDate"
+                  value={endDate}
                   onChange={handleChange}
                   disabled={timeframe}
                 />
@@ -397,6 +397,9 @@ const I_lineDriver = () => {
                 })}
               </tbody>
             </table>
+            {iLineDriverList?.result?.[0]?.paginationData?.length == 0 && (
+              <p className="text-center">No records found.</p>
+            )}
           </div>
           <div className="PaginationBox">
             <div className="PaginationLeft">

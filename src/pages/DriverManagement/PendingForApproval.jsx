@@ -136,6 +136,8 @@ const PendingForApproval = () => {
                 )}
               </tbody>
             </table>
+            {pendingForApprovalList?.result?.[0]?.paginationData?.length ==
+              0 && <p className="text-center">No records found.</p>}
           </div>
           <div className="PaginationBox">
             <div className="PaginationLeft">

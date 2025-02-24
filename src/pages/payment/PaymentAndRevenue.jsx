@@ -6,31 +6,40 @@ import TotalPaymentfromP2pDriverTab from "./TotalPaymentfromP2pDriverTab";
 import CommisionModal from "../../components/payment/CommisionModal";
 import { useLocation } from "react-router-dom";
 import { canPerformAction } from "../../utils/deniedAccess";
+import { useDispatch, useSelector } from "react-redux";
+import { activeTabFunc } from "../../features/slices/bookingManagementSlice";
+import { activePaymentTabFunc } from "../../features/slices/payment";
 
 const PaymentAndRevenue = () => {
   const [showState, setShowState] = useState({
-    totalRevenue: true,
-    totalRevenuefromILineDriver: false,
-    totalRevenuefromP2pDriver: false,
-    totalPaymentfromP2pDriver: false,
     setCommision: false,
+  });
+  const { setCommision } = showState;
+  const { state } = useLocation();
+  const dispatch=useDispatch()
+  const { activePaymentTab } = useSelector((state) => {
+    return state?.payment;
   });
   const {
     totalRevenue,
     totalRevenuefromILineDriver,
     totalRevenuefromP2pDriver,
     totalPaymentfromP2pDriver,
-    setCommision,
-  } = showState;
-  const { state } = useLocation();
+  } = activePaymentTab;
+    console.log({ activePaymentTab });
+    
   const handleClick = (name) => {
-    setShowState((prev) => ({
-      totalRevenue: false,
-      totalRevenuefromILineDriver: false,
-      totalRevenuefromP2pDriver: false,
-      totalPaymentfromP2pDriver: false,
-      [name]: true,
-    }));
+    console.log({name});
+    
+    dispatch(
+      activePaymentTabFunc({
+        totalRevenue: false,
+        totalRevenuefromILineDriver: false,
+        totalRevenuefromP2pDriver: false,
+        totalPaymentfromP2pDriver: false,
+        [name]: true,
+      })
+    );
   };
   const handleClose = () => {
     setShowState((prev) => ({
