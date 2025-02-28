@@ -49,7 +49,12 @@ const ChangeManagement = () => {
                     <div className="form-group">
                       <label>&nbsp;</label>
                       <button className="Button">Apply</button>
-                      <button className="Button Cancel">
+                      <button
+                        className="Button Cancel"
+                        data-toggle="tooltip"
+                        data-placement="bottom"
+                        title="Reset Filter"
+                      >
                         <i className="fa fa-refresh" />
                       </button>
                     </div>

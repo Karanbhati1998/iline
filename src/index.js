@@ -6,6 +6,7 @@ import reportWebVitals from "./reportWebVitals";
 import { Provider } from "react-redux";
 import store from "./features/store";
 import { SocketProvider } from "./context/SocketContext";
+import CustomToastContainer from "./components/CustomToastContainer";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -13,6 +14,7 @@ root.render(
     <SocketProvider>
       <App />
     </SocketProvider>
+    <CustomToastContainer />
   </Provider>
 );
 

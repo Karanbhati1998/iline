@@ -199,7 +199,13 @@ const VechileTable = ({ categoryId, vehicleType }) => {
                   <button className="Button" onClick={handleApply}>
                     Apply
                   </button>
-                  <button className="Button Cancel" onClick={handleReset}>
+                  <button
+                    className="Button Cancel"
+                    data-toggle="tooltip"
+                    data-placement="bottom"
+                    title="Reset Filter"
+                    onClick={handleReset}
+                  >
                     <i className="fa fa-refresh" />
                   </button>
                 </div>

@@ -19,8 +19,6 @@ const Sidebar = () => {
   const { VechileCategories } = useSelector((state) => {
     return state?.vechileCategory;
   });
-  console.log({ VechileCategories });
-
   useEffect(() => {
     dispatch(getVechileCategory({ limit: 99999 })).then((res) => {
       if (res?.payload?.code == 200) {
@@ -203,6 +201,7 @@ const Sidebar = () => {
               </Link>
             </li>
           )}
+          
           {denyAccess("Banner Management") && (
             <li className={url == "bannerManagement" ? "active" : ""}>
               <Link to="/bannerManagement">

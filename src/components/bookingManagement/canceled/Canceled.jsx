@@ -166,7 +166,13 @@ const Canceled = ({ categoryId }) => {
             <button className="Button" onClick={handleApply}>
               Apply
             </button>
-            <button className="Button Cancel" onClick={handleReset}>
+            <button
+              className="Button Cancel"
+              onClick={handleReset}
+              data-toggle="tooltip"
+              data-placement="bottom"
+              title="Reset Filter"
+            >
               <i className="fa fa-refresh" />
             </button>
           </div>
@@ -300,7 +306,7 @@ const Canceled = ({ categoryId }) => {
                   </td>
                   <td>{res?.pickUpLocationName}</td>
                   <td>{res?.dropOffLocationName}</td>
-                  <td>{res?.tripCharge}</td>
+                  <td>{res?.tripCharge?.toFixed(2)}</td>
                   <td>{res?.rideType}</td>
                   <td>
                     {res?.scheduledDate} &amp; {res?.scheduledTime}{" "}

@@ -46,8 +46,6 @@ const TotalRevenuefromILineDriverTab = ({ categoryId }) => {
   const { ilineRevenueList } = useSelector((state) => {
     return state?.payment;
   });
-
-  console.log({ ilineRevenueList });
   useEffect(() => {
     if (categoryId) {
       dispatch(
@@ -73,7 +71,6 @@ const TotalRevenuefromILineDriverTab = ({ categoryId }) => {
 
     return () => clearTimeout(delayDebounceFunc);
   }, [search, timeframe, dispatch, categoryId]);
-
   const handlePageChange = (page) => {
     setUpdateState({ ...iState, page });
     dispatch(
@@ -87,7 +84,6 @@ const TotalRevenuefromILineDriverTab = ({ categoryId }) => {
       })
     );
   };
-
   const handleChange = (e) => {
     setUpdateState({ ...iState, [e.target.name]: e.target.value });
   };
@@ -108,6 +104,7 @@ const TotalRevenuefromILineDriverTab = ({ categoryId }) => {
     };
     dispatch(getIlineRevenueList(data));
   };
+  
   return (
     <>
       <div
@@ -171,7 +168,13 @@ const TotalRevenuefromILineDriverTab = ({ categoryId }) => {
                 <button className="Button" onClick={handleApply}>
                   Apply
                 </button>
-                <button className="Button Cancel" onClick={handleReset}>
+                <button
+                  className="Button Cancel"
+                  data-toggle="tooltip"
+                  data-placement="bottom"
+                  title="Reset Filter"
+                  onClick={handleReset}
+                >
                   <i className="fa fa-refresh" />
                 </button>
               </div>

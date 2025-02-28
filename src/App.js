@@ -36,7 +36,7 @@ import DetailDriverManagement from "./components/driverManagement/allDriver/driv
 import VechileStatus from "./components/driverManagement/pendingForApproval/VechileStatus";
 import BookingManagementDetail from "./components/bookingManagement/BookingManagementDetail";
 import BookingManagementTrack from "./components/bookingManagement/BookingManagementTrack";
-import { isInternetAvailable } from "./utils/isInternetAvailable";
+import { checkInternetStatus } from "./utils/isInternetAvailable";
 import { getToken } from "./utils/getToken";
 import EditContentManagement from "./components/EditContentManagement";
 import AddFaq from "./components/FAQ/AddFaq";
@@ -79,7 +79,9 @@ function App() {
   const isAuthenticated = getToken("ilineLogin", "token");
   useEffect(() => {
     denyAccess();
+    checkInternetStatus();
   }, []);
+
   return (
     <>
       <HashRouter>
@@ -297,7 +299,6 @@ function App() {
           </Route>
         </Routes>
       </HashRouter>
-      <CustomToastContainer />
     </>
   );
 }

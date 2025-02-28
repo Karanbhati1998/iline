@@ -27,7 +27,13 @@ const ExportToExcel = React.forwardRef(({ fileName, type }, ref) => {
     });
 
     const worksheet = XLSX.utils.table_to_sheet(tableElement); // Convert the modified table to a sheet
-
+    Object.keys(worksheet).forEach((cell) => {
+      if (worksheet[cell].t === "n" && worksheet[cell].v > 999999999) {
+        // If the cell contains a large number, convert it to a string
+        worksheet[cell].v = `'${worksheet[cell].v}`; // Prefix with a single quote to keep it as text
+        worksheet[cell].t = "s"; // Set cell type to string
+      }
+    });
     // Convert the worksheet to CSV
     const csv = XLSX.utils.sheet_to_csv(worksheet);
 
