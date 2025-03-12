@@ -4,6 +4,8 @@ import LogoutModal from "./LogoutModal";
 import { getVechileCategory } from "../features/slices/vechileManagement/vechileCategory";
 import { useDispatch, useSelector } from "react-redux";
 import { denyAccess } from "../utils/deniedAccess";
+import { handleDriverPayoutPage, handleTotalRevenueIlinePage, handleTotalRevenueP2pPage, handleTotalRevenuePage } from "../features/slices/payment";
+import { handleCanceledPage, handleCompletedPage, handleOnGoingPage } from "../features/slices/bookingManagementSlice";
 
 const Sidebar = () => {
   const [catId, setCatId] = useState("");
@@ -36,10 +38,17 @@ const Sidebar = () => {
   const handleNavigate = (id) => {
     navigate("/bookingManagementTwoWheller", { state: id });
     setCatId(id);
+    dispatch(handleOnGoingPage(1));
+    dispatch(handleCompletedPage(1));
+    dispatch(handleCanceledPage(1));
   };
   const handleNavigateToPayment = (id) => {
     navigate("/paymentAndRevenueManagemnt", { state: id });
     setCatId(id);
+    dispatch(handleTotalRevenuePage(1));
+    dispatch(handleTotalRevenueIlinePage(1));
+    dispatch(handleTotalRevenueP2pPage(1));
+    dispatch(handleDriverPayoutPage(1));
   };
   return (
     <>
@@ -47,14 +56,14 @@ const Sidebar = () => {
         <ul>
           {/* {denyAccess("Dashboard") && (
           )} */}
-            <li className={url == "dashboard" ? "active" : ""}>
-              <Link to="/dashboard">
-                <span>
-                  <i className="fa fa-tachometer" />
-                </span>{" "}
-                Dashboard
-              </Link>
-            </li>
+          <li className={url == "dashboard" ? "active" : ""}>
+            <Link to="/dashboard">
+              <span>
+                <i className="fa fa-tachometer" />
+              </span>{" "}
+              Dashboard
+            </Link>
+          </li>
           {denyAccess("User Management") && (
             <li className={url == "userManagement" ? "active" : ""}>
               <Link to="/userManagement">
@@ -201,7 +210,7 @@ const Sidebar = () => {
               </Link>
             </li>
           )}
-          
+
           {denyAccess("Banner Management") && (
             <li className={url == "bannerManagement" ? "active" : ""}>
               <Link to="/bannerManagement">

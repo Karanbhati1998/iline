@@ -2,12 +2,11 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toastService } from "../../utils/toastify";
 import { getSosNotificationList } from "../../features/slices/notification";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import CommonPagination from "../CommonPagination";
 import moment from "moment";
 import BackButton from "../BackButton";
 const initialState = {
-  page: 1,
   search: "",
   startDate: "",
   endDate: "",
@@ -17,7 +16,9 @@ const initialState = {
 };
 const SosListComponent = () => {
   const [iState, setUpdateState] = useState(initialState);
-  const { page, search, startDate, endDate, timeframe, closeChat, id } = iState;
+    const [searchParams, setSearchParams] = useSearchParams();
+    const page = parseInt(searchParams.get("page")) || 1;
+  const {  search, startDate, endDate, timeframe, closeChat, id } = iState;
   const dispatch = useDispatch();
   const { sosList } = useSelector((state) => {
     return state?.notification;
@@ -64,7 +65,7 @@ const SosListComponent = () => {
   };
 
   const handlePageChange = (page) => {
-    setUpdateState({ ...iState, page });
+     setSearchParams({ page });
     dispatch(getSosNotificationList({ page }));
   };
   return (

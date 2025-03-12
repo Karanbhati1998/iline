@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import moment from "moment";
 import {
   driverStatus,
@@ -10,7 +10,7 @@ import { toastService } from "../../utils/toastify";
 import CommonPagination from "../../components/CommonPagination";
 import { canPerformAction } from "../../utils/deniedAccess";
 const initialState = {
-  page: 1,
+  // page: 1,
   search: "",
   startDate: "",
   endDate: "",
@@ -20,8 +20,17 @@ const initialState = {
 };
 const DisApprovedList = () => {
   const [iState, setUpdateState] = useState(initialState);
-  const { page, search, startDate, endDate, timeframe, deleteModal, id } =
-    iState;
+  const [searchParams, setSearchParams] = useSearchParams();
+  const page = parseInt(searchParams.get("page")) || 1;
+  const {
+    // page,
+    search,
+    startDate,
+    endDate,
+    timeframe,
+    deleteModal,
+    id,
+  } = iState;
   const dispatch = useDispatch();
   const iLineRef = useRef();
   const { rejectDriverList } = useSelector((state) => {
@@ -29,22 +38,24 @@ const DisApprovedList = () => {
   });
   useEffect(() => {
     dispatch(fetchRejectDriverList({ page, timeframe }));
-  }, [ timeframe]);
+  }, [timeframe]);
   useEffect(() => {
     const delayDebounceFunc = setTimeout(() => {
-      dispatch(
-        fetchRejectDriverList({
-          search: search.trim(),
-          timeframe,
-        })
-      );
+      if (search || timeframe) {
+        dispatch(
+          fetchRejectDriverList({
+            search: search.trim(),
+            timeframe,
+          })
+        );
+      }
     }, 1000);
 
     return () => clearTimeout(delayDebounceFunc);
   }, [search, timeframe, dispatch]);
 
   const handlePageChange = (page) => {
-    setUpdateState({ ...iState, page });
+    setSearchParams({ page });
     dispatch(fetchRejectDriverList({ page, timeframe, startDate, endDate }));
   };
   const handleChecked = (e, id) => {

@@ -4,12 +4,12 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   getAllCompletedBookingList,
   getCompletedBookingList,
+  handleCompletedPage,
 } from "../../../features/slices/bookingManagementSlice";
 import { Link, useLocation } from "react-router-dom";
 import CommonPagination from "../../CommonPagination";
 import ExportToExcel from "../../ExportToExcel";
 const initialState = {
-  page: 1,
   search: "",
   startDate: "",
   endDate: "",
@@ -20,10 +20,10 @@ const initialState = {
 };
 const Completed = ({ categoryId }) => {
   const [iState, setUpdateState] = useState(initialState);
-  const { page, search, startDate, endDate, timeframe, id } = iState;
+  const { search, startDate, endDate, timeframe, id } = iState;
   const dispatch = useDispatch();
   const { state } = useLocation();
-  const { completedBookingList } = useSelector((state) => {
+  const { completedBookingList, completedPage } = useSelector((state) => {
     return state.bookingManagement;
   });
   const userRef = useRef();
@@ -43,34 +43,37 @@ const Completed = ({ categoryId }) => {
         setAllData(res?.payload);
       }
     });
-  }, [timeframe, page, endDate, search, startDate, categoryId]);
+  }, [timeframe, endDate, search, startDate, categoryId]);
+  console.log({ completedPage });
 
   useEffect(() => {
     if (categoryId) {
       dispatch(
         getCompletedBookingList({
           categoryId,
-          page,
+          page: completedPage,
         })
       );
     }
-  }, [ categoryId]);
+  }, [categoryId]);
   useEffect(() => {
     const delayDebounceFunc = setTimeout(() => {
-      dispatch(
-        getCompletedBookingList({
-          categoryId,
-          search: search.trim(),
-          timeframe,
-        })
-      );
+      if (search || timeframe) {
+        dispatch(
+          getCompletedBookingList({
+            categoryId,
+            search: search.trim(),
+            timeframe,
+          })
+        );
+      }
     }, 1000);
 
     return () => clearTimeout(delayDebounceFunc);
   }, [search, timeframe, dispatch, categoryId]);
 
   const handlePageChange = (page) => {
-    setUpdateState({ ...iState, page });
+    dispatch(handleCompletedPage(page));
     dispatch(
       getCompletedBookingList({
         categoryId,
@@ -94,7 +97,7 @@ const Completed = ({ categoryId }) => {
       search,
       startDate,
       endDate,
-      page,
+      // page,
       categoryId,
     };
     dispatch(getCompletedBookingList(data));
@@ -198,9 +201,9 @@ const Completed = ({ categoryId }) => {
             {allData?.result?.[0]?.paginationData?.map((res, i) => {
               return (
                 <tr key={i}>
-                  <td>{i + 1 + (page - 1) * 10}</td>
+                  <td>{i + 1 + (completedPage - 1) * 10}</td>
                   <td>
-                    <a className="Blue">{res?.trip_number}</a>
+                    <a className="Blue">{res?.requestId}</a>
                   </td>
                   <td>
                     <a>{res?.driverData?.driver_number}</a>
@@ -224,7 +227,11 @@ const Completed = ({ categoryId }) => {
 
                   <td>
                     <div className="Actions">
-                      <Link to="completedetail" className="Blue" state={res}>
+                      <Link
+                        to="completedetail"
+                        className="Blue"
+                        state={{ ...res, type: "Completed" }}
+                      >
                         <i className="fa fa-info-circle" aria-hidden="true" />
                       </Link>
                       <span className="Orange">
@@ -263,9 +270,9 @@ const Completed = ({ categoryId }) => {
               (res, i) => {
                 return (
                   <tr key={i}>
-                    <td>{i + 1 + (page - 1) * 10}</td>
+                    <td>{i + 1 + (completedPage - 1) * 10}</td>
                     <td>
-                      <a className="Blue">{res?.trip_number}</a>
+                      <a className="Blue">{res?.requestId}</a>
                     </td>
                     <td>
                       <a>{res?.driverData?.driver_number}</a>
@@ -289,7 +296,11 @@ const Completed = ({ categoryId }) => {
 
                     <td>
                       <div className="Actions">
-                        <Link to="completedetail" className="Blue" state={res}>
+                        <Link
+                          to="completedetail"
+                          className="Blue"
+                          state={{ ...res, type: "Completed" }}
+                        >
                           <i className="fa fa-info-circle" aria-hidden="true" />
                         </Link>
                         <span className="Orange">
@@ -319,7 +330,7 @@ const Completed = ({ categoryId }) => {
         <div className="PaginationRight">
           {completedBookingList?.result?.[0]?.totalCount?.[0]?.count > 0 && (
             <CommonPagination
-              activePage={page}
+              activePage={completedPage}
               itemsCountPerPage={10}
               totalItemsCount={
                 completedBookingList?.result?.[0]?.totalCount?.[0]?.count || 0

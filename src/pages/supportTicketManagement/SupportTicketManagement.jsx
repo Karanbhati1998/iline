@@ -6,12 +6,11 @@ import {
   ticketReply,
 } from "../../features/slices/supportTicketManagement";
 import CloseChat from "./CloseChat";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { toastService } from "../../utils/toastify";
 import CommonPagination from "../../components/CommonPagination";
 import moment from "moment";
 const initialState = {
-  page: 1,
   search: "",
   startDate: "",
   endDate: "",
@@ -21,7 +20,9 @@ const initialState = {
 };
 const SupportTicketManagement = () => {
   const [iState, setUpdateState] = useState(initialState);
-  const { page, search, startDate, endDate, timeframe, closeChat, id } = iState;
+  const [searchParams, setSearchParams] = useSearchParams();
+  const page = parseInt(searchParams.get("page")) || 1;
+  const { search, startDate, endDate, timeframe, closeChat, id } = iState;
   const dispatch = useDispatch();
   const { supportTickets, count } = useSelector((state) => {
     return state?.supportTicket;
@@ -31,16 +32,18 @@ const SupportTicketManagement = () => {
   useEffect(() => {
     dispatch(getSupportTicketList({ page, timeframe }));
     dispatch(callRequestCount());
-  }, [ timeframe]);
+  }, [timeframe]);
 
   useEffect(() => {
     const delayDebounceFunc = setTimeout(() => {
-      dispatch(
-        getSupportTicketList({
-          search: search.trim(),
-          timeframe,
-        })
-      );
+      if (search || timeframe) {
+        dispatch(
+          getSupportTicketList({
+            search: search.trim(),
+            timeframe,
+          })
+        );
+      }
     }, 1000);
 
     return () => clearTimeout(delayDebounceFunc);
@@ -75,7 +78,7 @@ const SupportTicketManagement = () => {
     dispatch(ticketReply(data)).then((res) => {
       if (res?.payload?.code === 200) {
         toastService.success("Ticket closed successfully");
-        dispatch(getSupportTicketList());
+        dispatch(getSupportTicketList({ page }));
         handlecloseChatClose();
       } else {
         toastService.error("Failed to close ticket");
@@ -83,7 +86,7 @@ const SupportTicketManagement = () => {
     });
   };
   const handlePageChange = (page) => {
-    setUpdateState({ ...iState, page });
+    setSearchParams({ page });
     dispatch(
       getSupportTicketList({ page, timeframe, startDate, endDate, search })
     );

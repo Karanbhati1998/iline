@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   getAllIlineOrP2pVechileList,
   getIlineOrP2pVechileList,
+  handlePage,
   vehicleStatus,
 } from "../../../features/slices/vechileManagement/vechileManagement";
 import { toastService } from "../../../utils/toastify";
@@ -13,7 +14,6 @@ import DeleteModal from "../../DeleteModal";
 import { canPerformAction } from "../../../utils/deniedAccess";
 import ExportToExcel from "../../ExportToExcel";
 const initialState = {
-  page: 1,
   search: "",
   startDate: "",
   endDate: "",
@@ -24,11 +24,13 @@ const initialState = {
 };
 const VechileTable = ({ categoryId, vehicleType }) => {
   const [iState, setUpdateState] = useState(initialState);
-  const { page, search, startDate, endDate, timeframe, deleteModal, id } =
-    iState;
+  const { search, startDate, endDate, timeframe, deleteModal, id } = iState;
   const dispatch = useDispatch();
   const vechileRef = useRef();
   const [allData, setAllData] = useState([]);
+  const { ilineOrP2pVechileList, page } = useSelector((state) => {
+    return state?.vechile;
+  });
   useEffect(() => {
     const data = {
       search,
@@ -47,10 +49,8 @@ const VechileTable = ({ categoryId, vehicleType }) => {
         }
       });
     }
-  }, [timeframe, page, endDate, search, startDate, categoryId, vehicleType]);
-  const { ilineOrP2pVechileList } = useSelector((state) => {
-    return state?.vechile;
-  });
+  }, [timeframe, endDate, search, startDate, categoryId, vehicleType]);
+
   useEffect(() => {
     if (categoryId && vehicleType) {
       dispatch(
@@ -62,24 +62,26 @@ const VechileTable = ({ categoryId, vehicleType }) => {
         })
       );
     }
-  }, [ timeframe, categoryId, vehicleType]);
+  }, [timeframe, categoryId, vehicleType]);
   useEffect(() => {
     const delayDebounceFunc = setTimeout(() => {
-      dispatch(
-        getIlineOrP2pVechileList({
-          categoryId,
-          vehicleType,
-          search: search.trim(),
-          timeframe,
-        })
-      );
+      if (search || timeframe) {
+        dispatch(
+          getIlineOrP2pVechileList({
+            categoryId,
+            vehicleType,
+            search: search.trim(),
+            timeframe,
+          })
+        );
+      }
     }, 1000);
 
     return () => clearTimeout(delayDebounceFunc);
   }, [search, timeframe, dispatch, categoryId]);
 
   const handlePageChange = (page) => {
-    setUpdateState({ ...iState, page });
+    dispatch(handlePage(page));
     dispatch(
       getIlineOrP2pVechileList({
         categoryId,

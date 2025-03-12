@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import BackButton from "../../components/BackButton";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchPendingForApproval } from "../../features/slices/DriverManagement/pendingForApproval/pendingForApproval";
@@ -7,12 +7,18 @@ import moment from "moment";
 import CommonPagination from "../../components/CommonPagination";
 import { canPerformAction } from "../../utils/deniedAccess";
 const initialState = {
-  page: 1,
+  // page: 1,
   search: "",
 };
 const PendingForApproval = () => {
   const [iState, setUpdateState] = useState(initialState);
-  const { page, search } = iState;
+  const [searchParams, setSearchParams] = useSearchParams();
+  const page = parseInt(searchParams.get("page")) || 1;
+  const {
+    //  page,
+    search,
+  } = iState;
+
   const dispatch = useDispatch();
   const { pendingForApprovalList } = useSelector(
     (state) => state.driverManagementPendingForApproval
@@ -24,11 +30,13 @@ const PendingForApproval = () => {
   }, [page]);
   useEffect(() => {
     const delayDebounceFunc = setTimeout(() => {
-      dispatch(
-        fetchPendingForApproval({
-          search: search.trim(),
-        })
-      );
+      if (search) {
+        dispatch(
+          fetchPendingForApproval({
+            search: search.trim(),
+          })
+        );
+      }
     }, 1000);
 
     return () => clearTimeout(delayDebounceFunc);
@@ -41,7 +49,7 @@ const PendingForApproval = () => {
     dispatch(fetchPendingForApproval({ page: 1 }));
   };
   const handlePageChange = (page) => {
-    setUpdateState({ ...iState, page });
+    setSearchParams({ page });
     dispatch(fetchPendingForApproval({ page }));
   };
 

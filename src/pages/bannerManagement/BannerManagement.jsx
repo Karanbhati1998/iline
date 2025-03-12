@@ -2,14 +2,19 @@ import React, { useEffect, useRef, useState } from "react";
 import UploadBanner from "../../components/banner/UploadBanner";
 import DeleteBannerModal from "../../components/banner/DeleteBannerModal";
 import { useDispatch, useSelector } from "react-redux";
-import { bannerStatus, getAllBannerList, getBannerList } from "../../features/slices/bannerSlice";
+import {
+  bannerStatus,
+  getAllBannerList,
+  getBannerList,
+} from "../../features/slices/bannerSlice";
 import ExportToExcel from "../../components/ExportToExcel";
 import { toastService } from "../../utils/toastify";
 import moment from "moment";
 import { canPerformAction } from "../../utils/deniedAccess";
 import CommonPagination from "../../components/CommonPagination";
+import { useSearchParams } from "react-router-dom";
 const initialState = {
-  page: 1,
+  // page: 1,
   search: "",
   startDate: "",
   endDate: "",
@@ -20,8 +25,10 @@ const initialState = {
 };
 const BannerManagement = () => {
   const [iState, setUpdateState] = useState(initialState);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const page = parseInt(searchParams.get("page")) || 1;
   const {
-    page,
+    // page,
     search,
     startDate,
     endDate,
@@ -56,16 +63,18 @@ const BannerManagement = () => {
 
   useEffect(() => {
     dispatch(getBannerList({ page, timeframe }));
-  }, [ timeframe]);
+  }, [timeframe]);
 
   useEffect(() => {
     const delayDebounceFunc = setTimeout(() => {
-      dispatch(
-        getBannerList({
-          search: search.trim(),
-          timeframe,
-        })
-      );
+      if (search || timeframe) {
+        dispatch(
+          getBannerList({
+            search: search.trim(),
+            timeframe,
+          })
+        );
+      }
     }, 1000);
 
     return () => clearTimeout(delayDebounceFunc);
@@ -120,7 +129,7 @@ const BannerManagement = () => {
     }));
   };
   const handlePageChange = (page) => {
-    setUpdateState({ ...iState, page });
+    setSearchParams({ page });
     dispatch(getBannerList({ page, timeframe, startDate, endDate }));
   };
   return (

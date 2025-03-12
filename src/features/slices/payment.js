@@ -6,14 +6,21 @@ const initialState = {
   totalRevenueList: [],
   ilineRevenueList: [],
   p2pRevenueList: [],
+  driverPayout: [],
+  paymentList: [],
   activePaymentTab: {
     totalRevenue: true,
     totalRevenuefromILineDriver: false,
     totalRevenuefromP2pDriver: false,
     totalPaymentfromP2pDriver: false,
+    driverPayoutTab: false,
   },
   loading: false,
   error: null,
+  totalRevenuePage: 1,
+  totalRevenueIlinePage: 1,
+  totalRevenueP2pPage: 1,
+  driverPayoutPage:1
 };
 
 export const getViewCommision = createAsyncThunk(
@@ -126,6 +133,48 @@ export const getP2pRevenueList = createAsyncThunk(
     }
   }
 );
+export const getAllDriverPayout = createAsyncThunk(
+  "get/driverAllPaymentList",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get("/driverPaymentList", {
+        params: payload,
+      });
+      return response.data;
+    } catch (error) {
+      console.log({ error });
+      return rejectWithValue(error); // Return error instead of just rejecting
+    }
+  }
+);
+export const getDriverPayout = createAsyncThunk(
+  "get/driverPaymentList",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get("/driverPaymentList", {
+        params: payload,
+      });
+      return response.data;
+    } catch (error) {
+      console.log({ error });
+      return rejectWithValue(error); // Return error instead of just rejecting
+    }
+  }
+);
+export const downloadPaymentList = createAsyncThunk(
+  "get/downloadPaymentList",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get("/downloadPaymentList", {
+        params: payload,
+      });
+      return response.data;
+    } catch (error) {
+      console.log({ error });
+      return rejectWithValue(error); // Return error instead of just rejecting
+    }
+  }
+);
 
 const paymentSlice = createSlice({
   name: "payment",
@@ -133,6 +182,18 @@ const paymentSlice = createSlice({
   reducers: {
     activePaymentTabFunc: (state, action) => {
       state.activePaymentTab = action.payload;
+    },
+    handleTotalRevenuePage: (state, action) => {
+      state.totalRevenuePage = action.payload;
+    },
+    handleTotalRevenueIlinePage: (state, action) => {
+      state.totalRevenueIlinePage = action.payload;
+    },
+    handleTotalRevenueP2pPage: (state, action) => {
+      state.totalRevenueP2pPage = action.payload;
+    },
+    handleDriverPayoutPage: (state, action) => {
+      state.driverPayoutPage = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -180,7 +241,35 @@ const paymentSlice = createSlice({
       state.loading = false;
       state.error = action.payload || action.error.message; // Access the error message
     });
+    builder.addCase(getDriverPayout.pending, (state) => {
+      state.loading = true;
+    });
+    builder.addCase(getDriverPayout.fulfilled, (state, action) => {
+      state.loading = false;
+      state.driverPayout = action.payload;
+    });
+    builder.addCase(getDriverPayout.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload || action.error.message; // Access the error message
+    });
+    builder.addCase(downloadPaymentList.pending, (state) => {
+      state.loading = true;
+    });
+    builder.addCase(downloadPaymentList.fulfilled, (state, action) => {
+      state.loading = false;
+      state.paymentList = action.payload;
+    });
+    builder.addCase(downloadPaymentList.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload || action.error.message; // Access the error message
+    });
   },
 });
-export const { activePaymentTabFunc } = paymentSlice.actions;
+export const {
+  activePaymentTabFunc,
+  handleTotalRevenuePage,
+  handleTotalRevenueIlinePage,
+  handleTotalRevenueP2pPage,
+  handleDriverPayoutPage,
+} = paymentSlice.actions;
 export default paymentSlice.reducer;

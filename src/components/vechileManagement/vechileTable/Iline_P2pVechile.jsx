@@ -5,36 +5,42 @@ import BackButton from "../../BackButton";
 import { useDispatch, useSelector } from "react-redux";
 import { getVechileCategory } from "../../../features/slices/vechileManagement/vechileCategory";
 import PendingVechileTable from "./PendingVechileTable";
+import {
+  handleCatId,
+  handlePage,
+  handlePendingVechileTable,
+  handleVechileServicePage,
+} from "../../../features/slices/vechileManagement/vechileManagement";
 
 const Iline_P2pVechile = () => {
-  const [catId, setCatId] = useState({
-    catType: "",
-    id: "",
-  });
-  const [pendingVechileTable,setPendingVechileTable] = useState(false)
   const { state } = useLocation();
   const dispatch = useDispatch();
   console.log({ state });
   const { VechileCategories } = useSelector((state) => {
     return state?.vechileCategory;
   });
+  const { catId, pendingVechileTable } = useSelector((state) => {
+    return state?.vechile;
+  });
   useEffect(() => {
-    dispatch(getVechileCategory({ page: 1 })).then(res=>{
-        if(res?.payload?.code==200){
-            console.log({res});
-            setCatId({
-              catType: state?.CatName,
-              id: state?.ind,
-            });
-        }
-    })
-  }, []);
-  const handleClick = (id,type) => {
-    setCatId({
-      id: id,
-      catType:type,
+    dispatch(getVechileCategory({ page: 1 })).then((res) => {
+      if (res?.payload?.code == 200) {
+        console.log({ res });
+        // setCatId({
+        //   catType: state?.CatName,
+        //   id: state?.ind,
+        // });
+      }
     });
-    setPendingVechileTable(false)
+  }, []);
+  const handleClick = (id, type) => {
+    dispatch(
+      handleCatId({
+        id: id,
+        catType: type,
+      })
+    );
+    dispatch(handlePendingVechileTable(false));
   };
   return (
     <div className="WrapperArea">
@@ -56,7 +62,10 @@ const Iline_P2pVechile = () => {
                 <li
                   className="nav-item"
                   key={res?._id}
-                  onClick={() => handleClick(res?._id, res?.categoryName)}
+                  onClick={() => {
+                    handleClick(res?._id, res?.categoryName);
+                    dispatch(handlePage(1));
+                  }}
                 >
                   <a
                     className={
@@ -74,11 +83,14 @@ const Iline_P2pVechile = () => {
               <li
                 className="nav-item"
                 onClick={() => {
-                  setPendingVechileTable(true);
-                  setCatId({
-                    id: "",
-                    catType: "pending",
-                  });
+                  dispatch(handlePendingVechileTable(true));
+                  dispatch(
+                    handleCatId({
+                      id: "",
+                      catType: "pending",
+                    })
+                  );
+                  dispatch(handleVechileServicePage(1));
                 }}
               >
                 <a
@@ -94,7 +106,9 @@ const Iline_P2pVechile = () => {
             )}
           </ul>
           {!pendingVechileTable ? (
-          catId?.id &&  <VechileTable vehicleType={state?.type} categoryId={catId?.id} />
+            catId?.id && (
+              <VechileTable vehicleType={state?.type} categoryId={catId?.id} />
+            )
           ) : (
             <PendingVechileTable />
           )}

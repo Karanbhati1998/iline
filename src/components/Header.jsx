@@ -18,17 +18,17 @@ const Header = () => {
         <div className="Avater">
           <a href="javascript:void(0);">
             <figure>
-              <img src={require("../assets/images/user.png")} />
+              <img src={require("../assets/images/Avatar-1.png")} />
             </figure>
-            Bob Hyden
+            Admin
           </a>
           <ul>
             <li>
               <figure>
-                <img src={require("../assets/images/user.png")} />
+                <img src={require("../assets/images/Avatar-1.png")} />
               </figure>
               <h4>
-                Bob Hyden <span>Administrator</span>
+                Admin <span>Administrator</span>
               </h4>
             </li>
             <li>

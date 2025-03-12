@@ -3,12 +3,12 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   getIlineRevenueList,
   getIlineRevenueListDownload,
+  handleTotalRevenueIlinePage,
 } from "../../features/slices/payment";
 import { Link, useLocation } from "react-router-dom";
 import CommonPagination from "../../components/CommonPagination";
 import ExportToExcel from "../../components/ExportToExcel";
 const initialState = {
-  page: 1,
   search: "",
   startDate: "",
   endDate: "",
@@ -19,7 +19,7 @@ const initialState = {
 };
 const TotalRevenuefromILineDriverTab = ({ categoryId }) => {
   const [iState, setUpdateState] = useState(initialState);
-  const { page, search, startDate, endDate, timeframe, id } = iState;
+  const { search, startDate, endDate, timeframe, id } = iState;
   const dispatch = useDispatch();
   const { state } = useLocation();
   const totalRevenueILineRef = useRef();
@@ -42,8 +42,8 @@ const TotalRevenuefromILineDriverTab = ({ categoryId }) => {
         }
       });
     }
-  }, [timeframe, page, endDate, search, startDate, categoryId]);
-  const { ilineRevenueList } = useSelector((state) => {
+  }, [timeframe, endDate, search, startDate, categoryId]);
+  const { ilineRevenueList, totalRevenueIlinePage } = useSelector((state) => {
     return state?.payment;
   });
   useEffect(() => {
@@ -52,27 +52,29 @@ const TotalRevenuefromILineDriverTab = ({ categoryId }) => {
         getIlineRevenueList({
           categoryId,
           revenueType: "ILINE",
-          page,
+          page: totalRevenueIlinePage,
         })
       );
     }
-  }, [ categoryId]);
+  }, [categoryId]);
   useEffect(() => {
     const delayDebounceFunc = setTimeout(() => {
-      dispatch(
-        getIlineRevenueList({
-          categoryId,
-          revenueType: "ILINE",
-          search: search.trim(),
-          timeframe,
-        })
-      );
+      if (search || timeframe) {
+        dispatch(
+          getIlineRevenueList({
+            categoryId,
+            revenueType: "ILINE",
+            search: search.trim(),
+            timeframe,
+          })
+        );
+      }
     }, 1000);
 
     return () => clearTimeout(delayDebounceFunc);
   }, [search, timeframe, dispatch, categoryId]);
   const handlePageChange = (page) => {
-    setUpdateState({ ...iState, page });
+    dispatch(handleTotalRevenueIlinePage(page));
     dispatch(
       getIlineRevenueList({
         categoryId,
@@ -98,13 +100,13 @@ const TotalRevenuefromILineDriverTab = ({ categoryId }) => {
       search,
       startDate,
       endDate,
-      page,
+      // page,
       categoryId,
       revenueType: "ILINE",
     };
     dispatch(getIlineRevenueList(data));
   };
-  
+
   return (
     <>
       <div
@@ -211,7 +213,7 @@ const TotalRevenuefromILineDriverTab = ({ categoryId }) => {
                 {allData?.result?.[0]?.paginationData?.map((res, i) => {
                   return (
                     <tr>
-                      <td>{i + 1 + (page - 1) * 10}</td>
+                      <td>{i + 1 + (totalRevenueIlinePage - 1) * 10}</td>
                       <td>
                         <a
                           className="Blue"
@@ -284,7 +286,7 @@ const TotalRevenuefromILineDriverTab = ({ categoryId }) => {
                   (res, i) => {
                     return (
                       <tr>
-                        <td>{i + 1 + (page - 1) * 10}</td>
+                        <td>{i + 1 + (totalRevenueIlinePage - 1) * 10}</td>
                         <td>
                           <a
                             className="Blue"
@@ -351,7 +353,7 @@ const TotalRevenuefromILineDriverTab = ({ categoryId }) => {
             <div className="PaginationRight">
               {ilineRevenueList?.result?.[0]?.totalCount?.[0]?.count > 0 && (
                 <CommonPagination
-                  activePage={page}
+                  activePage={totalRevenueIlinePage}
                   itemsCountPerPage={10}
                   totalItemsCount={
                     ilineRevenueList?.result?.[0]?.totalCount?.[0]?.count || 0

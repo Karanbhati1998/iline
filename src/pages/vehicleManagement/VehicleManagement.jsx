@@ -1,7 +1,11 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { getCategoryWiseVehicleData } from "../../features/slices/vechileManagement/vechileManagement";
+import {
+  getCategoryWiseVehicleData,
+  handleCatId,
+  handleVechileServicePage,
+} from "../../features/slices/vechileManagement/vechileManagement";
 import { canPerformAction } from "../../utils/deniedAccess";
 
 const VehicleManagement = () => {
@@ -14,6 +18,17 @@ const VehicleManagement = () => {
   useEffect(() => {
     dispatch(getCategoryWiseVehicleData());
   }, []);
+  const handlePage = () => {
+    dispatch(handleVechileServicePage(1));
+  };
+  const handleCat = (id, type) => {
+    dispatch(
+      handleCatId({
+        catType: type,
+        id: id,
+      })
+    );
+  };
   return (
     <div className="WrapperArea">
       <div className="WrapperBox">
@@ -47,7 +62,7 @@ const VehicleManagement = () => {
                       <span className="Count">{res?.totalVehicleCount}</span>
                     </a>
                   </li>
-                  <li>
+                  <li onClick={() => handleCat(res?._id, res?.categoryName)}>
                     <Link
                       to="iline_p2p"
                       state={{
@@ -65,7 +80,7 @@ const VehicleManagement = () => {
                       </span>
                     </Link>
                   </li>
-                  <li>
+                  <li onClick={() => handleCat(res?._id, res?.categoryName)}>
                     <Link
                       to="iline_p2p"
                       state={{
@@ -83,7 +98,7 @@ const VehicleManagement = () => {
                       </span>
                     </Link>
                   </li>
-                  <li>
+                  <li onClick={handlePage}>
                     <Link
                       to="vechileService"
                       state={{
@@ -100,7 +115,7 @@ const VehicleManagement = () => {
                       </span>
                     </Link>
                   </li>
-                  <li>
+                  <li onClick={handlePage}>
                     <Link
                       to="vechileService"
                       state={{
@@ -118,7 +133,7 @@ const VehicleManagement = () => {
                       </span>
                     </Link>
                   </li>
-                  <li>
+                  <li onClick={handlePage}>
                     <Link
                       to="vechileService"
                       state={{
@@ -153,7 +168,7 @@ const VehicleManagement = () => {
                       <span className="Count">-</span>
                     </a>
                   </li> */}
-                  <li>
+                  <li onClick={handlePage}>
                     <Link to="pendingVechilePage" state={res?._id}>
                       <span className="Icon">
                         <img src={require("../../assets/images/car.png")} />

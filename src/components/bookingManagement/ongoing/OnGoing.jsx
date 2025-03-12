@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   getAllOngoingBookingList,
   getOngoingBookingList,
+  handleOnGoingPage,
 } from "../../../features/slices/bookingManagementSlice";
 import { Link, useLocation } from "react-router-dom";
 import { toastService } from "../../../utils/toastify";
@@ -11,7 +12,6 @@ import CommonPagination from "../../CommonPagination";
 import moment from "moment";
 import ExportToExcel from "../../ExportToExcel";
 const initialState = {
-  page: 1,
   search: "",
   startDate: "",
   endDate: "",
@@ -22,10 +22,10 @@ const initialState = {
 };
 const OnGoing = ({ categoryId }) => {
   const [iState, setUpdateState] = useState(initialState);
-  const { page, search, startDate, endDate, timeframe, id } = iState;
+  const { search, startDate, endDate, timeframe, id } = iState;
   const dispatch = useDispatch();
 
-  const { OngoingBookingList } = useSelector((state) => {
+  const { OngoingBookingList, ongoingPage } = useSelector((state) => {
     return state.bookingManagement;
   });
   const userRef = useRef();
@@ -47,7 +47,7 @@ const OnGoing = ({ categoryId }) => {
         }
       });
     }
-  }, [timeframe, page, endDate, search, startDate, categoryId]);
+  }, [timeframe, endDate, search, startDate, categoryId]);
   console.log({ allData });
 
   useEffect(() => {
@@ -55,27 +55,29 @@ const OnGoing = ({ categoryId }) => {
       dispatch(
         getOngoingBookingList({
           categoryId,
-          page,
+          page: ongoingPage,
         })
       );
     }
   }, [categoryId]);
   useEffect(() => {
     const delayDebounceFunc = setTimeout(() => {
-      dispatch(
-        getOngoingBookingList({
-          categoryId,
-          search: search.trim(),
-          timeframe,
-        })
-      );
+      if (search || timeframe) {
+        dispatch(
+          getOngoingBookingList({
+            categoryId,
+            search: search.trim(),
+            timeframe,
+          })
+        );
+      }
     }, 1000);
 
     return () => clearTimeout(delayDebounceFunc);
   }, [search, timeframe, dispatch, categoryId]);
 
   const handlePageChange = (page) => {
-    setUpdateState({ ...iState, page });
+    dispatch(handleOnGoingPage(page));
     dispatch(
       getOngoingBookingList({ categoryId, page, timeframe, startDate, endDate })
     );
@@ -93,7 +95,6 @@ const OnGoing = ({ categoryId }) => {
       search,
       startDate,
       endDate,
-      page,
       categoryId,
     };
     dispatch(getOngoingBookingList(data));
@@ -198,9 +199,9 @@ const OnGoing = ({ categoryId }) => {
             {allData?.result?.[0]?.paginationData?.map((res, i) => {
               return (
                 <tr key={i}>
-                  <td>{i + 1 + (page - 1) * 10}</td>
+                  <td>{i + 1 + (ongoingPage - 1) * 10}</td>
                   <td>
-                    <a className="Blue">{res?.trip_number}</a>
+                    <a className="Blue">{res?.requestId}</a>
                   </td>
                   <td>
                     <a>{res?.driverData?.driver_number}</a>
@@ -263,9 +264,9 @@ const OnGoing = ({ categoryId }) => {
             {OngoingBookingList?.result?.[0]?.paginationData?.map((res, i) => {
               return (
                 <tr key={i}>
-                  <td>{i + 1 + (page - 1) * 10}</td>
+                  <td>{i + 1 + (ongoingPage - 1) * 10}</td>
                   <td>
-                    <a className="Blue">{res?.trip_number}</a>
+                    <a className="Blue">{res?.requestId}</a>
                   </td>
                   <td>
                     <a>{res?.driverData?.driver_number}</a>
@@ -289,7 +290,11 @@ const OnGoing = ({ categoryId }) => {
                   <td>{res?.is_report ? "yes" : "No"}</td>
                   <td>
                     <div className="Actions">
-                      <Link to="completedetail" className="Blue" state={res}>
+                      <Link
+                        to="completedetail"
+                        className="Blue"
+                        state={{ ...res, type: "OnGoing" }}
+                      >
                         <i className="fa fa-info-circle" aria-hidden="true" />
                       </Link>
                       <span className="Orange">
@@ -318,7 +323,7 @@ const OnGoing = ({ categoryId }) => {
         <div className="PaginationRight">
           {OngoingBookingList?.result?.[0]?.totalCount?.[0]?.count > 0 && (
             <CommonPagination
-              activePage={page}
+              activePage={ongoingPage}
               itemsCountPerPage={10}
               totalItemsCount={
                 OngoingBookingList?.result?.[0]?.totalCount?.[0]?.count || 0

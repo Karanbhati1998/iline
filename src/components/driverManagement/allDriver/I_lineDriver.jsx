@@ -5,6 +5,7 @@ import {
   driverStatus,
   fetchAllILineDriverList,
   fetchILineDriverList,
+  handleIlinePage,
 } from "../../../features/slices/DriverManagement/allDriver/allDriverReducer";
 import { toastService } from "../../../utils/toastify";
 import moment from "moment";
@@ -13,7 +14,6 @@ import { canPerformAction } from "../../../utils/deniedAccess";
 import DeleteModal from "../../DeleteModal";
 import ExportToExcel from "../../ExportToExcel";
 const initialState = {
-  page: 1,
   search: "",
   startDate: "",
   endDate: "",
@@ -23,8 +23,7 @@ const initialState = {
 };
 const I_lineDriver = () => {
   const [iState, setUpdateState] = useState(initialState);
-  const { page, search, startDate, endDate, timeframe, deleteModal, id } =
-    iState;
+  const { search, startDate, endDate, timeframe, deleteModal, id } = iState;
   const dispatch = useDispatch();
   const iLineRef = useRef();
   const [allData, setAllData] = useState([]);
@@ -42,28 +41,31 @@ const I_lineDriver = () => {
         setAllData(res?.payload);
       }
     });
-  }, [timeframe, page, endDate, search, startDate]);
-  const { iLineDriverList } = useSelector((state) => {
+  }, [timeframe, endDate, search, startDate]);
+  const { iLineDriverList, ilinePage } = useSelector((state) => {
     return state?.driverManagementAllDrivers;
   });
   useEffect(() => {
-    dispatch(fetchILineDriverList({ page, timeframe }));
-  }, [ ]);
+    dispatch(fetchILineDriverList({ page: ilinePage, timeframe }));
+  }, []);
   useEffect(() => {
     const delayDebounceFunc = setTimeout(() => {
-      dispatch(
-        fetchILineDriverList({
-          search: search.trim(),
-          timeframe,
-        })
-      );
+      if (search || timeframe) {
+        dispatch(
+          fetchILineDriverList({
+            search: search.trim(),
+            timeframe,
+          })
+        );
+        dispatch(handleIlinePage(1));
+      }
     }, 1000);
 
     return () => clearTimeout(delayDebounceFunc);
   }, [search, timeframe, dispatch]);
 
   const handlePageChange = (page) => {
-    setUpdateState({ ...iState, page });
+    dispatch(handleIlinePage(page));
     dispatch(fetchILineDriverList({ page, timeframe, startDate, endDate }));
   };
   const handleChecked = (e, id) => {
@@ -74,7 +76,7 @@ const I_lineDriver = () => {
       console.log("status update api", res);
       if (res?.payload?.code == 200) {
         toastService.success("Status updated successfully");
-        dispatch(fetchILineDriverList({ page }));
+        dispatch(fetchILineDriverList({ page: ilinePage }));
       } else {
         toastService.error("status update failed");
       }
@@ -84,6 +86,7 @@ const I_lineDriver = () => {
     setUpdateState({ ...iState, [e.target.name]: e.target.value });
   };
   const handleReset = () => {
+    dispatch(handleIlinePage(1));
     setUpdateState(initialState);
     dispatch(fetchILineDriverList({ page: 1 }));
   };
@@ -92,9 +95,10 @@ const I_lineDriver = () => {
       search,
       startDate,
       endDate,
-      page,
+      // page: ilinePage,
     };
     dispatch(fetchILineDriverList(data));
+    dispatch(handleIlinePage(1));
   };
   const handleDelete = () => {
     const data = { id, status: "DELETED" };
@@ -102,7 +106,7 @@ const I_lineDriver = () => {
       console.log("status update api", res);
       if (res?.payload?.code == 200) {
         toastService.success("Delete successfully");
-        dispatch(fetchILineDriverList({ page }));
+        dispatch(fetchILineDriverList({ page: ilinePage }));
         hideDeleteModal();
       } else {
         toastService.error(" Delete failed");
@@ -227,7 +231,7 @@ const I_lineDriver = () => {
 
                   return (
                     <tr>
-                      <td>{i + 1 + (page - 1) * 10}</td>
+                      <td>{i + 1 + (ilinePage - 1) * 10}</td>
                       <td>{res?.driver_number}</td>
                       <td>
                         <Link
@@ -329,7 +333,7 @@ const I_lineDriver = () => {
 
                   return (
                     <tr>
-                      <td>{i + 1 + (page - 1) * 10}</td>
+                      <td>{i + 1 + (ilinePage - 1) * 10}</td>
                       <td>{res?.driver_number}</td>
                       <td>
                         <Link
@@ -420,7 +424,7 @@ const I_lineDriver = () => {
             <div className="PaginationRight">
               {iLineDriverList?.result?.[0]?.totalCount?.[0]?.count > 0 && (
                 <CommonPagination
-                  activePage={page}
+                  activePage={ilinePage}
                   itemsCountPerPage={10}
                   totalItemsCount={
                     iLineDriverList?.result?.[0]?.totalCount?.[0]?.count || 0

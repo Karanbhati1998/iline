@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   getRoleList,
   getSubAdminList,
+  handleSubAdminPage,
   roleStatus,
   subAdminStatus,
 } from "../../features/slices/subAdmin";
@@ -14,7 +15,6 @@ import DeleteModal from "../DeleteModal";
 import EditModal from "./EditModal";
 import { canPerformAction } from "../../utils/deniedAccess";
 const initialState = {
-  page: 1,
   search: "",
   startDate: "",
   endDate: "",
@@ -27,7 +27,6 @@ const initialState = {
 const SubAminComponent = () => {
   const [iState, setUpdateState] = useState(initialState);
   const {
-    page,
     search,
     startDate,
     endDate,
@@ -38,27 +37,29 @@ const SubAminComponent = () => {
     subAdminData,
   } = iState;
   const dispatch = useDispatch();
-  const { subAdmin } = useSelector((state) => {
+  const { subAdmin, subAdminPage } = useSelector((state) => {
     return state?.subAdmin;
   });
   useEffect(() => {
-    dispatch(getSubAdminList({ page, timeframe }));
-  }, [ timeframe]);
+    dispatch(getSubAdminList({ page: subAdminPage, timeframe }));
+  }, [timeframe]);
   useEffect(() => {
     const delayDebounceFunc = setTimeout(() => {
-      dispatch(
-        getSubAdminList({
-          search: search.trim(),
-          timeframe,
-        })
-      );
+      if (search || timeframe) {
+        dispatch(
+          getSubAdminList({
+            search: search.trim(),
+            timeframe,
+          })
+        );
+      }
     }, 1000);
 
     return () => clearTimeout(delayDebounceFunc);
   }, [search, timeframe, dispatch]);
 
   const handlePageChange = (page) => {
-    setUpdateState({ ...iState, page });
+    dispatch(handleSubAdminPage(page));
     dispatch(getSubAdminList({ page, timeframe, startDate, endDate, search }));
   };
   const handleChecked = (e, id) => {
@@ -69,7 +70,7 @@ const SubAminComponent = () => {
       console.log("status update api", res);
       if (res?.payload?.code == 200) {
         toastService.success("Status updated successfully");
-        dispatch(getSubAdminList({ page }));
+        dispatch(getSubAdminList({ page: subAdminPage }));
       } else {
         toastService.error("status update failed");
       }
@@ -87,7 +88,7 @@ const SubAminComponent = () => {
       search,
       startDate,
       endDate,
-      page,
+      // page,
     };
     dispatch(getSubAdminList(data));
   };
@@ -98,7 +99,7 @@ const SubAminComponent = () => {
         if (res?.payload?.code == 200) {
           toastService.success("Delete successfully");
           setUpdateState({ ...iState, deleteModal: false });
-          dispatch(getSubAdminList({ page }));
+          dispatch(getSubAdminList({ page: subAdminPage }));
         } else {
           toastService.error("Delete failed");
         }
@@ -204,7 +205,7 @@ const SubAminComponent = () => {
               {subAdmin?.result?.[0]?.paginationData?.map((res, i) => {
                 return (
                   <tr>
-                    <td>{i + 1 + (page - 1) * 10}</td>
+                    <td>{i + 1 + (subAdminPage - 1) * 10}</td>
                     <td>{res?.subadmin_number}</td>
                     <td>{res?.name}</td>
                     <td>{res?.roleId?.[0]?.title}</td>
@@ -280,7 +281,7 @@ const SubAminComponent = () => {
           <div className="PaginationRight">
             {subAdmin?.result?.[0]?.totalCount?.[0]?.count > 0 && (
               <CommonPagination
-                activePage={page}
+                activePage={subAdminPage}
                 itemsCountPerPage={10}
                 totalItemsCount={
                   subAdmin?.result?.[0]?.totalCount?.[0]?.count || 0

@@ -8,7 +8,11 @@ import { useLocation } from "react-router-dom";
 import { canPerformAction } from "../../utils/deniedAccess";
 import { useDispatch, useSelector } from "react-redux";
 import { activeTabFunc } from "../../features/slices/bookingManagementSlice";
-import { activePaymentTabFunc } from "../../features/slices/payment";
+import {
+  activePaymentTabFunc,
+  handleTotalRevenuePage,
+} from "../../features/slices/payment";
+import DriverPayout from "./DriverPayout";
 
 const PaymentAndRevenue = () => {
   const [showState, setShowState] = useState({
@@ -16,7 +20,7 @@ const PaymentAndRevenue = () => {
   });
   const { setCommision } = showState;
   const { state } = useLocation();
-  const dispatch=useDispatch()
+  const dispatch = useDispatch();
   const { activePaymentTab } = useSelector((state) => {
     return state?.payment;
   });
@@ -25,18 +29,19 @@ const PaymentAndRevenue = () => {
     totalRevenuefromILineDriver,
     totalRevenuefromP2pDriver,
     totalPaymentfromP2pDriver,
+    driverPayoutTab,
   } = activePaymentTab;
-    console.log({ activePaymentTab });
-    
+  console.log({ activePaymentTab });
+
   const handleClick = (name) => {
-    console.log({name});
-    
+   
     dispatch(
       activePaymentTabFunc({
         totalRevenue: false,
         totalRevenuefromILineDriver: false,
         totalRevenuefromP2pDriver: false,
         totalPaymentfromP2pDriver: false,
+        driverPayoutTab: false,
         [name]: true,
       })
     );
@@ -97,6 +102,14 @@ const PaymentAndRevenue = () => {
                   Total Revenue from P2P Driver
                 </a>
               </li>
+              <li className="nav-item">
+                <a
+                  className={driverPayoutTab ? "active nav-link" : "nav-link"}
+                  onClick={() => handleClick("driverPayoutTab")}
+                >
+                  Driver Payout
+                </a>
+              </li>
               {/* <li className="nav-item">
                 <a
                   className={
@@ -124,6 +137,7 @@ const PaymentAndRevenue = () => {
               {totalPaymentfromP2pDriver && (
                 <TotalPaymentfromP2pDriverTab categoryId={state} />
               )}
+              {driverPayoutTab && <DriverPayout categoryId={state} />}
             </div>
           </div>
         </div>

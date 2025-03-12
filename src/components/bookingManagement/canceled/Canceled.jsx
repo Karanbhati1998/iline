@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   getAllCanceledBookingList,
   getCanceledBookingList,
+  handleCanceledPage,
 } from "../../../features/slices/bookingManagementSlice";
 import { Link, useLocation } from "react-router-dom";
 import { toastService } from "../../../utils/toastify";
@@ -11,7 +12,6 @@ import CommonPagination from "../../CommonPagination";
 import moment from "moment";
 import ExportToExcel from "../../ExportToExcel";
 const initialState = {
-  page: 1,
   search: "",
   startDate: "",
   endDate: "",
@@ -22,10 +22,10 @@ const initialState = {
 };
 const Canceled = ({ categoryId }) => {
   const [iState, setUpdateState] = useState(initialState);
-  const { page, search, startDate, endDate, timeframe, id } = iState;
+  const { search, startDate, endDate, timeframe, id } = iState;
   const dispatch = useDispatch();
   const { state } = useLocation();
-  const { canceledBookingList } = useSelector((state) => {
+  const { canceledBookingList, canceledPage } = useSelector((state) => {
     return state.bookingManagement;
   });
   const userRef = useRef();
@@ -47,7 +47,7 @@ const Canceled = ({ categoryId }) => {
         }
       });
     }
-  }, [timeframe, page, endDate, search, startDate, categoryId]);
+  }, [timeframe, endDate, search, startDate, categoryId]);
 
   useEffect(() => {
     dispatch(getCanceledBookingList({ categoryId: state }));
@@ -57,27 +57,29 @@ const Canceled = ({ categoryId }) => {
       dispatch(
         getCanceledBookingList({
           categoryId,
-          
+          page: canceledPage,
         })
       );
     }
-  }, [page, categoryId]);
+  }, [ categoryId]);
   useEffect(() => {
     const delayDebounceFunc = setTimeout(() => {
-      dispatch(
-        getCanceledBookingList({
-          categoryId,
-          search: search.trim(),
-          timeframe,
-        })
-      );
+      if (search || timeframe) {
+        dispatch(
+          getCanceledBookingList({
+            categoryId,
+            search: search.trim(),
+            timeframe,
+          })
+        );
+      }
     }, 1000);
 
     return () => clearTimeout(delayDebounceFunc);
   }, [search, timeframe, dispatch, categoryId]);
 
   const handlePageChange = (page) => {
-    setUpdateState({ ...iState, page });
+    dispatch(handleCanceledPage(page));
     dispatch(
       getCanceledBookingList({
         categoryId,
@@ -101,7 +103,7 @@ const Canceled = ({ categoryId }) => {
       search,
       startDate,
       endDate,
-      page,
+      // page,
       categoryId,
     };
     dispatch(getCanceledBookingList(data));
@@ -206,9 +208,9 @@ const Canceled = ({ categoryId }) => {
             {allData?.result?.[0]?.paginationData?.map((res, i) => {
               return (
                 <tr key={i}>
-                  <td>{i + 1 + (page - 1) * 10}</td>
+                  <td>{i + 1 + (canceledPage - 1) * 10}</td>
                   <td>
-                    <a className="Blue">{res?.trip_number}</a>
+                    <a className="Blue">{res?.requestId}</a>
                   </td>
                   <td>
                     <a>
@@ -281,9 +283,9 @@ const Canceled = ({ categoryId }) => {
             {canceledBookingList?.result?.[0]?.paginationData?.map((res, i) => {
               return (
                 <tr key={i}>
-                  <td>{i + 1 + (page - 1) * 10}</td>
+                  <td>{i + 1 + (canceledPage - 1) * 10}</td>
                   <td>
-                    <a className="Blue">{res?.trip_number}</a>
+                    <a className="Blue">{res?.requestId}</a>
                   </td>
                   <td>
                     <a>
@@ -317,7 +319,11 @@ const Canceled = ({ categoryId }) => {
                   </td>
                   <td>
                     <div className="Actions">
-                      <Link to="canceldetail" className="Blue" state={res}>
+                      <Link
+                        to="canceldetail"
+                        className="Blue"
+                        state={{ ...res, type: "Cancelled" }}
+                      >
                         <i className="fa fa-info-circle" aria-hidden="true" />
                       </Link>
                       {/* <span className="Orange">
@@ -346,7 +352,7 @@ const Canceled = ({ categoryId }) => {
         <div className="PaginationRight">
           {canceledBookingList?.result?.[0]?.totalCount?.[0]?.count > 0 && (
             <CommonPagination
-              activePage={page}
+              activePage={canceledPage}
               itemsCountPerPage={10}
               totalItemsCount={
                 canceledBookingList?.result?.[0]?.totalCount?.[0]?.count || 0

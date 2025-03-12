@@ -13,6 +13,8 @@ const initialState = {
   type: false,
   showBookingSummary: false,
   loading: false,
+  ilinePage:1,
+  p2pPage:1,
 };
 export const fetchAllDriverList = createAsyncThunk(
   "get/AllDriverList",
@@ -220,6 +222,12 @@ const allDriver = createSlice({
     bookingSummaryType: (state, action) => {
       state.showBookingSummary = action.payload;
     },
+    handleIlinePage: (state, action) => {
+      state.ilinePage = action.payload;
+    },
+    handleP2pPage: (state, action) => {
+      state.p2pPage = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(fetchILineDriverList.pending, (state, action) => {
@@ -314,5 +322,6 @@ const allDriver = createSlice({
     });
   },
 });
-export const { driverType, bookingSummaryType } = allDriver.actions;
+export const { driverType, bookingSummaryType, handleIlinePage, handleP2pPage } =
+  allDriver.actions;
 export default allDriver.reducer;

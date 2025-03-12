@@ -68,7 +68,7 @@ const TwoWheller = () => {
                 className={canceled ? "nav-link active" : "nav-link"}
                 onClick={() => handleActiveTab("canceled")}
               >
-                Canceled
+                Cancelled
               </a>
             </li>
           </ul>

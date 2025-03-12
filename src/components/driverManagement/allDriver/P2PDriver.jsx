@@ -5,6 +5,7 @@ import {
   driverStatus,
   fetchAllP2pDriverList,
   fetchP2pDriverList,
+  handleP2pPage,
 } from "../../../features/slices/DriverManagement/allDriver/allDriverReducer";
 import { toastService } from "../../../utils/toastify";
 import moment from "moment";
@@ -13,7 +14,6 @@ import { canPerformAction } from "../../../utils/deniedAccess";
 import DeleteModal from "../../DeleteModal";
 import ExportToExcel from "../../ExportToExcel";
 const initialState = {
-  page: 1,
   search: "",
   startDate: "",
   endDate: "",
@@ -23,8 +23,7 @@ const initialState = {
 };
 const P2PDriver = () => {
   const [iState, setUpdateState] = useState(initialState);
-  const { page, search, startDate, endDate, timeframe, deleteModal, id } =
-    iState;
+  const { search, startDate, endDate, timeframe, deleteModal, id } = iState;
   const dispatch = useDispatch();
   const iLineRef = useRef();
   const [allData, setAllData] = useState([]);
@@ -42,30 +41,33 @@ const P2PDriver = () => {
         setAllData(res?.payload);
       }
     });
-  }, [timeframe, page, endDate, search, startDate]);
-  const { p2pDriverList } = useSelector((state) => {
+  }, [timeframe, endDate, search, startDate]);
+  const { p2pDriverList, p2pPage } = useSelector((state) => {
     return state?.driverManagementAllDrivers;
   });
   console.log({ p2pDriverList });
 
   useEffect(() => {
-    dispatch(fetchP2pDriverList({ page, timeframe }));
-  }, [ ]);
+    dispatch(fetchP2pDriverList({ page: p2pPage, timeframe }));
+  }, []);
   useEffect(() => {
     const delayDebounceFunc = setTimeout(() => {
-      dispatch(
-        fetchP2pDriverList({
-          search: search.trim(),
-          timeframe,
-        })
-      );
+      if (search || timeframe) {
+        dispatch(
+          fetchP2pDriverList({
+            search: search.trim(),
+            timeframe,
+          })
+        );
+         dispatch(handleP2pPage(1));
+      }
     }, 1000);
 
     return () => clearTimeout(delayDebounceFunc);
   }, [search, timeframe, dispatch]);
 
   const handlePageChange = (page) => {
-    setUpdateState({ ...iState, page });
+    dispatch(handleP2pPage(page));
     dispatch(fetchP2pDriverList({ page, startDate, endDate, timeframe }));
   };
   const handleChecked = (e, id) => {
@@ -75,7 +77,7 @@ const P2PDriver = () => {
     dispatch(driverStatus(data)).then((res) => {
       if (res?.payload?.code == 200) {
         toastService.success("Status updated successfully");
-        dispatch(fetchP2pDriverList({ page }));
+        dispatch(fetchP2pDriverList({ page: p2pPage }));
       } else {
         toastService.error("status update failed");
       }
@@ -86,6 +88,7 @@ const P2PDriver = () => {
   };
   const handleReset = () => {
     setUpdateState(initialState);
+    dispatch(handleP2pPage(1));
     dispatch(fetchP2pDriverList({ page: 1 }));
   };
   const handleApply = () => {
@@ -93,8 +96,9 @@ const P2PDriver = () => {
       search,
       startDate,
       endDate,
-      page,
+      // page: p2pPage,
     };
+    dispatch(handleP2pPage(1));
     dispatch(fetchP2pDriverList(data));
   };
   const handleDelete = () => {
@@ -103,7 +107,7 @@ const P2PDriver = () => {
       console.log("status update api", res);
       if (res?.payload?.code == 200) {
         toastService.success("Delete successfully");
-        dispatch(fetchP2pDriverList({ page }));
+        dispatch(fetchP2pDriverList({ page: p2pPage }));
         hideDeleteModal();
       } else {
         toastService.error(" Delete failed");
@@ -226,7 +230,7 @@ const P2PDriver = () => {
                 {allData?.result?.[0]?.paginationData?.map((res, i) => {
                   return (
                     <tr>
-                      <td>{i + 1 + (page - 1) * 10}</td>
+                      <td>{i + 1 + (p2pPage - 1) * 10}</td>
                       <td>{res?.driver_number}</td>
                       <td>
                         <Link
@@ -326,7 +330,7 @@ const P2PDriver = () => {
                 {p2pDriverList?.result?.[0]?.paginationData?.map((res, i) => {
                   return (
                     <tr>
-                      <td>{i + 1 + (page - 1) * 10}</td>
+                      <td>{i + 1 + (p2pPage - 1) * 10}</td>
                       <td>{res?.driver_number}</td>
                       <td>
                         <Link
@@ -417,7 +421,7 @@ const P2PDriver = () => {
             <div className="PaginationRight">
               {p2pDriverList?.result?.[0]?.totalCount?.[0]?.count > 0 && (
                 <CommonPagination
-                  activePage={page}
+                  activePage={p2pPage}
                   itemsCountPerPage={10}
                   totalItemsCount={
                     p2pDriverList?.result?.[0]?.totalCount?.[0]?.count || 0

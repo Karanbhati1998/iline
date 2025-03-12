@@ -4,6 +4,7 @@ import {
   getAllPendingVehicleList,
   getIlineOrP2pVechileList,
   getPendingVehicleList,
+  handleVechileServicePage,
   pendingVehicleStatus,
   vehicleStatus,
 } from "../../../features/slices/vechileManagement/vechileManagement";
@@ -34,7 +35,6 @@ const PendingVechileTable = ({ categoryId }) => {
   const [imageModal, setImageModal] = useState(false);
   const [image, setImage] = useState("");
   const {
-    page,
     search,
     startDate,
     endDate,
@@ -63,36 +63,38 @@ const PendingVechileTable = ({ categoryId }) => {
         setAllData(res?.payload);
       }
     });
-  }, [timeframe, page, endDate, search, startDate]);
+  }, [timeframe, endDate, search, startDate]);
 
-  const { PendingVechileList } = useSelector((state) => {
+  const { PendingVechileList, vechileServicePage } = useSelector((state) => {
     return state?.vechile;
   });
   useEffect(() => {
     dispatch(
       getPendingVehicleList({
         categoryId,
-        page,
+        page: vechileServicePage,
         timeframe,
       })
     );
-  }, [ timeframe]);
+  }, [timeframe]);
   useEffect(() => {
     const delayDebounceFunc = setTimeout(() => {
-      dispatch(
-        getPendingVehicleList({
-          categoryId,
-          search: search.trim(),
-          timeframe,
-        })
-      );
+      if (search || timeframe) {
+        dispatch(
+          getPendingVehicleList({
+            categoryId,
+            search: search.trim(),
+            timeframe,
+          })
+        );
+      }
     }, 1000);
 
     return () => clearTimeout(delayDebounceFunc);
   }, [search, timeframe, dispatch]);
 
   const handlePageChange = (page) => {
-    setUpdateState({ ...iState, page });
+    dispatch(handleVechileServicePage(page));
     dispatch(
       getPendingVehicleList({ page, categoryId, timeframe, startDate, endDate })
     );
@@ -105,7 +107,9 @@ const PendingVechileTable = ({ categoryId }) => {
       console.log("status update api", res);
       if (res?.payload?.code == 200) {
         toastService.success("Status updated successfully");
-        dispatch(getPendingVehicleList({ page, categoryId }));
+        dispatch(
+          getPendingVehicleList({ page: vechileServicePage, categoryId })
+        );
       } else {
         toastService.error("status update failed");
       }
@@ -124,7 +128,7 @@ const PendingVechileTable = ({ categoryId }) => {
       startDate,
       endDate,
       categoryId,
-      page,
+      // page,
     };
     dispatch(getPendingVehicleList(data));
   };
@@ -152,7 +156,9 @@ const PendingVechileTable = ({ categoryId }) => {
       if (res?.payload?.code == 200) {
         toastService.success("Delete successfully");
         setUpdateState({ ...iState, deleteModal: false, id: "" });
-        dispatch(getPendingVehicleList({ page, categoryId }));
+        dispatch(
+          getPendingVehicleList({ page: vechileServicePage, categoryId })
+        );
       } else {
         toastService.error("Delete failed");
       }
@@ -270,7 +276,7 @@ const PendingVechileTable = ({ categoryId }) => {
                 {allData?.result?.[0]?.paginationData?.map((res, i) => {
                   return (
                     <tr>
-                      <td>{i + 1 + (page - 1) * 10}</td>
+                      <td>{i + 1 + (vechileServicePage - 1) * 10}</td>
                       <td>{res?.vehicleNumber}</td>
                       <td>{res?.vehicleNumberPlate}</td>
 
@@ -376,7 +382,7 @@ const PendingVechileTable = ({ categoryId }) => {
                   (res, i) => {
                     return (
                       <tr>
-                        <td>{i + 1 + (page - 1) * 10}</td>
+                        <td>{i + 1 + (vechileServicePage - 1) * 10}</td>
                         <td>{res?.vehicleNumber}</td>
                         <td>{res?.vehicleNumberPlate}</td>
 
@@ -474,11 +480,10 @@ const PendingVechileTable = ({ categoryId }) => {
                 </span>
               </p>
             </div>
-
             <div className="PaginationRight">
               {PendingVechileList?.result?.[0]?.totalCount?.[0]?.count > 0 && (
                 <CommonPagination
-                  activePage={page}
+                  activePage={vechileServicePage}
                   itemsCountPerPage={10}
                   totalItemsCount={
                     PendingVechileList?.result?.[0]?.totalCount?.[0]?.count || 0

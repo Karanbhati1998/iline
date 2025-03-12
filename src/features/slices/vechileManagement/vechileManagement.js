@@ -8,6 +8,13 @@ const initialState = {
   vehicleHistory: [],
   loading: false,
   error: null,
+  page: 1,
+  vechileServicePage: 1,
+  catId: {
+    catType: "",
+    id: "",
+  },
+  pendingVechileTable:false,
 };
 export const getAllIlineOrP2pVechileList = createAsyncThunk(
   "get/allilineOrP2pVechileList",
@@ -200,6 +207,22 @@ export const deleteVehicleHistory = createAsyncThunk(
 const vechileSlice = createSlice({
   name: "vechileCategory",
   initialState: initialState,
+  reducers: {
+    handlePage: (state, action) => {
+      state.page = action.payload;
+    },
+    handleVechileServicePage: (state, action) => {
+      state.vechileServicePage = action.payload;
+    },
+    handleCatId: (state, action) => {
+      state.catId = action.payload;
+
+    },
+    handlePendingVechileTable: (state, action) => {
+      state.pendingVechileTable = action.payload;
+
+    }
+  },
   extraReducers: (builder) => {
     builder.addCase(getIlineOrP2pVechileList.pending, (state, action) => {
       state.loading = true;
@@ -253,4 +276,10 @@ const vechileSlice = createSlice({
     });
   },
 });
+export const {
+  handlePage,
+  handleVechileServicePage,
+  handleCatId,
+  handlePendingVechileTable,
+} = vechileSlice.actions;
 export default vechileSlice.reducer;

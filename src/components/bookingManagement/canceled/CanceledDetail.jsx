@@ -18,7 +18,7 @@ const CanceledDetail = () => {
         <div className="Small-Wrapper">
           <div className="DriverCountList">
             <div className="OrderHeader">
-              <h1> Booking Details</h1>
+              <h1> {state?.type} Booking Details</h1>
               <p>
                 {state?.scheduledDate} {"  ,"}
                 {state?.scheduledTime} • ID: {state?.trip_number}
@@ -30,7 +30,11 @@ const CanceledDetail = () => {
                   Driver Details{" "}
                   <span> #{state?.driverData?.driver_number}</span>
                 </h2>
-                <a href="driver-management-all-driver-details.html">
+                <a
+                  style={{
+                    cursor: "auto",
+                  }}
+                >
                   <span className="Icon">
                     <img
                       src={
@@ -53,7 +57,11 @@ const CanceledDetail = () => {
                 <h2>
                   Customer Details<span> #{state?.userData?.user_number}</span>
                 </h2>
-                <a href="driver-management-all-driver-details.html">
+                <a
+                  style={{
+                    cursor: "auto",
+                  }}
+                >
                   <span className="Icon">
                     <img
                       src={
@@ -71,7 +79,11 @@ const CanceledDetail = () => {
               </li>
               <li>
                 <h2>Pick Up Location</h2>
-                <a href="driver-management-all-driver-details.html">
+                <a
+                  style={{
+                    cursor: "auto",
+                  }}
+                >
                   <span className="Icon">
                     <img
                       src={require("../../../assets/images/locationIcon.png")}
@@ -88,7 +100,11 @@ const CanceledDetail = () => {
               </li>
               <li>
                 <h2>Drop Location</h2>
-                <a href="driver-management-all-driver-details.html">
+                <a
+                  style={{
+                    cursor: "auto",
+                  }}
+                >
                   <span className="Icon">
                     <img
                       src={require("../../../assets/images/locationIcon.png")}
@@ -105,7 +121,11 @@ const CanceledDetail = () => {
               </li>
               <li>
                 <h2>Sender Details</h2>
-                <a href="driver-management-all-driver-details.html">
+                <a
+                  style={{
+                    cursor: "auto",
+                  }}
+                >
                   <span className="Icon">
                     <img src={require("../../../assets/images/Driver.png")} />
                   </span>
@@ -119,7 +139,11 @@ const CanceledDetail = () => {
               </li>
               <li>
                 <h2>Receiver Details</h2>
-                <a href="driver-management-all-driver-details.html">
+                <a
+                  style={{
+                    cursor: "auto",
+                  }}
+                >
                   <span className="Icon">
                     <img src={require("../../../assets/images/Driver.png")} />
                   </span>
@@ -135,7 +159,11 @@ const CanceledDetail = () => {
                   Vehicle Details{" "}
                   <span> {state?.vehicleData?.vehicleNumber}</span>
                 </h2>
-                <a href="driver-management-all-driver-details.html">
+                <a
+                  style={{
+                    cursor: "auto",
+                  }}
+                >
                   <span className="Icon">
                     <img src={state?.vehicleData?.vehicleFrontImage} />
                   </span>
@@ -153,7 +181,7 @@ const CanceledDetail = () => {
                       <aside>
                         <p>
                           <strong>Package Type </strong>{" "}
-                          <span>Standard Package</span>
+                          <span>{state?.packageType}</span>
                         </p>
                         <p>
                           <strong> Weight</strong>
@@ -258,10 +286,12 @@ const CanceledDetail = () => {
                         <strong>GST (5%)</strong>
                         <span> Rs {state?.gstCharge}</span>
                       </p>
-                      {/* <p>
-                        <strong>Coupon Discount</strong>
-                        <span> -Rs -</span>
-                      </p> */}
+                      <p>
+                        <strong>Distance</strong>{" "}
+                        <span>
+                          {state?.distance ? state.distance + " km" : "-"}
+                        </span>
+                      </p>
                     </aside>
                   </article>
                 </div>

@@ -4,6 +4,7 @@ import {
   getAllServiceBasedVehicleList,
   getIlineOrP2pVechileList,
   getServiceBasedVehicleList,
+  handleVechileServicePage,
   vehicleStatus,
 } from "../../../features/slices/vechileManagement/vechileManagement";
 import { Link, useLocation } from "react-router-dom";
@@ -15,7 +16,6 @@ import DeleteModal from "../../DeleteModal";
 import { canPerformAction } from "../../../utils/deniedAccess";
 import ExportToExcel from "../../ExportToExcel";
 const initialState = {
-  page: 1,
   search: "",
   startDate: "",
   endDate: "",
@@ -26,8 +26,7 @@ const initialState = {
 };
 const DeliverTable = () => {
   const [iState, setUpdateState] = useState(initialState);
-  const { page, search, startDate, endDate, timeframe, deleteModal, id } =
-    iState;
+  const { search, startDate, endDate, timeframe, deleteModal, id } = iState;
   const dispatch = useDispatch();
   const { state } = useLocation();
   const vechileService = useRef();
@@ -50,11 +49,13 @@ const DeliverTable = () => {
         }
       });
     }
-  }, [timeframe, page, endDate, search, startDate]);
+  }, [timeframe, endDate, search, startDate]);
 
-  const { serviceBasedVehicleList } = useSelector((state) => {
-    return state?.vechile;
-  });
+  const { serviceBasedVehicleList, vechileServicePage } = useSelector(
+    (state) => {
+      return state?.vechile;
+    }
+  );
 
   console.log({ serviceBasedVehicleList });
   console.log({ state });
@@ -65,7 +66,7 @@ const DeliverTable = () => {
         getServiceBasedVehicleList({
           serviceType: state?.type,
           categoryId: state?.ind,
-          page,
+          page: vechileServicePage,
           timeframe,
         })
       );
@@ -73,21 +74,23 @@ const DeliverTable = () => {
   }, [state, timeframe]);
   useEffect(() => {
     const delayDebounceFunc = setTimeout(() => {
-      dispatch(
-        getServiceBasedVehicleList({
-          search: search.trim(),
-          timeframe,
-          serviceType: state?.type,
-          categoryId: state?.ind,
-        })
-      );
+      if (search || timeframe) {
+        dispatch(
+          getServiceBasedVehicleList({
+            search: search.trim(),
+            timeframe,
+            serviceType: state?.type,
+            categoryId: state?.ind,
+          })
+        );
+      }
     }, 1000);
 
     return () => clearTimeout(delayDebounceFunc);
   }, [search, timeframe, dispatch]);
 
   const handlePageChange = (page) => {
-    setUpdateState({ ...iState, page });
+    dispatch(handleVechileServicePage(page));
     dispatch(
       getServiceBasedVehicleList({
         serviceType: state?.type,
@@ -111,7 +114,7 @@ const DeliverTable = () => {
           getServiceBasedVehicleList({
             serviceType: state?.type,
             categoryId: state?.ind,
-            page,
+            page: vechileServicePage,
           })
         );
       } else {
@@ -137,7 +140,7 @@ const DeliverTable = () => {
       search,
       startDate,
       endDate,
-      page,
+      // page,
       serviceType: state?.type,
       categoryId: state?.ind,
     };
@@ -155,7 +158,7 @@ const DeliverTable = () => {
           getServiceBasedVehicleList({
             serviceType: state?.type,
             categoryId: state?.ind,
-            page,
+            page: vechileServicePage,
           })
         );
       } else {
@@ -285,7 +288,7 @@ const DeliverTable = () => {
                       {allData?.result?.[0]?.paginationData?.map((res, i) => {
                         return (
                           <tr key={res?._id}>
-                            <td>{i + 1 + (page - 1) * 10}</td>
+                            <td>{i + 1 + (vechileServicePage - 1) * 10}</td>
                             <td>{res?.vehicleNumber}</td>
                             <td>{res?.vehicleNumberPlate}</td>
 
@@ -399,7 +402,7 @@ const DeliverTable = () => {
                         (res, i) => {
                           return (
                             <tr key={res?._id}>
-                              <td>{i + 1 + (page - 1) * 10}</td>
+                              <td>{i + 1 + (vechileServicePage - 1) * 10}</td>
                               <td>{res?.vehicleNumber}</td>
                               <td>{res?.vehicleNumberPlate}</td>
 
@@ -509,7 +512,7 @@ const DeliverTable = () => {
                     {serviceBasedVehicleList?.result?.[0]?.totalCount?.[0]
                       ?.count > 0 && (
                       <CommonPagination
-                        activePage={page}
+                        activePage={vechileServicePage}
                         itemsCountPerPage={10}
                         totalItemsCount={
                           serviceBasedVehicleList?.result?.[0]?.totalCount?.[0]

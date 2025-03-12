@@ -14,6 +14,9 @@ const initialState = {
   },
   loading: false,
   error: null,
+  ongoingPage: 1,
+  completedPage: 1,
+  canceledPage: 1,
 };
 
 export const getOngoingBookingList = createAsyncThunk(
@@ -136,6 +139,15 @@ const bookingManagementSlice = createSlice({
     activeTabFunc: (state, action) => {
       state.activeBookingTab = action.payload;
     },
+    handleOnGoingPage: (state, action) => {
+      state.ongoingPage = action.payload;
+    },
+    handleCompletedPage: (state, action) => {
+      state.completedPage = action.payload;
+    },
+    handleCanceledPage: (state, action) => {
+      state.canceledPage = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -185,5 +197,10 @@ const bookingManagementSlice = createSlice({
       });
   },
 });
-export const { activeTabFunc } = bookingManagementSlice.actions;
+export const {
+  activeTabFunc,
+  handleOnGoingPage,
+  handleCompletedPage,
+  handleCanceledPage,
+} = bookingManagementSlice.actions;
 export default bookingManagementSlice.reducer;

@@ -4,10 +4,9 @@ import { blogStatus, getBlogList } from "../../features/slices/blogSlice";
 import { toastService } from "../../utils/toastify";
 import moment from "moment";
 import CommonPagination from "../../components/CommonPagination";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { canPerformAction } from "../../utils/deniedAccess";
 const initialState = {
-  page: 1,
   search: "",
   startDate: "",
   endDate: "",
@@ -16,7 +15,9 @@ const initialState = {
 };
 const BlogManagement = () => {
   const [iState, setUpdateState] = useState(initialState);
-  const { page, search, startDate, endDate, timeframe } = iState;
+  const [searchParams, setSearchParams] = useSearchParams();
+  const page = parseInt(searchParams.get("page")) || 1;
+  const { search, startDate, endDate, timeframe } = iState;
   const dispatch = useDispatch();
   const { blog } = useSelector((state) => {
     return state?.blog;
@@ -26,19 +27,21 @@ const BlogManagement = () => {
   }, [timeframe]);
   useEffect(() => {
     const delayDebounceFunc = setTimeout(() => {
-      dispatch(
-        getBlogList({
-          search: search.trim(),
-          timeframe,
-        })
-      );
+      if (search || timeframe) {
+        dispatch(
+          getBlogList({
+            search: search.trim(),
+            timeframe,
+          })
+        );
+      }
     }, 1000);
 
     return () => clearTimeout(delayDebounceFunc);
   }, [search, timeframe, dispatch]);
 
   const handlePageChange = (page) => {
-    setUpdateState({ ...iState, page });
+    setSearchParams({ page });
     dispatch(getBlogList({ page, timeframe, startDate, endDate, search }));
   };
   const handleChecked = (e, id) => {

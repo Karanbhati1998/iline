@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import {
   getAllUserList,
   userList,
@@ -12,7 +12,7 @@ import { toastService } from "../../utils/toastify";
 import ExportToExcel from "../../components/ExportToExcel";
 import { canPerformAction } from "../../utils/deniedAccess";
 const initialState = {
-  page: 1,
+  // page: 1,
   search: "",
   startDate: "",
   endDate: "",
@@ -20,7 +20,11 @@ const initialState = {
 };
 const UserManagement = () => {
   const [iState, setUpdateState] = useState(initialState);
-  const { page, search, startDate, endDate, timeframe } = iState;
+    const [searchParams, setSearchParams] = useSearchParams();
+    const page = parseInt(searchParams.get("page")) || 1;
+  const {
+    //  page,
+     search, startDate, endDate, timeframe } = iState;
   const dispatch = useDispatch();
   const { users } = useSelector((state) => {
     return state?.userManagement;
@@ -47,19 +51,21 @@ const UserManagement = () => {
   }, []);
   useEffect(() => {
     const delayDebounceFunc = setTimeout(() => {
+       if (search || timeframe) {
       dispatch(
         userList({
           search: search.trim(),
           timeframe,
         })
       );
+    }
     }, 1000);
 
     return () => clearTimeout(delayDebounceFunc);
   }, [search, timeframe, dispatch]);
 
   const handlePageChange = (page) => {
-    setUpdateState({ ...iState, page });
+    setSearchParams({ page });
     dispatch(userList({ page, startDate, endDate, timeframe }));
   };
   const handleChecked = (e, id) => {

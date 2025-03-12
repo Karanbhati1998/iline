@@ -3,12 +3,12 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   getTotalRevenueList,
   getTotalRevenueListDownload,
+  handleTotalRevenuePage,
 } from "../../features/slices/payment";
 import { Link, useLocation } from "react-router-dom";
 import CommonPagination from "../CommonPagination";
 import ExportToExcel from "../ExportToExcel";
 const initialState = {
-  page: 1,
   search: "",
   startDate: "",
   endDate: "",
@@ -19,7 +19,7 @@ const initialState = {
 };
 const TotalRevenueTab = ({ categoryId }) => {
   const [iState, setUpdateState] = useState(initialState);
-  const { page, search, startDate, endDate, timeframe, id } = iState;
+  const { search, startDate, endDate, timeframe, id } = iState;
   const dispatch = useDispatch();
   const { state } = useLocation();
   const paymentRef = useRef();
@@ -41,8 +41,8 @@ const TotalRevenueTab = ({ categoryId }) => {
         }
       });
     }
-  }, [timeframe, page, endDate, search, startDate, categoryId]);
-  const { totalRevenueList } = useSelector((state) => {
+  }, [timeframe, endDate, search, startDate, categoryId]);
+  const { totalRevenueList, totalRevenuePage } = useSelector((state) => {
     return state?.payment;
   });
 
@@ -52,27 +52,30 @@ const TotalRevenueTab = ({ categoryId }) => {
       dispatch(
         getTotalRevenueList({
           categoryId,
-          page,
+          page: totalRevenuePage,
         })
       );
     }
   }, [categoryId]);
   useEffect(() => {
     const delayDebounceFunc = setTimeout(() => {
-      dispatch(
-        getTotalRevenueList({
-          categoryId,
-          search: search.trim(),
-          timeframe,
-        })
-      );
+      if (search || timeframe) {
+        dispatch(
+          getTotalRevenueList({
+            categoryId,
+            search: search.trim(),
+            timeframe,
+          })
+        );
+      }
     }, 1000);
 
     return () => clearTimeout(delayDebounceFunc);
   }, [search, timeframe, dispatch, categoryId]);
-
+  console.log({ totalRevenuePage });
+  
   const handlePageChange = (page) => {
-    setUpdateState({ ...iState, page });
+      dispatch(handleTotalRevenuePage(page));
     dispatch(
       getTotalRevenueList({ categoryId, page, timeframe, startDate, endDate })
     );
@@ -90,7 +93,7 @@ const TotalRevenueTab = ({ categoryId }) => {
       search,
       startDate,
       endDate,
-      page,
+      // page,
       categoryId,
     };
     dispatch(getTotalRevenueList(data));
@@ -194,7 +197,7 @@ const TotalRevenueTab = ({ categoryId }) => {
                 {allData?.result?.[0]?.paginationData?.map((res, i) => {
                   return (
                     <tr>
-                      <td>{i + 1 + (page - 1) * 10}</td>
+                      <td>{i + 1 + (totalRevenuePage - 1) * 10}</td>
                       <td>
                         <a
                           className="Blue"
@@ -279,7 +282,7 @@ const TotalRevenueTab = ({ categoryId }) => {
                   (res, i) => {
                     return (
                       <tr>
-                        <td>{i + 1 + (page - 1) * 10}</td>
+                        <td>{i + 1 + (totalRevenuePage - 1) * 10}</td>
                         <td>
                           <a
                             className="Blue"
@@ -355,7 +358,7 @@ const TotalRevenueTab = ({ categoryId }) => {
             <div className="PaginationRight">
               {totalRevenueList?.result?.[0]?.totalCount?.[0]?.count > 0 && (
                 <CommonPagination
-                  activePage={page}
+                  activePage={totalRevenuePage}
                   itemsCountPerPage={10}
                   totalItemsCount={
                     totalRevenueList?.result?.[0]?.totalCount?.[0]?.count || 0

@@ -11,24 +11,27 @@ import { canPerformAction } from "../../../../../utils/deniedAccess";
 import ZoomEffect from "../../../../ZoomEffect";
 
 const ProfileSummary = ({ state }) => {
-  const [status, setStatus] = useState();
+  const [statu, setStatus] = useState(false);
     const [imageModal, setImageModal] = useState(false);
     const [image, setImage] = useState("");
   const dispatch = useDispatch();
   console.log({ state });
   useEffect(() => {
-    setStatus(state?.userStatus);
+    const dataStatus = state?.userStatus == "ACTIVE"?true : false;
+    setStatus(dataStatus);
   }, [state]);
   console.log({ state });
   const handleChecked = (e, id) => {
     const { name, checked } = e?.target;
     const status = checked ? "ACTIVE" : "INACTIVE";
+    console.log({ status });
+    
     const data = { id, status };
     dispatch(driverStatus(data)).then((res) => {
       if (res?.payload?.code == 200) {
         toastService.success("Status updated successfully");
         setStatus(checked);
-        dispatch(fetchP2pDriverList({ page: 1 }));
+        // dispatch(fetchP2pDriverList({ page: 1 }));
       } else {
         toastService.error("status update failed");
       }
@@ -76,7 +79,7 @@ const ProfileSummary = ({ state }) => {
      setImageModal(false);
      setImage("");
    };
-  console.log({ location });
+  console.log({ statu });
   return (
     <>
       <div className="tab-content">
@@ -110,7 +113,7 @@ const ProfileSummary = ({ state }) => {
                     <label className="Switch">
                       <input
                         type="checkbox"
-                        checked={status}
+                        checked={statu }
                         onChange={(e) => handleChecked(e, state?._id)}
                       />
                       <span className="slider" />

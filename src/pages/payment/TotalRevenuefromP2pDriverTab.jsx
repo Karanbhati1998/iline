@@ -3,12 +3,12 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   getP2pRevenueList,
   getP2pRevenueListDownload,
+  handleTotalRevenueP2pPage,
 } from "../../features/slices/payment";
 import { Link, useLocation } from "react-router-dom";
 import CommonPagination from "../../components/CommonPagination";
 import ExportToExcel from "../../components/ExportToExcel";
 const initialState = {
-  page: 1,
   search: "",
   startDate: "",
   endDate: "",
@@ -19,7 +19,7 @@ const initialState = {
 };
 const TotalRevenuefromP2pDriverTab = ({ categoryId }) => {
   const [iState, setUpdateState] = useState(initialState);
-  const { page, search, startDate, endDate, timeframe, id } = iState;
+  const { search, startDate, endDate, timeframe, id } = iState;
   const dispatch = useDispatch();
   const { state } = useLocation();
   const totalRevenueP2pRef = useRef();
@@ -42,8 +42,8 @@ const TotalRevenuefromP2pDriverTab = ({ categoryId }) => {
         }
       });
     }
-  }, [timeframe, page, endDate, search, startDate, categoryId]);
-  const { p2pRevenueList } = useSelector((state) => {
+  }, [timeframe, endDate, search, startDate, categoryId]);
+  const { p2pRevenueList, totalRevenueP2pPage } = useSelector((state) => {
     return state?.payment;
   });
 
@@ -54,28 +54,30 @@ const TotalRevenuefromP2pDriverTab = ({ categoryId }) => {
         getP2pRevenueList({
           categoryId,
           revenueType: "ILINE",
-          page,
+          page: totalRevenueP2pPage,
         })
       );
     }
-  }, [ categoryId]);
+  }, [categoryId]);
   useEffect(() => {
     const delayDebounceFunc = setTimeout(() => {
-      dispatch(
-        getP2pRevenueList({
-          categoryId,
-          revenueType: "ILINE",
-          search: search.trim(),
-          timeframe,
-        })
-      );
+      if (search || timeframe) {
+        dispatch(
+          getP2pRevenueList({
+            categoryId,
+            revenueType: "ILINE",
+            search: search.trim(),
+            timeframe,
+          })
+        );
+      }
     }, 1000);
 
     return () => clearTimeout(delayDebounceFunc);
   }, [search, timeframe, dispatch, categoryId]);
 
   const handlePageChange = (page) => {
-    setUpdateState({ ...iState, page });
+     dispatch(handleTotalRevenueP2pPage(page));
     dispatch(
       getP2pRevenueList({
         categoryId,
@@ -100,7 +102,7 @@ const TotalRevenuefromP2pDriverTab = ({ categoryId }) => {
       search,
       startDate,
       endDate,
-      page,
+      // page,
       categoryId,
       revenueType: "ILINE",
     };
@@ -209,7 +211,7 @@ const TotalRevenuefromP2pDriverTab = ({ categoryId }) => {
                 {allData?.result?.[0]?.paginationData?.map((res, i) => {
                   return (
                     <tr>
-                      <td>{i + 1 + (page - 1) * 10}</td>
+                      <td>{i + 1 + (totalRevenueP2pPage - 1) * 10}</td>
                       <td>
                         <a
                           className="Blue"
@@ -286,7 +288,7 @@ const TotalRevenuefromP2pDriverTab = ({ categoryId }) => {
                 {p2pRevenueList?.result?.[0]?.paginationData?.map((res, i) => {
                   return (
                     <tr>
-                      <td>{i + 1 + (page - 1) * 10}</td>
+                      <td>{i + 1 + (totalRevenueP2pPage - 1) * 10}</td>
                       <td>
                         <a
                           className="Blue"
@@ -351,7 +353,7 @@ const TotalRevenuefromP2pDriverTab = ({ categoryId }) => {
             <div className="PaginationRight">
               {p2pRevenueList?.result?.[0]?.totalCount?.[0]?.count > 0 && (
                 <CommonPagination
-                  activePage={page}
+                  activePage={totalRevenueP2pPage}
                   itemsCountPerPage={10}
                   totalItemsCount={
                     p2pRevenueList?.result?.[0]?.totalCount?.[0]?.count || 0

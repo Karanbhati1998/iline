@@ -13,7 +13,8 @@ const PersonalDetail = ({ state }) => {
   const dispatch = useDispatch();
   console.log({ state });
   useEffect(() => {
-    setStatus(state?.userStatus);
+    const dataStatus = state?.userStatus == "ACTIVE" ? true : false;
+    setStatus(dataStatus);
   }, [state]);
   const handleChecked = (e, id) => {
     const { name, checked } = e?.target;
@@ -23,7 +24,7 @@ const PersonalDetail = ({ state }) => {
       if (res?.payload?.code == 200) {
         toastService.success("Status updated successfully");
         setStatus(checked);
-        dispatch(userList());
+        // dispatch(userList());
       } else {
         toastService.error("status update failed");
       }

@@ -3,10 +3,12 @@ import axiosInstance from "../axiosInstance";
 
 const initialState = {
   subAdmin: [],
-  role:[],
-  activeSubadminTab:false,
+  role: [],
+  activeSubadminTab: false,
   loading: false,
   error: null,
+  subAdminPage: 1,
+  rolePage: 1,
 };
 
 export const getSubAdminList = createAsyncThunk(
@@ -61,7 +63,6 @@ export const editSubAdmin = createAsyncThunk(
     }
   }
 );
-
 
 export const getRoleList = createAsyncThunk(
   "get/role",
@@ -123,6 +124,12 @@ const subAdminSlice = createSlice({
     activeSubadminTabFunc: (state, action) => {
       state.activeSubadminTab = action.payload;
     },
+    handleSubAdminPage: (state, action) => {
+      state.subAdminPage = action.payload;
+    },
+    handleRolePage: (state, action) => {
+      state.rolePage = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(getSubAdminList.pending, (state) => {
@@ -149,5 +156,6 @@ const subAdminSlice = createSlice({
     });
   },
 });
-export const { activeSubadminTabFunc } = subAdminSlice.actions;
+export const { activeSubadminTabFunc, handleSubAdminPage, handleRolePage } =
+  subAdminSlice.actions;
 export default subAdminSlice.reducer;
