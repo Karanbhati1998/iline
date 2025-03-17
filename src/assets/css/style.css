@@ -1824,3 +1824,6 @@ input[type="date"] {
   width: 100% !important;
   height: 100% !important;
 }
+.ZoomImageBox figure div img{
+    max-height: 275px;
+}

@@ -216,9 +216,12 @@ const Detail_ride = () => {
                           <strong> Unloading Time</strong>
                           <span>{state?.unloadingTime}</span>
                         </p>
-                        {/* <p>
-                          <strong> -</strong> -
-                        </p> */}
+                        <p>
+                          <strong> Distance</strong>
+                          <span>
+                            {state?.distance ? state.distance + " km" : "-"}
+                          </span>
+                        </p>
                       </aside>
                     </article>
                   </div>
